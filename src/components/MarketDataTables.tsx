@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -28,22 +28,31 @@ const MarketDataTables: React.FC = () => {
   const { data: marketMetrics, isLoading } = useQuery({
     queryKey: ["marketMetrics"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("market_metrics")
-        .select("*")
-        .order("timestamp", { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from("market_metrics")
+          .select("*")
+          .order("timestamp", { ascending: false });
 
-      if (error) {
-        console.error("Error fetching market metrics:", error);
+        if (error) {
+          console.error("Error fetching market metrics:", error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch market data. Please try again later.",
+            variant: "destructive",
+          });
+          throw error;
+        }
+
+        return data as MarketMetric[];
+      } catch (error) {
+        console.error("Error in query function:", error);
         throw error;
       }
-
-      return data as MarketMetric[];
     },
   });
 
-  // Set up real-time subscription
-  useEffect(() => {
+  React.useEffect(() => {
     const channel = supabase
       .channel("market-metrics-changes")
       .on(
@@ -68,14 +77,6 @@ const MarketDataTables: React.FC = () => {
     };
   }, [toast]);
 
-  const groupedMetrics = marketMetrics?.reduce((acc, metric) => {
-    if (!acc[metric.market_type]) {
-      acc[metric.market_type] = [];
-    }
-    acc[metric.market_type].push(metric);
-    return acc;
-  }, {} as Record<MarketMetric["market_type"], MarketMetric[]>);
-
   if (isLoading) {
     return (
       <div className="space-y-8">
@@ -85,6 +86,14 @@ const MarketDataTables: React.FC = () => {
       </div>
     );
   }
+
+  const groupedMetrics = marketMetrics?.reduce((acc, metric) => {
+    if (!acc[metric.market_type]) {
+      acc[metric.market_type] = [];
+    }
+    acc[metric.market_type].push(metric);
+    return acc;
+  }, {} as Record<MarketMetric["market_type"], MarketMetric[]>);
 
   return (
     <div className="space-y-8 py-8">

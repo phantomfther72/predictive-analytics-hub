@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -10,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 type MarketMetric = {
@@ -22,7 +22,7 @@ type MarketMetric = {
   source: string;
 };
 
-const MarketDataTables = () => {
+const MarketDataTables: React.FC = () => {
   const { toast } = useToast();
 
   const { data: marketMetrics, isLoading } = useQuery({

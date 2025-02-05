@@ -5,6 +5,7 @@ import Industries from "@/components/Industries";
 import Testimonials from "@/components/Testimonials";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
+import MarketDataTables from "@/components/MarketDataTables";
 
 const Index = () => {
   return (
@@ -12,6 +13,9 @@ const Index = () => {
       <Navbar />
       <Hero />
       <Features />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <MarketDataTables />
+      </div>
       <Industries />
       <Testimonials />
       <CTA />

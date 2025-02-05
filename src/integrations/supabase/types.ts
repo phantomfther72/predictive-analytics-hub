@@ -9,7 +9,84 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      market_metrics: {
+        Row: {
+          created_at: string | null
+          id: string
+          market_type: Database["public"]["Enums"]["market_type"]
+          metric_name: string
+          source: string
+          timestamp: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          market_type: Database["public"]["Enums"]["market_type"]
+          metric_name: string
+          source: string
+          timestamp?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          market_type?: Database["public"]["Enums"]["market_type"]
+          metric_name?: string
+          source?: string
+          timestamp?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
+      market_trends: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          description: string
+          end_date: string | null
+          id: string
+          market_type: Database["public"]["Enums"]["market_type"]
+          start_date: string
+          trend_name: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          description: string
+          end_date?: string | null
+          id?: string
+          market_type: Database["public"]["Enums"]["market_type"]
+          start_date: string
+          trend_name: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          description?: string
+          end_date?: string | null
+          id?: string
+          market_type?: Database["public"]["Enums"]["market_type"]
+          start_date?: string
+          trend_name?: string
+        }
+        Relationships: []
+      }
+      Mining: {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +95,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      market_type: "housing" | "agriculture" | "mining" | "cryptocurrency"
     }
     CompositeTypes: {
       [_ in never]: never

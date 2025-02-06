@@ -50,15 +50,40 @@ const App: React.FC = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
             <Route
-              path="/"
+              path="/real-time-tracking"
               element={
                 <PrivateRoute>
                   <Index />
                 </PrivateRoute>
               }
             />
-            <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/ai-predictions"
+              element={
+                <PrivateRoute>
+                  <Index />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/cross-sector"
+              element={
+                <PrivateRoute>
+                  <Index />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Index />
+                </PrivateRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -1,29 +1,30 @@
 import { Brain, LineChart, BarChart3, Layout } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const features = [
   {
     icon: LineChart,
     title: "Real-Time Data Tracking",
-    description:
-      "Monitor market movements as they happen with our advanced tracking system.",
+    description: "Monitor market movements as they happen with our advanced tracking system.",
+    link: "/real-time-tracking",
   },
   {
     icon: Brain,
     title: "AI-Driven Predictions",
-    description:
-      "Leverage machine learning algorithms to forecast market trends with precision.",
+    description: "Leverage machine learning algorithms to forecast market trends with precision.",
+    link: "/ai-predictions",
   },
   {
     icon: BarChart3,
     title: "Cross-Sector Analytics",
-    description:
-      "Analyze data across housing, agriculture, mining, and cryptocurrency markets.",
+    description: "Analyze data across housing, agriculture, mining, and cryptocurrency markets.",
+    link: "/cross-sector",
   },
   {
     icon: Layout,
     title: "User-Friendly Dashboard",
-    description:
-      "Access all your insights through our intuitive and customizable interface.",
+    description: "Access all your insights through our intuitive and customizable interface.",
+    link: "/dashboard",
   },
 ];
 
@@ -42,18 +43,21 @@ const Features = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
-            <div
+            <Link
               key={index}
-              className="relative group bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
+              to={feature.link}
+              className="group bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1"
             >
-              <div className="h-12 w-12 rounded-lg bg-slate-900 text-white flex items-center justify-center mb-6">
-                <feature.icon className="h-6 w-6" />
+              <div className="relative">
+                <div className="h-12 w-12 rounded-lg bg-slate-900 text-white flex items-center justify-center mb-6">
+                  <feature.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-slate-600">{feature.description}</p>
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-slate-600">{feature.description}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

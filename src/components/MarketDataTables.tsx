@@ -1,28 +1,12 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-
-type MarketMetric = {
-  id: string;
-  market_type: "housing" | "agriculture" | "mining" | "cryptocurrency";
-  metric_name: string;
-  value: number;
-  timestamp: string;
-  source: string;
-};
+import { MarketDataHeader } from "./market-data/MarketDataHeader";
+import { MarketDataTable } from "./market-data/MarketDataTable";
+import type { MarketMetric } from "@/types/market";
 
 const MarketDataTables: React.FC = () => {
   const { toast } = useToast();
@@ -94,19 +78,6 @@ const MarketDataTables: React.FC = () => {
     };
   }, [toast]);
 
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to sign out. Please try again.",
-        variant: "destructive",
-      });
-    } else {
-      navigate("/auth");
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-8">
@@ -127,47 +98,17 @@ const MarketDataTables: React.FC = () => {
 
   return (
     <div id="market-data" className="space-y-8 py-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold text-slate-900">Market Data</h2>
-        <Button variant="outline" onClick={handleSignOut}>
-          Sign Out
-        </Button>
-      </div>
+      <MarketDataHeader />
       {groupedMetrics &&
         (Object.entries(groupedMetrics) as [
           MarketMetric["market_type"],
           MarketMetric[]
         ][]).map(([marketType, metrics]) => (
-          <div key={marketType} className="rounded-lg border bg-card">
-            <Table>
-              <TableCaption>
-                Real-time {marketType.charAt(0).toUpperCase() + marketType.slice(1)}{" "}
-                Market Data
-              </TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Metric</TableHead>
-                  <TableHead>Value</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Last Updated</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {metrics.map((metric) => (
-                  <TableRow key={metric.id}>
-                    <TableCell className="font-medium">
-                      {metric.metric_name}
-                    </TableCell>
-                    <TableCell>{metric.value.toLocaleString()}</TableCell>
-                    <TableCell>{metric.source}</TableCell>
-                    <TableCell>
-                      {new Date(metric.timestamp).toLocaleString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <MarketDataTable
+            key={marketType}
+            marketType={marketType}
+            metrics={metrics}
+          />
         ))}
     </div>
   );

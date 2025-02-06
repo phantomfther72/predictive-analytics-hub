@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 type MarketMetric = {
   id: string;
@@ -24,11 +26,18 @@ type MarketMetric = {
 
 const MarketDataTables: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const { data: marketMetrics, isLoading } = useQuery({
     queryKey: ["marketMetrics"],
     queryFn: async () => {
       try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session.session) {
+          navigate("/auth");
+          return [];
+        }
+
         const { data, error } = await supabase
           .from("market_metrics")
           .select("*")
@@ -36,11 +45,19 @@ const MarketDataTables: React.FC = () => {
 
         if (error) {
           console.error("Error fetching market metrics:", error);
-          toast({
-            title: "Error",
-            description: "Failed to fetch market data. Please try again later.",
-            variant: "destructive",
-          });
+          if (error.code === "PGRST116") {
+            toast({
+              title: "Access Restricted",
+              description: "Upgrade to premium to view historical data.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: "Failed to fetch market data. Please try again later.",
+              variant: "destructive",
+            });
+          }
           throw error;
         }
 
@@ -77,6 +94,19 @@ const MarketDataTables: React.FC = () => {
     };
   }, [toast]);
 
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
+    } else {
+      navigate("/auth");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-8">
@@ -97,6 +127,11 @@ const MarketDataTables: React.FC = () => {
 
   return (
     <div className="space-y-8 py-8">
+      <div className="flex justify-end">
+        <Button variant="outline" onClick={handleSignOut}>
+          Sign Out
+        </Button>
+      </div>
       {groupedMetrics &&
         (Object.entries(groupedMetrics) as [
           MarketMetric["market_type"],

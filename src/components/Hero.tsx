@@ -87,6 +87,13 @@ const Hero = () => {
     };
   }, []);
 
+  const scrollToMarketData = () => {
+    const marketDataSection = document.querySelector('#market-data');
+    if (marketDataSection) {
+      marketDataSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <canvas
@@ -108,7 +115,10 @@ const Hero = () => {
             Harness AI-driven analytics to stay ahead in dynamic markets.
             Transform your market strategies with real-time data tracking.
           </p>
-          <button className="inline-flex items-center px-8 py-3 text-lg font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors">
+          <button 
+            onClick={scrollToMarketData}
+            className="inline-flex items-center px-8 py-3 text-lg font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors"
+          >
             Get Started Today
             <ArrowRight className="ml-2 h-5 w-5" />
           </button>

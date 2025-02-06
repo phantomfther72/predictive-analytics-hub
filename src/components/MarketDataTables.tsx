@@ -126,8 +126,9 @@ const MarketDataTables: React.FC = () => {
   }, {} as Record<MarketMetric["market_type"], MarketMetric[]>);
 
   return (
-    <div className="space-y-8 py-8">
-      <div className="flex justify-end">
+    <div id="market-data" className="space-y-8 py-8">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold text-slate-900">Market Data</h2>
         <Button variant="outline" onClick={handleSignOut}>
           Sign Out
         </Button>

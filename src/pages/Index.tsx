@@ -13,10 +13,10 @@ const Index: React.FC = () => {
     <div className="min-h-screen bg-white">
       <Navbar />
       <Hero />
-      <Features />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <MarketDataTables />
       </div>
+      <Features />
       <Industries />
       <Testimonials />
       <CTA />

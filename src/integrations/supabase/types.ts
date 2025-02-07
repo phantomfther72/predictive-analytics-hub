@@ -87,6 +87,50 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          status: Database["public"]["Enums"]["payment_status"]
+          stripe_client_secret: string | null
+          stripe_payment_intent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          status?: Database["public"]["Enums"]["payment_status"]
+          stripe_client_secret?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          status?: Database["public"]["Enums"]["payment_status"]
+          stripe_client_secret?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -138,6 +182,7 @@ export type Database = {
     }
     Enums: {
       market_type: "housing" | "agriculture" | "mining" | "cryptocurrency"
+      payment_status: "pending" | "success" | "failed"
       subscription_tier: "free" | "premium"
     }
     CompositeTypes: {

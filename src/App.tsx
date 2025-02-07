@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "./components/ui/use-toast";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,12 +22,25 @@ const queryClient = new QueryClient({
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = React.useState<boolean | null>(null);
+  const { toast } = useToast();
 
   React.useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Error checking session:", error);
+        toast({
+          title: "Session Error",
+          description: "Please sign in again",
+          variant: "destructive",
+        });
+        setSession(false);
+        return;
+      }
       setSession(!!session);
     });
 
+    // Subscribe to auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -34,7 +48,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [toast]);
 
   if (session === null) {
     return null; // Loading state

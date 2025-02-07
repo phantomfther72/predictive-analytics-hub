@@ -92,6 +92,10 @@ export type Database = {
           created_at: string | null
           email: string
           id: string
+          last_payment_status: string | null
+          stripe_customer_id: string | null
+          subscription_end_date: string | null
+          subscription_start_date: string | null
           subscription_tier:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
@@ -101,6 +105,10 @@ export type Database = {
           created_at?: string | null
           email: string
           id: string
+          last_payment_status?: string | null
+          stripe_customer_id?: string | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
@@ -110,6 +118,10 @@ export type Database = {
           created_at?: string | null
           email?: string
           id?: string
+          last_payment_status?: string | null
+          stripe_customer_id?: string | null
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null

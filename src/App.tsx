@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Dashboard from "./pages/Dashboard";
 import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient({
@@ -53,34 +54,10 @@ const App: React.FC = () => {
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route
-              path="/real-time-tracking"
+              path="/dashboard/*"
               element={
                 <PrivateRoute>
-                  <Index />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/ai-predictions"
-              element={
-                <PrivateRoute>
-                  <Index />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/cross-sector"
-              element={
-                <PrivateRoute>
-                  <Index />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <Index />
+                  <Dashboard />
                 </PrivateRoute>
               }
             />

@@ -1,6 +1,8 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export const DashboardProfile = () => {
   return (
@@ -22,7 +24,10 @@ export const DashboardProfile = () => {
           </div>
           <div className="grid gap-2">
             <label className="text-sm font-medium">Subscription Tier</label>
-            <p className="text-slate-600">Free</p>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">Free</Badge>
+              <span className="text-sm text-muted-foreground">- Basic access to market analytics</span>
+            </div>
           </div>
           <Button>Upgrade to Premium</Button>
         </CardContent>

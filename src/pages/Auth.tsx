@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,7 @@ const Auth = () => {
         return;
       }
       if (session) {
-        navigate("/dashboard");
+        navigate("/");
       }
     });
 
@@ -38,7 +39,7 @@ const Auth = () => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        navigate("/dashboard");
+        navigate("/");
       }
     });
 
@@ -81,7 +82,7 @@ const Auth = () => {
         password,
       });
       if (error) throw error;
-      navigate("/dashboard");
+      navigate("/");
     } catch (error: any) {
       toast({
         title: "Error",

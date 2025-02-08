@@ -41,6 +41,9 @@ serve(async (req) => {
       throw new Error('Stripe secret key not found in environment variables')
     }
 
+    // Log the first few characters of the key to verify its format (without exposing the full key)
+    console.log('Stripe key type:', stripeSecretKey.startsWith('sk_') ? 'Secret key' : 'Not a secret key')
+
     const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
       httpClient: Stripe.createFetchHttpClient(),

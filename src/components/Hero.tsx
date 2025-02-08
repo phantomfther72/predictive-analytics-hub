@@ -1,3 +1,4 @@
+
 import { useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 
@@ -95,29 +96,29 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden px-4">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
         style={{ zIndex: 0 }}
       />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="animate-fade-up">
-          <span className="inline-block px-4 py-1 mb-6 text-sm font-medium text-teal-500 bg-teal-50 rounded-full">
+        <div className="animate-fade-up space-y-6">
+          <span className="inline-block px-4 py-1 mb-4 text-sm font-medium text-teal-500 bg-teal-50 rounded-full">
             TotalEnergies Startup Challenge Top 100
           </span>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900">
             Empowering Financial Decisions
-            <br />
+            <br className="hidden sm:block" />
             with Predictive Insights
           </h1>
-          <p className="text-xl text-slate-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
             Harness AI-driven analytics to stay ahead in dynamic markets.
             Transform your market strategies with real-time data tracking.
           </p>
           <button 
             onClick={scrollToMarketData}
-            className="inline-flex items-center px-8 py-3 text-lg font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors"
+            className="inline-flex items-center px-6 sm:px-8 py-3 text-base sm:text-lg font-medium text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors"
           >
             Get Started Today
             <ArrowRight className="ml-2 h-5 w-5" />

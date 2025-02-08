@@ -17,7 +17,7 @@ const Dashboard = () => {
         <div className="flex-1 flex flex-col min-w-0">
           <DashboardHeader />
           <div className={cn(
-            "flex-1 transition-all duration-300",
+            "flex-1 py-6",
             isMobile ? "px-4" : "container"
           )}>
             <DashboardContent />

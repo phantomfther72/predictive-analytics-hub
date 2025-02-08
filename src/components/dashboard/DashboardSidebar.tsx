@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
 import {
@@ -9,8 +10,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { LayoutDashboard, LineChart, Table, User } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const menuItems = [
   {
@@ -37,9 +40,17 @@ const menuItems = [
 
 export const DashboardSidebar = () => {
   const location = useLocation();
+  const isMobile = useIsMobile();
+  const { isOpen, close } = useSidebar();
+
+  const handleNavigate = () => {
+    if (isMobile) {
+      close();
+    }
+  };
 
   return (
-    <Sidebar>
+    <Sidebar defaultCollapsed={isMobile}>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
@@ -50,6 +61,7 @@ export const DashboardSidebar = () => {
                   <SidebarMenuButton
                     asChild
                     isActive={location.pathname === item.path}
+                    onClick={handleNavigate}
                   >
                     <Link to={item.path} className="flex items-center gap-2">
                       <item.icon className="h-4 w-4" />

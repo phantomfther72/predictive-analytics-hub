@@ -14,11 +14,13 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export const DashboardHeader = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { toggle } = useSidebar();
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -37,11 +39,11 @@ export const DashboardHeader = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
-          {isMobile ? (
-            <Button variant="ghost" size="icon" className="md:hidden">
+          {isMobile && (
+            <Button variant="ghost" size="icon" onClick={toggle}>
               <Menu className="h-5 w-5" />
             </Button>
-          ) : null}
+          )}
           <span className="text-lg sm:text-xl font-semibold text-slate-900 truncate">
             Predictive Pulse
           </span>

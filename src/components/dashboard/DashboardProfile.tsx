@@ -7,9 +7,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PaymentModal } from "../payment/PaymentModal";
 
 export const DashboardProfile = () => {
   const { toast } = useToast();
+  const [paymentModalOpen, setPaymentModalOpen] = React.useState(false);
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile'],
@@ -91,10 +93,16 @@ export const DashboardProfile = () => {
             </div>
           </div>
           {profile?.subscription_tier !== 'premium' && (
-            <Button>Upgrade to Premium</Button>
+            <Button onClick={() => setPaymentModalOpen(true)}>
+              Upgrade to Premium
+            </Button>
           )}
         </CardContent>
       </Card>
+      <PaymentModal 
+        open={paymentModalOpen} 
+        onOpenChange={setPaymentModalOpen} 
+      />
     </div>
   );
 };

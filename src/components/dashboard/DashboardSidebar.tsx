@@ -5,8 +5,8 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -41,16 +41,16 @@ const menuItems = [
 export const DashboardSidebar = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { isOpen, close } = useSidebar();
+  const { setOpenMobile } = useSidebar();
 
   const handleNavigate = () => {
     if (isMobile) {
-      close();
+      setOpenMobile(false);
     }
   };
 
   return (
-    <Sidebar defaultCollapsed={isMobile}>
+    <Sidebar>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>

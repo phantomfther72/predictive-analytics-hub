@@ -20,7 +20,7 @@ export const DashboardHeader = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { toggle } = useSidebar();
+  const { toggleSidebar } = useSidebar();
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -40,7 +40,7 @@ export const DashboardHeader = () => {
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           {isMobile && (
-            <Button variant="ghost" size="icon" onClick={toggle}>
+            <Button variant="ghost" size="icon" onClick={toggleSidebar}>
               <Menu className="h-5 w-5" />
             </Button>
           )}

@@ -19,7 +19,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const stripePromise = loadStripe("pk_test_your_publishable_key");
+// Initialize Stripe with your publishable key
+const stripePromise = loadStripe("pk_test_51Ou5jbF8tOH0584Sh0qnkMXPQF5YD3YGKlrUa9YdS11KBQl7S37jHYEFKqkU7lsGTxUqOPP9yE7j4N41CXJg6GXE00ILRylgIp");
 
 const CheckoutForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const stripe = useStripe();

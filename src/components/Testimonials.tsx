@@ -1,24 +1,25 @@
+
 const testimonials = [
   {
     content:
-      "Predictive Pulse has transformed how we analyze market trends. The AI-driven insights have been invaluable for our investment strategy.",
-    author: "Sarah Chen",
-    role: "Investment Director",
-    company: "Global Ventures",
+      "Predictive Pulse has transformed how we analyze market trends in Namibia. The uranium mining insights have been particularly valuable for our investment decisions.",
+    author: "Johannes Shikongo",
+    role: "Mining Operations Director",
+    company: "Namibia Mining Solutions",
   },
   {
     content:
-      "The cross-sector analytics have given us a competitive edge in identifying market opportunities. An essential tool for modern finance.",
-    author: "Michael Rodriguez",
-    role: "Market Analyst",
-    company: "Market Insights Co",
+      "The real-time tracking of the Namibian housing market across different regions has given us a competitive edge. An essential tool for our property consultancy.",
+    author: "Maria Nangolo",
+    role: "Property Market Analyst",
+    company: "Windhoek Real Estate Group",
   },
   {
     content:
-      "The platform's real-time tracking capabilities have significantly improved our decision-making process. Highly recommended.",
-    author: "David Park",
-    role: "Portfolio Manager",
-    company: "Asset Management Ltd",
+      "As an agricultural business owner, the platform's insights into cattle farming metrics and crop production have significantly improved our strategic planning.",
+    author: "Daniel !Gases",
+    role: "Agricultural Economist",
+    company: "Namibia Agri Consulting",
   },
 ];
 
@@ -28,7 +29,7 @@ const Testimonials = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">
-            Trusted by Industry Leaders
+            Trusted by Namibian Industry Leaders
           </h2>
           <p className="mt-4 text-xl text-slate-600">
             See what our clients say about Predictive Pulse

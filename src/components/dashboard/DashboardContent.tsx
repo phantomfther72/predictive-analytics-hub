@@ -5,6 +5,7 @@ import { DashboardOverview } from "./DashboardOverview";
 import { DashboardCharts } from "./DashboardCharts";
 import { DashboardTables } from "./DashboardTables";
 import { DashboardProfile } from "./DashboardProfile";
+import { IndustryView } from "@/components/industry/IndustryView";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -27,6 +28,22 @@ export const DashboardContent = () => {
             <Route path="/charts" element={<DashboardCharts />} />
             <Route path="/tables" element={<DashboardTables />} />
             <Route path="/profile" element={<DashboardProfile />} />
+            <Route 
+              path="/industry/housing" 
+              element={<IndustryView industry="housing" />} 
+            />
+            <Route 
+              path="/industry/agriculture" 
+              element={<IndustryView industry="agriculture" />} 
+            />
+            <Route 
+              path="/industry/mining" 
+              element={<IndustryView industry="mining" />} 
+            />
+            <Route 
+              path="/industry/cryptocurrency" 
+              element={<IndustryView industry="cryptocurrency" />} 
+            />
           </Routes>
         </motion.div>
       </AnimatePresence>

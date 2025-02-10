@@ -69,6 +69,42 @@ export type Database = {
         }
         Relationships: []
       }
+      industry_insights: {
+        Row: {
+          created_at: string
+          id: string
+          industry: Database["public"]["Enums"]["industry_type"]
+          metric_name: string
+          source: string | null
+          trend_percentage: number | null
+          unit: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          industry: Database["public"]["Enums"]["industry_type"]
+          metric_name: string
+          source?: string | null
+          trend_percentage?: number | null
+          unit: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          industry?: Database["public"]["Enums"]["industry_type"]
+          metric_name?: string
+          source?: string | null
+          trend_percentage?: number | null
+          unit?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
       market_metrics: {
         Row: {
           created_at: string | null
@@ -271,6 +307,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      industry_type: "housing" | "agriculture" | "mining" | "cryptocurrency"
       market_type: "housing" | "agriculture" | "mining" | "cryptocurrency"
       payment_status: "pending" | "success" | "failed"
       subscription_tier: "free" | "premium"

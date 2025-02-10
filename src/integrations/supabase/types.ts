@@ -9,6 +9,66 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      financial_market_metrics: {
+        Row: {
+          asset: string
+          change_percentage_24h: number
+          created_at: string | null
+          current_price: number
+          id: string
+          timestamp: string
+          volume: number
+        }
+        Insert: {
+          asset: string
+          change_percentage_24h: number
+          created_at?: string | null
+          current_price: number
+          id?: string
+          timestamp?: string
+          volume: number
+        }
+        Update: {
+          asset?: string
+          change_percentage_24h?: number
+          created_at?: string | null
+          current_price?: number
+          id?: string
+          timestamp?: string
+          volume?: number
+        }
+        Relationships: []
+      }
+      housing_market_data: {
+        Row: {
+          avg_price_usd: number
+          created_at: string | null
+          id: string
+          listings_active: number
+          region: string
+          timestamp: string
+          yoy_change: number
+        }
+        Insert: {
+          avg_price_usd: number
+          created_at?: string | null
+          id?: string
+          listings_active: number
+          region: string
+          timestamp?: string
+          yoy_change: number
+        }
+        Update: {
+          avg_price_usd?: number
+          created_at?: string | null
+          id?: string
+          listings_active?: number
+          region?: string
+          timestamp?: string
+          yoy_change?: number
+        }
+        Relationships: []
+      }
       market_metrics: {
         Row: {
           created_at: string | null
@@ -84,6 +144,36 @@ export type Database = {
         Update: {
           created_at?: string
           id?: number
+        }
+        Relationships: []
+      }
+      mining_sector_insights: {
+        Row: {
+          commodity: string
+          created_at: string | null
+          export_growth_percentage: number
+          id: string
+          market_value_usd: number
+          production_mt: number
+          timestamp: string
+        }
+        Insert: {
+          commodity: string
+          created_at?: string | null
+          export_growth_percentage: number
+          id?: string
+          market_value_usd: number
+          production_mt: number
+          timestamp?: string
+        }
+        Update: {
+          commodity?: string
+          created_at?: string | null
+          export_growth_percentage?: number
+          id?: string
+          market_value_usd?: number
+          production_mt?: number
+          timestamp?: string
         }
         Relationships: []
       }

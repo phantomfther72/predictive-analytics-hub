@@ -12,8 +12,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, LineChart, Table, User } from "lucide-react";
+import { LayoutDashboard, LineChart, Table, User, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
 
 const menuItems = [
   {
@@ -41,7 +42,7 @@ const menuItems = [
 export const DashboardSidebar = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { setOpenMobile } = useSidebar();
+  const { openMobile, setOpenMobile } = useSidebar();
 
   const handleNavigate = () => {
     if (isMobile) {
@@ -50,8 +51,20 @@ export const DashboardSidebar = () => {
   };
 
   return (
-    <Sidebar>
+    <Sidebar mobile={openMobile}>
       <SidebarContent>
+        {isMobile && (
+          <div className="flex items-center justify-end p-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setOpenMobile(false)}
+              aria-label="Close mobile menu"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>

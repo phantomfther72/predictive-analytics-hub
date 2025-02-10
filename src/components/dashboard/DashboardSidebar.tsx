@@ -3,7 +3,7 @@ import React from "react";
 import { useLocation, Link } from "react-router-dom";
 import {
   Sidebar,
-  SidebarContent,
+  SidebarContent as SidebarContentWrapper,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
@@ -40,7 +40,7 @@ const menuItems = [
   },
 ];
 
-const SidebarContent = () => {
+const SidebarContentComponent = () => {
   const location = useLocation();
   const { setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
@@ -98,7 +98,7 @@ export const DashboardSidebar = () => {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile}>
         <SheetContent side="left" className="w-[240px] p-0">
-          <SidebarContent />
+          <SidebarContentComponent />
         </SheetContent>
       </Sheet>
     );
@@ -106,10 +106,9 @@ export const DashboardSidebar = () => {
 
   return (
     <Sidebar>
-      <SidebarContent>
-        <SidebarContent />
-      </SidebarContent>
+      <SidebarContentWrapper>
+        <SidebarContentComponent />
+      </SidebarContentWrapper>
     </Sidebar>
   );
 };
-

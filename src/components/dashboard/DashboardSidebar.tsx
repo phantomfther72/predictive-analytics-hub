@@ -15,6 +15,7 @@ import {
 import { LayoutDashboard, LineChart, Table, User, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const menuItems = [
   {
@@ -39,10 +40,10 @@ const menuItems = [
   },
 ];
 
-export const DashboardSidebar = () => {
+const SidebarContent = () => {
   const location = useLocation();
+  const { setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
-  const { openMobile, setOpenMobile } = useSidebar();
 
   const handleNavigate = () => {
     if (isMobile) {
@@ -51,42 +52,64 @@ export const DashboardSidebar = () => {
   };
 
   return (
-    <Sidebar mobile={openMobile}>
+    <div className="flex h-full flex-col">
+      {isMobile && (
+        <div className="flex items-center justify-end p-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpenMobile(false)}
+            aria-label="Close mobile menu"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
+      <SidebarGroup>
+        <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {menuItems.map((item) => (
+              <SidebarMenuItem key={item.path}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname === item.path}
+                  onClick={handleNavigate}
+                >
+                  <Link to={item.path} className="flex items-center gap-2">
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </div>
+  );
+};
+
+export const DashboardSidebar = () => {
+  const isMobile = useIsMobile();
+  const { openMobile, setOpenMobile } = useSidebar();
+
+  if (isMobile) {
+    return (
+      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
+        <SheetContent side="left" className="w-[240px] p-0">
+          <SidebarContent />
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  return (
+    <Sidebar>
       <SidebarContent>
-        {isMobile && (
-          <div className="flex items-center justify-end p-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setOpenMobile(false)}
-              aria-label="Close mobile menu"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-        )}
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.path}
-                    onClick={handleNavigate}
-                  >
-                    <Link to={item.path} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarContent />
       </SidebarContent>
     </Sidebar>
   );
 };
+

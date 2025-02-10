@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -9,14 +10,42 @@ export const MarketDataHeader: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      // First check if we have a session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        navigate("/auth");
+        return;
+      }
+
+      if (!session) {
+        // If no session, just redirect to auth
+        navigate("/auth");
+        return;
+      }
+
+      // If we have a session, attempt to sign out
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Sign out error:", error);
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        navigate("/auth");
+      }
+    } catch (error: any) {
+      console.error("Unexpected error during sign out:", error);
       toast({
         title: "Error",
-        description: "Failed to sign out. Please try again.",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-    } else {
+      // Still redirect to auth page on error
       navigate("/auth");
     }
   };

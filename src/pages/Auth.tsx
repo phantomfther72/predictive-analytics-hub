@@ -23,16 +23,8 @@ const Auth = () => {
   const { toast } = useToast();
 
   React.useEffect(() => {
-    // Check if we already have a session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error("Error checking session:", error);
-        return;
-      }
-      if (session) {
-        navigate("/");
-      }
-    });
+    // First clear any existing session
+    supabase.auth.signOut();
 
     // Set up auth state listener
     const {

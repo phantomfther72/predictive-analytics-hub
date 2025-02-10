@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -23,32 +24,44 @@ const queryClient = new QueryClient({
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = React.useState<boolean | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   React.useEffect(() => {
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error("Error checking session:", error);
-        toast({
-          title: "Session Error",
-          description: "Please sign in again",
-          variant: "destructive",
-        });
+    // Initial session check
+    const checkSession = async () => {
+      try {
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Session error:", error);
+          toast({
+            title: "Session Error",
+            description: "Please sign in again",
+            variant: "destructive",
+          });
+          setSession(false);
+          return;
+        }
+        setSession(!!currentSession);
+      } catch (error) {
+        console.error("Session check error:", error);
         setSession(false);
-        return;
       }
-      setSession(!!session);
-    });
+    };
+
+    checkSession();
 
     // Subscribe to auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(!!session);
+      if (!session) {
+        navigate("/auth");
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, [toast]);
+  }, [toast, navigate]);
 
   if (session === null) {
     return null; // Loading state

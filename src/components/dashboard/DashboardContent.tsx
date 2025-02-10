@@ -1,23 +1,35 @@
 
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { DashboardOverview } from "./DashboardOverview";
 import { DashboardCharts } from "./DashboardCharts";
 import { DashboardTables } from "./DashboardTables";
 import { DashboardProfile } from "./DashboardProfile";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AnimatePresence, motion } from "framer-motion";
 
 export const DashboardContent = () => {
   const isMobile = useIsMobile();
+  const location = useLocation();
   
   return (
     <main className={`flex-1 ${isMobile ? 'space-y-6' : 'container space-y-8'}`}>
-      <Routes>
-        <Route path="/" element={<DashboardOverview />} />
-        <Route path="/charts" element={<DashboardCharts />} />
-        <Route path="/tables" element={<DashboardTables />} />
-        <Route path="/profile" element={<DashboardProfile />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.2 }}
+        >
+          <Routes location={location}>
+            <Route path="/" element={<DashboardOverview />} />
+            <Route path="/charts" element={<DashboardCharts />} />
+            <Route path="/tables" element={<DashboardTables />} />
+            <Route path="/profile" element={<DashboardProfile />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
     </main>
   );
 };

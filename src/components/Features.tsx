@@ -1,30 +1,31 @@
+
 import { Brain, LineChart, BarChart3, Layout } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const features = [
   {
-    icon: LineChart,
-    title: "Real-Time Data Tracking",
+    icon: Layout,
+    title: "Dashboard Overview",
     description: "Monitor market movements as they happen with our advanced tracking system.",
-    link: "/real-time-tracking",
+    link: "/dashboard",
   },
   {
-    icon: Brain,
-    title: "AI-Driven Predictions",
+    icon: LineChart,
+    title: "Interactive Charts",
     description: "Leverage machine learning algorithms to forecast market trends with precision.",
-    link: "/ai-predictions",
+    link: "/dashboard/charts",
   },
   {
     icon: BarChart3,
-    title: "Cross-Sector Analytics",
+    title: "Data Tables",
     description: "Analyze data across housing, agriculture, mining, and cryptocurrency markets.",
-    link: "/cross-sector",
+    link: "/dashboard/tables",
   },
   {
-    icon: Layout,
-    title: "User-Friendly Dashboard",
-    description: "Access all your insights through our intuitive and customizable interface.",
-    link: "/dashboard",
+    icon: Brain,
+    title: "Profile Settings",
+    description: "Access and manage your account settings and preferences.",
+    link: "/dashboard/profile",
   },
 ];
 

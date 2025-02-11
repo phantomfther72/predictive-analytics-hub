@@ -14,8 +14,123 @@ import {
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
-import type { FinancialMarketMetric, HousingMarketData, MiningSectorInsight } from "@/types/market";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import type {
+  FinancialMarketMetric,
+  HousingMarketData,
+  MiningSectorInsight,
+  PredictionFactors,
+} from "@/types/market";
 import { cn } from "@/lib/utils";
+
+const PredictionDetails = ({
+  confidence,
+  explanation,
+  factors,
+}: {
+  confidence: number;
+  explanation: string | null;
+  factors: PredictionFactors | null;
+}) => (
+  <div className="space-y-4 p-4">
+    <div className="space-y-2">
+      <p className="text-sm font-medium">Confidence Level</p>
+      <Progress value={confidence * 100} className="h-2" />
+      <p className="text-xs text-muted-foreground">
+        {(confidence * 100).toFixed(1)}% confidence in this prediction
+      </p>
+    </div>
+    {explanation && (
+      <div className="space-y-2">
+        <p className="text-sm font-medium">Explanation</p>
+        <p className="text-sm text-muted-foreground">{explanation}</p>
+      </div>
+    )}
+    {factors && (
+      <div className="space-y-2">
+        <p className="text-sm font-medium">Contributing Factors</p>
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs">
+            <span>Market Trend</span>
+            <span>{factors.market_trend.toFixed(1)}%</span>
+          </div>
+          <Progress value={factors.market_trend} className="h-1" />
+          <div className="flex justify-between text-xs">
+            <span>Volatility</span>
+            <span>{factors.volatility.toFixed(1)}%</span>
+          </div>
+          <Progress value={factors.volatility} className="h-1" />
+          <div className="flex justify-between text-xs">
+            <span>Sentiment</span>
+            <span>{factors.sentiment.toFixed(1)}%</span>
+          </div>
+          <Progress value={factors.sentiment} className="h-1" />
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+const renderPredictedChange = (
+  value: number | null,
+  confidence: number,
+  explanation: string | null,
+  factors: PredictionFactors | null
+) => {
+  if (value === null) return <span className="text-gray-400">N/A</span>;
+  const isPositive = value >= 0;
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          className={cn(
+            "inline-flex items-center space-x-1 font-medium",
+            isPositive ? "text-green-600" : "text-red-600"
+          )}
+        >
+          <span>
+            {isPositive ? "+" : ""}
+            {value.toFixed(2)}%
+          </span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="ml-1">
+                <div className="h-2 w-2 rounded-full bg-current" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Click for prediction details</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Prediction Details</DialogTitle>
+        </DialogHeader>
+        <PredictionDetails
+          confidence={confidence}
+          explanation={explanation}
+          factors={factors}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export const DashboardTables = () => {
   const { toast } = useToast();
@@ -77,22 +192,6 @@ export const DashboardTables = () => {
     },
   });
 
-  const renderPredictedChange = (value: number | null) => {
-    if (value === null) return <span className="text-gray-400">N/A</span>;
-    const isPositive = value >= 0;
-    return (
-      <span
-        className={cn(
-          "font-medium",
-          isPositive ? "text-green-600" : "text-red-600"
-        )}
-      >
-        {isPositive ? "+" : ""}
-        {value.toFixed(2)}%
-      </span>
-    );
-  };
-
   if (isLoadingFinancial || isLoadingHousing || isLoadingMining) {
     return (
       <div className="space-y-6">
@@ -128,11 +227,20 @@ export const DashboardTables = () => {
                 <TableRow key={metric.id}>
                   <TableCell className="font-medium">{metric.asset}</TableCell>
                   <TableCell>${metric.current_price.toLocaleString()}</TableCell>
-                  <TableCell className={metric.change_percentage_24h >= 0 ? "text-green-600" : "text-red-600"}>
+                  <TableCell
+                    className={metric.change_percentage_24h >= 0 ? "text-green-600" : "text-red-600"}
+                  >
                     {metric.change_percentage_24h.toFixed(2)}%
                   </TableCell>
                   <TableCell>${metric.volume.toLocaleString()}</TableCell>
-                  <TableCell>{renderPredictedChange(metric.predicted_change)}</TableCell>
+                  <TableCell>
+                    {renderPredictedChange(
+                      metric.predicted_change,
+                      metric.prediction_confidence,
+                      metric.prediction_explanation,
+                      metric.prediction_factors
+                    )}
+                  </TableCell>
                   <TableCell>{new Date(metric.timestamp).toLocaleString()}</TableCell>
                 </TableRow>
               ))}
@@ -158,11 +266,20 @@ export const DashboardTables = () => {
                 <TableRow key={data.id}>
                   <TableCell className="font-medium">{data.region}</TableCell>
                   <TableCell>${data.avg_price_usd.toLocaleString()}</TableCell>
-                  <TableCell className={data.yoy_change >= 0 ? "text-green-600" : "text-red-600"}>
+                  <TableCell
+                    className={data.yoy_change >= 0 ? "text-green-600" : "text-red-600"}
+                  >
                     {data.yoy_change.toFixed(2)}%
                   </TableCell>
                   <TableCell>{data.listings_active}</TableCell>
-                  <TableCell>{renderPredictedChange(data.predicted_change)}</TableCell>
+                  <TableCell>
+                    {renderPredictedChange(
+                      data.predicted_change,
+                      data.prediction_confidence,
+                      data.prediction_explanation,
+                      data.prediction_factors
+                    )}
+                  </TableCell>
                   <TableCell>{new Date(data.timestamp).toLocaleString()}</TableCell>
                 </TableRow>
               ))}
@@ -189,10 +306,19 @@ export const DashboardTables = () => {
                   <TableCell className="font-medium">{data.commodity}</TableCell>
                   <TableCell>{data.production_mt.toLocaleString()}</TableCell>
                   <TableCell>${data.market_value_usd.toLocaleString()}</TableCell>
-                  <TableCell className={data.export_growth_percentage >= 0 ? "text-green-600" : "text-red-600"}>
+                  <TableCell
+                    className={data.export_growth_percentage >= 0 ? "text-green-600" : "text-red-600"}
+                  >
                     {data.export_growth_percentage.toFixed(2)}%
                   </TableCell>
-                  <TableCell>{renderPredictedChange(data.predicted_change)}</TableCell>
+                  <TableCell>
+                    {renderPredictedChange(
+                      data.predicted_change,
+                      data.prediction_confidence,
+                      data.prediction_explanation,
+                      data.prediction_factors
+                    )}
+                  </TableCell>
                   <TableCell>{new Date(data.timestamp).toLocaleString()}</TableCell>
                 </TableRow>
               ))}

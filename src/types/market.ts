@@ -1,6 +1,12 @@
 
 export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency";
 
+export type PredictionFactors = {
+  market_trend: number;
+  volatility: number;
+  sentiment: number;
+};
+
 export type MarketMetric = {
   id: string;
   market_type: MarketType;
@@ -8,6 +14,19 @@ export type MarketMetric = {
   value: number;
   timestamp: string;
   source: string;
+};
+
+export type NewsItem = {
+  id: string;
+  headline: string;
+  summary: string | null;
+  source: string;
+  published_at: string;
+  url: string;
+  image_url: string | null;
+  sector: string;
+  region: string | null;
+  created_at: string;
 };
 
 export type FinancialMarketMetric = {
@@ -19,6 +38,9 @@ export type FinancialMarketMetric = {
   timestamp: string;
   predicted_change: number | null;
   prediction_timestamp: string;
+  prediction_confidence: number;
+  prediction_explanation: string | null;
+  prediction_factors: PredictionFactors | null;
 };
 
 export type HousingMarketData = {
@@ -30,6 +52,9 @@ export type HousingMarketData = {
   timestamp: string;
   predicted_change: number | null;
   prediction_timestamp: string;
+  prediction_confidence: number;
+  prediction_explanation: string | null;
+  prediction_factors: PredictionFactors | null;
 };
 
 export type MiningSectorInsight = {
@@ -41,4 +66,7 @@ export type MiningSectorInsight = {
   timestamp: string;
   predicted_change: number | null;
   prediction_timestamp: string;
+  prediction_confidence: number;
+  prediction_explanation: string | null;
+  prediction_factors: PredictionFactors | null;
 };

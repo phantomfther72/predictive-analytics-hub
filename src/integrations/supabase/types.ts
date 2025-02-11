@@ -17,6 +17,9 @@ export type Database = {
           current_price: number
           id: string
           predicted_change: number | null
+          prediction_confidence: number | null
+          prediction_explanation: string | null
+          prediction_factors: Json | null
           prediction_timestamp: string | null
           timestamp: string
           volume: number
@@ -28,6 +31,9 @@ export type Database = {
           current_price: number
           id?: string
           predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
           prediction_timestamp?: string | null
           timestamp?: string
           volume: number
@@ -39,6 +45,9 @@ export type Database = {
           current_price?: number
           id?: string
           predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
           prediction_timestamp?: string | null
           timestamp?: string
           volume?: number
@@ -52,6 +61,9 @@ export type Database = {
           id: string
           listings_active: number
           predicted_change: number | null
+          prediction_confidence: number | null
+          prediction_explanation: string | null
+          prediction_factors: Json | null
           prediction_timestamp: string | null
           region: string
           timestamp: string
@@ -63,6 +75,9 @@ export type Database = {
           id?: string
           listings_active: number
           predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
           prediction_timestamp?: string | null
           region: string
           timestamp?: string
@@ -74,6 +89,9 @@ export type Database = {
           id?: string
           listings_active?: number
           predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
           prediction_timestamp?: string | null
           region?: string
           timestamp?: string
@@ -203,6 +221,9 @@ export type Database = {
           id: string
           market_value_usd: number
           predicted_change: number | null
+          prediction_confidence: number | null
+          prediction_explanation: string | null
+          prediction_factors: Json | null
           prediction_timestamp: string | null
           production_mt: number
           timestamp: string
@@ -214,6 +235,9 @@ export type Database = {
           id?: string
           market_value_usd: number
           predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
           prediction_timestamp?: string | null
           production_mt: number
           timestamp?: string
@@ -225,9 +249,51 @@ export type Database = {
           id?: string
           market_value_usd?: number
           predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
           prediction_timestamp?: string | null
           production_mt?: number
           timestamp?: string
+        }
+        Relationships: []
+      }
+      news_feed: {
+        Row: {
+          created_at: string | null
+          headline: string
+          id: string
+          image_url: string | null
+          published_at: string | null
+          region: string | null
+          sector: string
+          source: string
+          summary: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          headline: string
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          region?: string | null
+          sector: string
+          source: string
+          summary?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          headline?: string
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          region?: string | null
+          sector?: string
+          source?: string
+          summary?: string | null
+          url?: string
         }
         Relationships: []
       }
@@ -327,7 +393,12 @@ export type Database = {
           current_value: number
           historical_change: number
         }
-        Returns: number
+        Returns: {
+          predicted_change: number
+          confidence: number
+          explanation: string
+          factors: Json
+        }[]
       }
       update_predictions: {
         Args: Record<PropertyKey, never>

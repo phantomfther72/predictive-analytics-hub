@@ -16,6 +16,8 @@ export type Database = {
           created_at: string | null
           current_price: number
           id: string
+          predicted_change: number | null
+          prediction_timestamp: string | null
           timestamp: string
           volume: number
         }
@@ -25,6 +27,8 @@ export type Database = {
           created_at?: string | null
           current_price: number
           id?: string
+          predicted_change?: number | null
+          prediction_timestamp?: string | null
           timestamp?: string
           volume: number
         }
@@ -34,6 +38,8 @@ export type Database = {
           created_at?: string | null
           current_price?: number
           id?: string
+          predicted_change?: number | null
+          prediction_timestamp?: string | null
           timestamp?: string
           volume?: number
         }
@@ -45,6 +51,8 @@ export type Database = {
           created_at: string | null
           id: string
           listings_active: number
+          predicted_change: number | null
+          prediction_timestamp: string | null
           region: string
           timestamp: string
           yoy_change: number
@@ -54,6 +62,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           listings_active: number
+          predicted_change?: number | null
+          prediction_timestamp?: string | null
           region: string
           timestamp?: string
           yoy_change: number
@@ -63,6 +73,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           listings_active?: number
+          predicted_change?: number | null
+          prediction_timestamp?: string | null
           region?: string
           timestamp?: string
           yoy_change?: number
@@ -190,6 +202,8 @@ export type Database = {
           export_growth_percentage: number
           id: string
           market_value_usd: number
+          predicted_change: number | null
+          prediction_timestamp: string | null
           production_mt: number
           timestamp: string
         }
@@ -199,6 +213,8 @@ export type Database = {
           export_growth_percentage: number
           id?: string
           market_value_usd: number
+          predicted_change?: number | null
+          prediction_timestamp?: string | null
           production_mt: number
           timestamp?: string
         }
@@ -208,6 +224,8 @@ export type Database = {
           export_growth_percentage?: number
           id?: string
           market_value_usd?: number
+          predicted_change?: number | null
+          prediction_timestamp?: string | null
           production_mt?: number
           timestamp?: string
         }
@@ -304,7 +322,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_predicted_change: {
+        Args: {
+          current_value: number
+          historical_change: number
+        }
+        Returns: number
+      }
+      update_predictions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       industry_type: "housing" | "agriculture" | "mining" | "cryptocurrency"

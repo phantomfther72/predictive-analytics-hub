@@ -17,6 +17,8 @@ export type FinancialMarketMetric = {
   change_percentage_24h: number;
   volume: number;
   timestamp: string;
+  predicted_change: number | null;
+  prediction_timestamp: string;
 };
 
 export type HousingMarketData = {
@@ -26,6 +28,8 @@ export type HousingMarketData = {
   yoy_change: number;
   listings_active: number;
   timestamp: string;
+  predicted_change: number | null;
+  prediction_timestamp: string;
 };
 
 export type MiningSectorInsight = {
@@ -35,4 +39,6 @@ export type MiningSectorInsight = {
   market_value_usd: number;
   export_growth_percentage: number;
   timestamp: string;
+  predicted_change: number | null;
+  prediction_timestamp: string;
 };

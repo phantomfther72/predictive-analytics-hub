@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +34,30 @@ import type {
   PredictionFactors,
 } from "@/types/market";
 import { cn } from "@/lib/utils";
+
+const isPredictionFactors = (factors: any): factors is PredictionFactors => {
+  return (
+    factors &&
+    typeof factors === 'object' &&
+    typeof factors.market_trend === 'number' &&
+    typeof factors.volatility === 'number' &&
+    typeof factors.sentiment === 'number'
+  );
+};
+
+const parsePredictionFactors = (rawFactors: any): PredictionFactors | null => {
+  if (!rawFactors) return null;
+  
+  try {
+    const factors = typeof rawFactors === 'string' ? JSON.parse(rawFactors) : rawFactors;
+    if (isPredictionFactors(factors)) {
+      return factors;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
 
 const PredictionDetails = ({
   confidence,
@@ -150,7 +173,10 @@ export const DashboardTables = () => {
         });
         throw error;
       }
-      return data as FinancialMarketMetric[];
+      return (data as any[]).map(item => ({
+        ...item,
+        prediction_factors: parsePredictionFactors(item.prediction_factors)
+      })) as FinancialMarketMetric[];
     },
   });
 
@@ -169,7 +195,10 @@ export const DashboardTables = () => {
         });
         throw error;
       }
-      return data as HousingMarketData[];
+      return (data as any[]).map(item => ({
+        ...item,
+        prediction_factors: parsePredictionFactors(item.prediction_factors)
+      })) as HousingMarketData[];
     },
   });
 
@@ -188,7 +217,10 @@ export const DashboardTables = () => {
         });
         throw error;
       }
-      return data as MiningSectorInsight[];
+      return (data as any[]).map(item => ({
+        ...item,
+        prediction_factors: parsePredictionFactors(item.prediction_factors)
+      })) as MiningSectorInsight[];
     },
   });
 

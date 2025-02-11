@@ -1,6 +1,5 @@
+
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import {
   Table,
   TableBody,
@@ -12,217 +11,18 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
-import type {
-  FinancialMarketMetric,
-  HousingMarketData,
-  MiningSectorInsight,
-  PredictionFactors,
-} from "@/types/market";
-import { cn } from "@/lib/utils";
-
-const isPredictionFactors = (factors: any): factors is PredictionFactors => {
-  return (
-    factors &&
-    typeof factors === 'object' &&
-    typeof factors.market_trend === 'number' &&
-    typeof factors.volatility === 'number' &&
-    typeof factors.sentiment === 'number'
-  );
-};
-
-const parsePredictionFactors = (rawFactors: any): PredictionFactors | null => {
-  if (!rawFactors) return null;
-  
-  try {
-    const factors = typeof rawFactors === 'string' ? JSON.parse(rawFactors) : rawFactors;
-    if (isPredictionFactors(factors)) {
-      return factors;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-};
-
-const PredictionDetails = ({
-  confidence,
-  explanation,
-  factors,
-}: {
-  confidence: number;
-  explanation: string | null;
-  factors: PredictionFactors | null;
-}) => (
-  <div className="space-y-4 p-4">
-    <div className="space-y-2">
-      <p className="text-sm font-medium">Confidence Level</p>
-      <Progress value={confidence * 100} className="h-2" />
-      <p className="text-xs text-muted-foreground">
-        {(confidence * 100).toFixed(1)}% confidence in this prediction
-      </p>
-    </div>
-    {explanation && (
-      <div className="space-y-2">
-        <p className="text-sm font-medium">Explanation</p>
-        <p className="text-sm text-muted-foreground">{explanation}</p>
-      </div>
-    )}
-    {factors && (
-      <div className="space-y-2">
-        <p className="text-sm font-medium">Contributing Factors</p>
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs">
-            <span>Market Trend</span>
-            <span>{factors.market_trend.toFixed(1)}%</span>
-          </div>
-          <Progress value={factors.market_trend} className="h-1" />
-          <div className="flex justify-between text-xs">
-            <span>Volatility</span>
-            <span>{factors.volatility.toFixed(1)}%</span>
-          </div>
-          <Progress value={factors.volatility} className="h-1" />
-          <div className="flex justify-between text-xs">
-            <span>Sentiment</span>
-            <span>{factors.sentiment.toFixed(1)}%</span>
-          </div>
-          <Progress value={factors.sentiment} className="h-1" />
-        </div>
-      </div>
-    )}
-  </div>
-);
-
-const renderPredictedChange = (
-  value: number | null,
-  confidence: number,
-  explanation: string | null,
-  factors: PredictionFactors | null
-) => {
-  if (value === null) return <span className="text-gray-400">N/A</span>;
-  const isPositive = value >= 0;
-
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button
-          className={cn(
-            "inline-flex items-center space-x-1 font-medium",
-            isPositive ? "text-green-600" : "text-red-600"
-          )}
-        >
-          <span>
-            {isPositive ? "+" : ""}
-            {value.toFixed(2)}%
-          </span>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger className="ml-1">
-                <div className="h-2 w-2 rounded-full bg-current" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Click for prediction details</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Prediction Details</DialogTitle>
-        </DialogHeader>
-        <PredictionDetails
-          confidence={confidence}
-          explanation={explanation}
-          factors={factors}
-        />
-      </DialogContent>
-    </Dialog>
-  );
-};
+import { PredictionCell } from "./tables/PredictionCell";
+import { useMarketData } from "./tables/useMarketData";
 
 export const DashboardTables = () => {
-  const { toast } = useToast();
-
-  const { data: financialData, isLoading: isLoadingFinancial } = useQuery({
-    queryKey: ["financialMarketMetrics"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("financial_market_metrics")
-        .select("*")
-        .order("timestamp", { ascending: false });
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch financial market data",
-          variant: "destructive",
-        });
-        throw error;
-      }
-      return (data as any[]).map(item => ({
-        ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors)
-      })) as FinancialMarketMetric[];
-    },
-  });
-
-  const { data: housingData, isLoading: isLoadingHousing } = useQuery({
-    queryKey: ["housingMarketData"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("housing_market_data")
-        .select("*")
-        .order("timestamp", { ascending: false });
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch housing market data",
-          variant: "destructive",
-        });
-        throw error;
-      }
-      return (data as any[]).map(item => ({
-        ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors)
-      })) as HousingMarketData[];
-    },
-  });
-
-  const { data: miningData, isLoading: isLoadingMining } = useQuery({
-    queryKey: ["miningSectorInsights"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("mining_sector_insights")
-        .select("*")
-        .order("timestamp", { ascending: false });
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch mining sector data",
-          variant: "destructive",
-        });
-        throw error;
-      }
-      return (data as any[]).map(item => ({
-        ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors)
-      })) as MiningSectorInsight[];
-    },
-  });
+  const {
+    financialData,
+    housingData,
+    miningData,
+    isLoadingFinancial,
+    isLoadingHousing,
+    isLoadingMining,
+  } = useMarketData();
 
   if (isLoadingFinancial || isLoadingHousing || isLoadingMining) {
     return (
@@ -266,12 +66,12 @@ export const DashboardTables = () => {
                   </TableCell>
                   <TableCell>${metric.volume.toLocaleString()}</TableCell>
                   <TableCell>
-                    {renderPredictedChange(
-                      metric.predicted_change,
-                      metric.prediction_confidence,
-                      metric.prediction_explanation,
-                      metric.prediction_factors
-                    )}
+                    <PredictionCell
+                      value={metric.predicted_change}
+                      confidence={metric.prediction_confidence}
+                      explanation={metric.prediction_explanation}
+                      factors={metric.prediction_factors}
+                    />
                   </TableCell>
                   <TableCell>{new Date(metric.timestamp).toLocaleString()}</TableCell>
                 </TableRow>
@@ -305,12 +105,12 @@ export const DashboardTables = () => {
                   </TableCell>
                   <TableCell>{data.listings_active}</TableCell>
                   <TableCell>
-                    {renderPredictedChange(
-                      data.predicted_change,
-                      data.prediction_confidence,
-                      data.prediction_explanation,
-                      data.prediction_factors
-                    )}
+                    <PredictionCell
+                      value={data.predicted_change}
+                      confidence={data.prediction_confidence}
+                      explanation={data.prediction_explanation}
+                      factors={data.prediction_factors}
+                    />
                   </TableCell>
                   <TableCell>{new Date(data.timestamp).toLocaleString()}</TableCell>
                 </TableRow>
@@ -344,12 +144,12 @@ export const DashboardTables = () => {
                     {data.export_growth_percentage.toFixed(2)}%
                   </TableCell>
                   <TableCell>
-                    {renderPredictedChange(
-                      data.predicted_change,
-                      data.prediction_confidence,
-                      data.prediction_explanation,
-                      data.prediction_factors
-                    )}
+                    <PredictionCell
+                      value={data.predicted_change}
+                      confidence={data.prediction_confidence}
+                      explanation={data.prediction_explanation}
+                      factors={data.prediction_factors}
+                    />
                   </TableCell>
                   <TableCell>{new Date(data.timestamp).toLocaleString()}</TableCell>
                 </TableRow>

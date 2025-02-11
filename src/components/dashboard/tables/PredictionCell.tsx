@@ -1,0 +1,73 @@
+
+import React from "react";
+import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { PredictionDetails } from "./PredictionDetails";
+import type { PredictionFactors } from "@/types/market";
+
+interface PredictionCellProps {
+  value: number | null;
+  confidence: number;
+  explanation: string | null;
+  factors: PredictionFactors | null;
+}
+
+export const PredictionCell: React.FC<PredictionCellProps> = ({
+  value,
+  confidence,
+  explanation,
+  factors,
+}) => {
+  if (value === null) return <span className="text-gray-400">N/A</span>;
+  const isPositive = value >= 0;
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          className={cn(
+            "inline-flex items-center space-x-1 font-medium",
+            isPositive ? "text-green-600" : "text-red-600"
+          )}
+        >
+          <span>
+            {isPositive ? "+" : ""}
+            {value.toFixed(2)}%
+          </span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="ml-1">
+                <div className="h-2 w-2 rounded-full bg-current" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Click for prediction details</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Prediction Details</DialogTitle>
+        </DialogHeader>
+        <PredictionDetails
+          confidence={confidence}
+          explanation={explanation}
+          factors={factors}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+};

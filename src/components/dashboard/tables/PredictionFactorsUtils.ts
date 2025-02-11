@@ -24,3 +24,4 @@ export const parsePredictionFactors = (rawFactors: any): PredictionFactors | nul
     return null;
   }
 };
+

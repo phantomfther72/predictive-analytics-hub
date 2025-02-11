@@ -123,3 +123,4 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
     </div>
   );
 };
+

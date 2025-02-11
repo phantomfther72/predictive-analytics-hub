@@ -52,3 +52,4 @@ export const PredictionDetails: React.FC<PredictionDetailsProps> = ({
     )}
   </div>
 );
+

@@ -10,25 +10,37 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MarketMetric } from "@/types/market";
 
 interface IndustryViewProps {
   industry: "housing" | "agriculture" | "mining" | "cryptocurrency";
 }
 
 export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
-  const { data: insights, isLoading } = useQuery({
+  const { data: insights, isLoading, error } = useQuery({
     queryKey: ["industry-insights", industry],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("industry_insights")
+        .from("market_metrics")
         .select("*")
-        .eq("industry", industry)
-        .order("created_at", { ascending: false });
+        .eq("market_type", industry)
+        .order("timestamp", { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data as MarketMetric[];
     },
+    retry: 3,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
+
+  if (error) {
+    return (
+      <div className="p-4 text-red-500">
+        Error loading market data. Please try again later.
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -56,13 +68,8 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
             <CardContent>
               <div className="space-y-2">
                 <p className="text-2xl font-bold">
-                  {insight.value} {insight.unit}
+                  {insight.value.toLocaleString()} {insight.metric_name.includes('Price') ? 'USD' : ''}
                 </p>
-                {insight.trend_percentage && (
-                  <p className={`text-sm ${insight.trend_percentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {insight.trend_percentage >= 0 ? '↑' : '↓'} {Math.abs(insight.trend_percentage)}% change
-                  </p>
-                )}
               </div>
             </CardContent>
           </Card>

@@ -1,6 +1,6 @@
 
 import { Home, Leaf, Mountain, Bitcoin } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const industries = [
@@ -36,6 +36,8 @@ const industries = [
 
 const Industries = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentIndustry = location.pathname.split('/').pop();
 
   return (
     <section id="industries" className="py-24">
@@ -56,12 +58,20 @@ const Industries = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => navigate(`/dashboard/industry/${industry.type}`)}
-              className="group relative overflow-hidden bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer"
+              className={`group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${
+                currentIndustry === industry.type
+                  ? "bg-slate-50 ring-2 ring-slate-900/10"
+                  : "bg-white"
+              }`}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-slate-900/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative p-8">
                 <div className="flex items-center space-x-4">
-                  <div className="h-12 w-12 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+                  <div className={`h-12 w-12 rounded-lg text-white flex items-center justify-center ${
+                    currentIndustry === industry.type
+                      ? "bg-slate-800"
+                      : "bg-slate-900"
+                  }`}>
                     <industry.icon className="h-6 w-6" />
                   </div>
                   <h3 className="text-xl font-semibold text-slate-900">

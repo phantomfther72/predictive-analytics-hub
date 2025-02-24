@@ -1,5 +1,7 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { NewsFeed } from "./NewsFeed";
 
 export const DashboardOverview = () => {
   return (
@@ -38,6 +40,10 @@ export const DashboardOverview = () => {
             <p className="text-3xl font-bold">94%</p>
           </CardContent>
         </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 gap-6">
+        <NewsFeed />
       </div>
     </div>
   );

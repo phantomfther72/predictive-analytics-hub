@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { parsePredictionFactors } from "./tables/PredictionFactorsUtils";
 import type { FinancialMarketMetric, HousingMarketData, MiningSectorInsight } from "@/types/market";
 
 const TIME_RANGES = {
@@ -63,7 +63,10 @@ export const DashboardCharts = () => {
         throw error;
       }
 
-      return data as FinancialMarketMetric[];
+      return data.map(item => ({
+        ...item,
+        prediction_factors: parsePredictionFactors(item.prediction_factors)
+      })) as FinancialMarketMetric[];
     },
   });
 
@@ -84,7 +87,10 @@ export const DashboardCharts = () => {
         throw error;
       }
 
-      return data as HousingMarketData[];
+      return data.map(item => ({
+        ...item,
+        prediction_factors: parsePredictionFactors(item.prediction_factors)
+      })) as HousingMarketData[];
     },
   });
 
@@ -105,7 +111,10 @@ export const DashboardCharts = () => {
         throw error;
       }
 
-      return data as MiningSectorInsight[];
+      return data.map(item => ({
+        ...item,
+        prediction_factors: parsePredictionFactors(item.prediction_factors)
+      })) as MiningSectorInsight[];
     },
   });
 

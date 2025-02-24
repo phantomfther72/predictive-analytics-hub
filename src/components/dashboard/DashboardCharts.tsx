@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -25,24 +25,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { parsePredictionFactors } from "./tables/PredictionFactorsUtils";
+import { TimeRangeSlider } from "./charts/TimeRangeSlider";
+import { MetricSelector, type Metric } from "./charts/MetricSelector";
+import { ChartTooltip } from "./charts/ChartTooltip";
 import type { FinancialMarketMetric, HousingMarketData, MiningSectorInsight } from "@/types/market";
-
-const TIME_RANGES = {
-  "24h": "24 hours",
-  "7d": "7 days",
-  "30d": "30 days"
-} as const;
-
-type TimeRange = keyof typeof TIME_RANGES;
 
 const CHART_COLORS = {
   primary: "#2563eb",
@@ -52,6 +40,12 @@ const CHART_COLORS = {
   grid: "#e2e8f0",
   text: "#64748b",
 } as const;
+
+const FINANCIAL_METRICS: Metric[] = [
+  { key: "current_price", name: "Price", color: CHART_COLORS.primary },
+  { key: "volume", name: "Volume", color: CHART_COLORS.secondary },
+  { key: "predicted_change", name: "Prediction", color: CHART_COLORS.prediction },
+];
 
 const commonChartProps = {
   margin: { top: 10, right: 30, left: 0, bottom: 0 },
@@ -67,8 +61,16 @@ const commonAxisProps = {
 
 export const DashboardCharts = () => {
   const { toast } = useToast();
-  const [timeRange, setTimeRange] = useState<TimeRange>("24h");
-  const [activeSeries, setActiveSeries] = useState<Record<string, boolean>>({});
+  const [timeRange, setTimeRange] = useState(1);
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(["current_price", "volume"]);
+
+  const handleMetricToggle = useCallback((metric: string) => {
+    setSelectedMetrics(prev => 
+      prev.includes(metric) 
+        ? prev.filter(m => m !== metric)
+        : [...prev, metric]
+    );
+  }, []);
 
   const { data: financialData, isLoading: isLoadingFinancial } = useQuery({
     queryKey: ["financialMetrics", timeRange],
@@ -160,73 +162,64 @@ export const DashboardCharts = () => {
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const prediction = payload[0]?.payload?.predicted_change ? {
+        value: payload[0].payload.predicted_change,
+        confidence: payload[0].payload.prediction_confidence,
+        explanation: payload[0].payload.prediction_explanation,
+        factors: payload[0].payload.prediction_factors,
+      } : undefined;
+
       return (
-        <div className="bg-white p-4 border rounded-lg shadow-lg">
-          <p className="font-semibold mb-2">{new Date(label).toLocaleDateString(undefined, {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}</p>
-          {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex justify-between items-center mb-1">
-              <span className="font-medium text-sm" style={{ color: entry.color }}>
-                {entry.name}:
-              </span>
-              <span className="ml-4 text-sm">
-                {typeof entry.value === "number"
-                  ? entry.dataKey.toLowerCase().includes("percentage")
-                    ? formatPercentage(entry.value)
-                    : entry.value.toLocaleString()
-                  : entry.value}
-              </span>
-            </div>
-          ))}
-          {payload[0]?.payload?.predicted_change && (
-            <div className="mt-2 pt-2 border-t">
-              <p className="text-sm font-medium text-teal-600">
-                Predicted Change: {formatPercentage(payload[0].payload.predicted_change)}
-              </p>
-              <p className="text-xs text-slate-500">
-                Confidence: {formatPercentage(payload[0].payload.prediction_confidence)}
-              </p>
-            </div>
-          )}
-        </div>
+        <ChartTooltip prediction={prediction}>
+          <div className="bg-white p-4 border rounded-lg shadow-lg">
+            <p className="font-semibold mb-2">
+              {new Date(label).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </p>
+            {payload.map((entry: any, index: number) => (
+              <div key={index} className="flex justify-between items-center mb-1">
+                <span className="font-medium text-sm" style={{ color: entry.color }}>
+                  {entry.name}:
+                </span>
+                <span className="ml-4 text-sm">
+                  {typeof entry.value === "number"
+                    ? entry.dataKey.toLowerCase().includes("percentage")
+                      ? `${entry.value.toFixed(2)}%`
+                      : entry.value.toLocaleString()
+                    : entry.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </ChartTooltip>
       );
     }
     return null;
   };
 
-  const handleLegendClick = (data: Payload, index: number) => {
+  const handleLegendClick = (data: Payload) => {
     if (data.dataKey) {
-      setActiveSeries(prev => ({
-        ...prev,
-        [data.dataKey.toString()]: !prev[data.dataKey.toString()]
-      }));
+      handleMetricToggle(data.dataKey.toString());
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <h1 className="text-3xl font-bold">Interactive Charts</h1>
-        <Select
-          value={timeRange}
-          onValueChange={(value: TimeRange) => setTimeRange(value)}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select time range" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(TIME_RANGES).map(([value, label]) => (
-              <SelectItem key={value} value={value}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col md:flex-row gap-6">
+          <TimeRangeSlider value={timeRange} onChange={setTimeRange} />
+          <MetricSelector
+            metrics={FINANCIAL_METRICS}
+            selectedMetrics={selectedMetrics}
+            onMetricToggle={handleMetricToggle}
+          />
+        </div>
       </div>
 
       <div className="grid gap-6">
@@ -251,7 +244,14 @@ export const DashboardCharts = () => {
                   <YAxis
                     {...commonAxisProps}
                     yAxisId="price"
-                    tickFormatter={formatCurrency}
+                    tickFormatter={(value) => (
+                      new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      }).format(value)
+                    )}
                   />
                   <YAxis
                     {...commonAxisProps}
@@ -264,27 +264,29 @@ export const DashboardCharts = () => {
                     onClick={handleLegendClick}
                     wrapperStyle={{ fontSize: '12px' }}
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="current_price"
-                    stroke={CHART_COLORS.primary}
-                    yAxisId="price"
-                    name="Price"
-                    dot={false}
-                    hide={activeSeries["current_price"]}
-                    animationDuration={300}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="volume"
-                    stroke={CHART_COLORS.secondary}
-                    yAxisId="volume"
-                    name="Volume"
-                    dot={false}
-                    hide={activeSeries["volume"]}
-                    animationDuration={300}
-                  />
-                  {financialData?.map((item, index) => (
+                  {selectedMetrics.includes("current_price") && (
+                    <Line
+                      type="monotone"
+                      dataKey="current_price"
+                      stroke={CHART_COLORS.primary}
+                      yAxisId="price"
+                      name="Price"
+                      dot={false}
+                      animationDuration={300}
+                    />
+                  )}
+                  {selectedMetrics.includes("volume") && (
+                    <Line
+                      type="monotone"
+                      dataKey="volume"
+                      stroke={CHART_COLORS.secondary}
+                      yAxisId="volume"
+                      name="Volume"
+                      dot={false}
+                      animationDuration={300}
+                    />
+                  )}
+                  {selectedMetrics.includes("predicted_change") && financialData?.map((item, index) => (
                     item.predicted_change && (
                       <ReferenceArea
                         key={index}

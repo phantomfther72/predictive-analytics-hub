@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -199,11 +198,13 @@ export const DashboardCharts = () => {
     return null;
   };
 
-  const handleLegendClick = (dataKey: string) => {
-    setActiveSeries(prev => ({
-      ...prev,
-      [dataKey]: !prev[dataKey]
-    }));
+  const handleLegendClick = (entry: { dataKey: string | number | undefined }) => {
+    if (entry.dataKey) {
+      setActiveSeries(prev => ({
+        ...prev,
+        [entry.dataKey.toString()]: !prev[entry.dataKey.toString()]
+      }));
+    }
   };
 
   return (
@@ -259,7 +260,7 @@ export const DashboardCharts = () => {
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend 
-                    onClick={(e) => handleLegendClick(e.dataKey)}
+                    onClick={handleLegendClick}
                     wrapperStyle={{ fontSize: '12px' }}
                   />
                   <Line
@@ -321,7 +322,7 @@ export const DashboardCharts = () => {
                   <YAxis {...commonAxisProps} tickFormatter={formatCurrency} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend
-                    onClick={(e) => handleLegendClick(e.dataKey)}
+                    onClick={handleLegendClick}
                     wrapperStyle={{ fontSize: '12px' }}
                   />
                   <Bar
@@ -365,7 +366,7 @@ export const DashboardCharts = () => {
                   <YAxis {...commonAxisProps} tickFormatter={formatCurrency} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend
-                    onClick={(e) => handleLegendClick(e.dataKey)}
+                    onClick={handleLegendClick}
                     wrapperStyle={{ fontSize: '12px' }}
                   />
                   <Area

@@ -16,6 +16,7 @@ import {
   ResponsiveContainer,
   ReferenceArea,
 } from "recharts";
+import type { Payload } from "recharts/types/component/DefaultLegendContent";
 import {
   Card,
   CardContent,
@@ -198,11 +199,11 @@ export const DashboardCharts = () => {
     return null;
   };
 
-  const handleLegendClick = (entry: { dataKey: string | number | undefined }) => {
-    if (entry.dataKey) {
+  const handleLegendClick = (data: Payload, index: number) => {
+    if (data.dataKey) {
       setActiveSeries(prev => ({
         ...prev,
-        [entry.dataKey.toString()]: !prev[entry.dataKey.toString()]
+        [data.dataKey.toString()]: !prev[data.dataKey.toString()]
       }));
     }
   };

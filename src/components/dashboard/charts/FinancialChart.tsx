@@ -46,7 +46,7 @@ export function FinancialChart({ data, isLoading, selectedMetrics, onLegendClick
           orientation="right"
           tickFormatter={(value) => `${(value / 1e9).toFixed(1)}B`}
         />
-        <Tooltip content={<ChartTooltip />} />
+        <Tooltip content={(props) => <ChartTooltip {...props} />} />
         <Legend 
           onClick={onLegendClick}
           wrapperStyle={{ fontSize: '12px' }}

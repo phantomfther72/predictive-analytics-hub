@@ -39,7 +39,7 @@ export function MiningChart({ data, isLoading, selectedMetrics, onLegendClick }:
             }).format(value)
           )}
         />
-        <Tooltip content={<ChartTooltip />} />
+        <Tooltip content={(props) => <ChartTooltip {...props} />} />
         <Legend
           onClick={onLegendClick}
           wrapperStyle={{ fontSize: '12px' }}

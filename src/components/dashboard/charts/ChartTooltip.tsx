@@ -11,7 +11,7 @@ import { TooltipProps } from "recharts";
 interface ChartTooltipProps extends Omit<TooltipProps<any, any>, 'payload'> {
   active?: boolean;
   payload?: Array<{
-    value: number | string;
+    value: any;
     name: string;
     dataKey: string | number;
     color?: string;

@@ -11,9 +11,9 @@ import { TooltipProps } from "recharts";
 interface ChartTooltipProps extends Omit<TooltipProps<any, any>, 'payload'> {
   active?: boolean;
   payload?: Array<{
-    value: any;
-    name: string;
-    dataKey: string | number;
+    value?: any;
+    name?: string;
+    dataKey?: string | number;
     color?: string;
     fill?: string;
     stroke?: string;
@@ -47,7 +47,7 @@ export function ChartTooltip({ active, payload, label, prediction }: ChartToolti
           <span className="font-medium">
             {typeof entry.value === 'number' 
               ? new Intl.NumberFormat('en-US', {
-                  style: entry.name.toLowerCase().includes('price') ? 'currency' : 'decimal',
+                  style: entry.name?.toLowerCase().includes('price') ? 'currency' : 'decimal',
                   currency: 'USD',
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0,

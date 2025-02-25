@@ -6,7 +6,8 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Info } from "lucide-react";
-import { TooltipProps, Payload } from "recharts";
+import { TooltipProps } from "recharts";
+import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
 // Define a type that matches Recharts' Payload type more closely
 type ChartTooltipPayload = Payload<any, any>;

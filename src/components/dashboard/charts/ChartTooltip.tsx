@@ -6,18 +6,14 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Info } from "lucide-react";
-import { TooltipProps } from "recharts";
+import { TooltipProps, Payload } from "recharts";
 
-interface ChartTooltipProps extends Omit<TooltipProps<any, any>, 'payload'> {
+// Define a type that matches Recharts' Payload type more closely
+type ChartTooltipPayload = Payload<any, any>;
+
+interface ChartTooltipProps {
   active?: boolean;
-  payload?: Array<{
-    value?: any;
-    name?: string;
-    dataKey?: string | number;
-    color?: string;
-    fill?: string;
-    stroke?: string;
-  }>;
+  payload?: ChartTooltipPayload[];
   label?: string;
   prediction?: {
     value: number;
@@ -43,11 +39,13 @@ export function ChartTooltip({ active, payload, label, prediction }: ChartToolti
       <p className="font-medium mb-2">{formattedDate}</p>
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center justify-between gap-4">
-          <span style={{ color: entry.color || entry.fill || entry.stroke }}>{entry.name}:</span>
+          <span style={{ color: entry.color || entry.fill || entry.stroke }}>
+            {typeof entry.name === 'string' || typeof entry.name === 'number' ? entry.name : ''}:
+          </span>
           <span className="font-medium">
             {typeof entry.value === 'number' 
               ? new Intl.NumberFormat('en-US', {
-                  style: entry.name?.toLowerCase().includes('price') ? 'currency' : 'decimal',
+                  style: typeof entry.name === 'string' && entry.name.toLowerCase().includes('price') ? 'currency' : 'decimal',
                   currency: 'USD',
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0,

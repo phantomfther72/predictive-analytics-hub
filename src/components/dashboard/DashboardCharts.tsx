@@ -31,6 +31,10 @@ import { TimeRangeSlider } from "./charts/TimeRangeSlider";
 import { MetricSelector, type Metric } from "./charts/MetricSelector";
 import { ChartTooltip } from "./charts/ChartTooltip";
 import type { FinancialMarketMetric, HousingMarketData, MiningSectorInsight } from "@/types/market";
+import { ChartContainer } from "./charts/ChartContainer";
+import { ChartLayout } from "./charts/ChartLayout";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import html2canvas from "html2canvas";
 
 const CHART_COLORS = {
   primary: "#2563eb",
@@ -80,6 +84,11 @@ export const DashboardCharts = () => {
     "market_value_usd",
     "production_mt"
   ]);
+  const [layout, setLayout] = useLocalStorage<string[]>("chart-layout", [
+    "financial",
+    "housing",
+    "mining"
+  ]);
 
   const handleMetricToggle = useCallback((metric: string) => {
     setSelectedMetrics(prev => 
@@ -111,7 +120,7 @@ export const DashboardCharts = () => {
         prediction_factors: parsePredictionFactors(item.prediction_factors)
       })) as FinancialMarketMetric[];
     },
-    refetchInterval: 60000, // Refresh every minute
+    refetchInterval: 60000,
   });
 
   const { data: housingData, isLoading: isLoadingHousing } = useQuery({
@@ -225,6 +234,25 @@ export const DashboardCharts = () => {
     }
   };
 
+  const exportChart = async (containerId: string) => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    try {
+      const canvas = await html2canvas(container);
+      const link = document.createElement("a");
+      link.download = `${containerId}-chart.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "Failed to export chart as image",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -257,182 +285,176 @@ export const DashboardCharts = () => {
         </div>
       </div>
 
-      <div className="grid gap-6">
-        {/* Financial Markets Chart */}
-        <Card className="hover:shadow-lg transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle>Cryptocurrency Trends</CardTitle>
-            <CardDescription>Price movements and predicted changes</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[400px]">
-            {isLoadingFinancial ? (
-              <Skeleton className="w-full h-full animate-pulse" />
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={financialData} {...commonChartProps}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
-                  <XAxis
-                    {...commonAxisProps}
-                    dataKey="timestamp"
-                    tickFormatter={(time) => new Date(time).toLocaleDateString()}
-                  />
-                  <YAxis
-                    {...commonAxisProps}
-                    yAxisId="price"
-                    tickFormatter={(value) => (
-                      new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      }).format(value)
-                    )}
-                  />
-                  <YAxis
-                    {...commonAxisProps}
-                    yAxisId="volume"
-                    orientation="right"
-                    tickFormatter={(value) => `${(value / 1e9).toFixed(1)}B`}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend 
-                    onClick={handleLegendClick}
-                    wrapperStyle={{ fontSize: '12px' }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="current_price"
-                    stroke={CHART_COLORS.primary}
-                    yAxisId="price"
-                    name="Price"
-                    dot={false}
-                    hide={!selectedMetrics.includes("current_price")}
-                    animationDuration={300}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="volume"
-                    stroke={CHART_COLORS.secondary}
-                    yAxisId="volume"
-                    name="Volume"
-                    dot={false}
-                    hide={!selectedMetrics.includes("volume")}
-                    animationDuration={300}
-                  />
-                  {selectedMetrics.includes("predicted_change") && financialData?.map((item, index) => (
-                    item.predicted_change && (
-                      <ReferenceArea
-                        key={index}
-                        x1={item.timestamp}
-                        x2={item.prediction_timestamp}
-                        y1={item.current_price}
-                        y2={item.current_price * (1 + item.predicted_change / 100)}
-                        yAxisId="price"
-                        fill={CHART_COLORS.prediction}
-                        fillOpacity={0.1}
-                        stroke={CHART_COLORS.prediction}
-                        strokeOpacity={0.3}
-                      />
-                    )
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
+      <ChartLayout onLayoutChange={handleLayoutChange}>
+        <ChartContainer
+          id="financial"
+          title="Cryptocurrency Trends"
+          description="Price movements and predicted changes"
+          onExport={() => exportChart("financial")}
+        >
+          {isLoadingFinancial ? (
+            <Skeleton className="w-full h-full animate-pulse" />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={financialData} {...commonChartProps}>
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                <XAxis
+                  {...commonAxisProps}
+                  dataKey="timestamp"
+                  tickFormatter={(time) => new Date(time).toLocaleDateString()}
+                />
+                <YAxis
+                  {...commonAxisProps}
+                  yAxisId="price"
+                  tickFormatter={(value) => (
+                    new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    }).format(value)
+                  )}
+                />
+                <YAxis
+                  {...commonAxisProps}
+                  yAxisId="volume"
+                  orientation="right"
+                  tickFormatter={(value) => `${(value / 1e9).toFixed(1)}B`}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend 
+                  onClick={handleLegendClick}
+                  wrapperStyle={{ fontSize: '12px' }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="current_price"
+                  stroke={CHART_COLORS.primary}
+                  yAxisId="price"
+                  name="Price"
+                  dot={false}
+                  hide={!selectedMetrics.includes("current_price")}
+                  animationDuration={300}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="volume"
+                  stroke={CHART_COLORS.secondary}
+                  yAxisId="volume"
+                  name="Volume"
+                  dot={false}
+                  hide={!selectedMetrics.includes("volume")}
+                  animationDuration={300}
+                />
+                {selectedMetrics.includes("predicted_change") && financialData?.map((item, index) => (
+                  item.predicted_change && (
+                    <ReferenceArea
+                      key={index}
+                      x1={item.timestamp}
+                      x2={item.prediction_timestamp}
+                      y1={item.current_price}
+                      y2={item.current_price * (1 + item.predicted_change / 100)}
+                      yAxisId="price"
+                      fill={CHART_COLORS.prediction}
+                      fillOpacity={0.1}
+                      stroke={CHART_COLORS.prediction}
+                      strokeOpacity={0.3}
+                    />
+                  )
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </ChartContainer>
 
-        {/* Housing Market Chart */}
-        <Card className="hover:shadow-lg transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle>Housing Market Overview</CardTitle>
-            <CardDescription>Regional price trends and listings</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[400px]">
-            {isLoadingHousing ? (
-              <Skeleton className="w-full h-full animate-pulse" />
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={housingData} {...commonChartProps}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
-                  <XAxis {...commonAxisProps} dataKey="region" />
-                  <YAxis {...commonAxisProps} tickFormatter={formatCurrency} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend
-                    onClick={handleLegendClick}
-                    wrapperStyle={{ fontSize: '12px' }}
-                  />
-                  <Bar
-                    dataKey="avg_price_usd"
-                    fill={CHART_COLORS.primary}
-                    name="Average Price"
-                    hide={!selectedMetrics.includes("avg_price_usd")}
-                    animationDuration={300}
-                  />
-                  <Bar
-                    dataKey="listings_active"
-                    fill={CHART_COLORS.secondary}
-                    name="Active Listings"
-                    hide={!selectedMetrics.includes("listings_active")}
-                    animationDuration={300}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
+        <ChartContainer
+          id="housing"
+          title="Housing Market Overview"
+          description="Regional price trends and listings"
+          onExport={() => exportChart("housing")}
+        >
+          {isLoadingHousing ? (
+            <Skeleton className="w-full h-full animate-pulse" />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={housingData} {...commonChartProps}>
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                <XAxis {...commonAxisProps} dataKey="region" />
+                <YAxis {...commonAxisProps} tickFormatter={formatCurrency} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  onClick={handleLegendClick}
+                  wrapperStyle={{ fontSize: '12px' }}
+                />
+                <Bar
+                  dataKey="avg_price_usd"
+                  fill={CHART_COLORS.primary}
+                  name="Average Price"
+                  hide={!selectedMetrics.includes("avg_price_usd")}
+                  animationDuration={300}
+                />
+                <Bar
+                  dataKey="listings_active"
+                  fill={CHART_COLORS.secondary}
+                  name="Active Listings"
+                  hide={!selectedMetrics.includes("listings_active")}
+                  animationDuration={300}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </ChartContainer>
 
-        {/* Mining Sector Chart */}
-        <Card className="hover:shadow-lg transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle>Mining Sector Performance</CardTitle>
-            <CardDescription>Production and market value trends</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[400px]">
-            {isLoadingMining ? (
-              <Skeleton className="w-full h-full animate-pulse" />
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={miningData} {...commonChartProps}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
-                  <XAxis
-                    {...commonAxisProps}
-                    dataKey="timestamp"
-                    tickFormatter={(time) => new Date(time).toLocaleDateString()}
-                  />
-                  <YAxis {...commonAxisProps} tickFormatter={formatCurrency} />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend
-                    onClick={handleLegendClick}
-                    wrapperStyle={{ fontSize: '12px' }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="market_value_usd"
-                    stackId="1"
-                    stroke={CHART_COLORS.primary}
-                    fill={CHART_COLORS.primary}
-                    fillOpacity={0.3}
-                    name="Market Value"
-                    hide={!selectedMetrics.includes("market_value_usd")}
-                    animationDuration={300}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="production_mt"
-                    stackId="2"
-                    stroke={CHART_COLORS.secondary}
-                    fill={CHART_COLORS.secondary}
-                    fillOpacity={0.3}
-                    name="Production (MT)"
-                    hide={!selectedMetrics.includes("production_mt")}
-                    animationDuration={300}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+        <ChartContainer
+          id="mining"
+          title="Mining Sector Performance"
+          description="Production and market value trends"
+          onExport={() => exportChart("mining")}
+        >
+          {isLoadingMining ? (
+            <Skeleton className="w-full h-full animate-pulse" />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={miningData} {...commonChartProps}>
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                <XAxis
+                  {...commonAxisProps}
+                  dataKey="timestamp"
+                  tickFormatter={(time) => new Date(time).toLocaleDateString()}
+                />
+                <YAxis {...commonAxisProps} tickFormatter={formatCurrency} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  onClick={handleLegendClick}
+                  wrapperStyle={{ fontSize: '12px' }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="market_value_usd"
+                  stackId="1"
+                  stroke={CHART_COLORS.primary}
+                  fill={CHART_COLORS.primary}
+                  fillOpacity={0.3}
+                  name="Market Value"
+                  hide={!selectedMetrics.includes("market_value_usd")}
+                  animationDuration={300}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="production_mt"
+                  stackId="2"
+                  stroke={CHART_COLORS.secondary}
+                  fill={CHART_COLORS.secondary}
+                  fillOpacity={0.3}
+                  name="Production (MT)"
+                  hide={!selectedMetrics.includes("production_mt")}
+                  animationDuration={300}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </ChartContainer>
+      </ChartLayout>
     </div>
   );
 };

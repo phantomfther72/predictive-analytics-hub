@@ -264,28 +264,26 @@ export const DashboardCharts = () => {
                     onClick={handleLegendClick}
                     wrapperStyle={{ fontSize: '12px' }}
                   />
-                  {selectedMetrics.includes("current_price") && (
-                    <Line
-                      type="monotone"
-                      dataKey="current_price"
-                      stroke={CHART_COLORS.primary}
-                      yAxisId="price"
-                      name="Price"
-                      dot={false}
-                      animationDuration={300}
-                    />
-                  )}
-                  {selectedMetrics.includes("volume") && (
-                    <Line
-                      type="monotone"
-                      dataKey="volume"
-                      stroke={CHART_COLORS.secondary}
-                      yAxisId="volume"
-                      name="Volume"
-                      dot={false}
-                      animationDuration={300}
-                    />
-                  )}
+                  <Line
+                    type="monotone"
+                    dataKey="current_price"
+                    stroke={CHART_COLORS.primary}
+                    yAxisId="price"
+                    name="Price"
+                    dot={false}
+                    hide={!selectedMetrics.includes("current_price")}
+                    animationDuration={300}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="volume"
+                    stroke={CHART_COLORS.secondary}
+                    yAxisId="volume"
+                    name="Volume"
+                    dot={false}
+                    hide={!selectedMetrics.includes("volume")}
+                    animationDuration={300}
+                  />
                   {selectedMetrics.includes("predicted_change") && financialData?.map((item, index) => (
                     item.predicted_change && (
                       <ReferenceArea
@@ -332,14 +330,14 @@ export const DashboardCharts = () => {
                     dataKey="avg_price_usd"
                     fill={CHART_COLORS.primary}
                     name="Average Price"
-                    hide={activeSeries["avg_price_usd"]}
+                    hide={!selectedMetrics.includes("avg_price_usd")}
                     animationDuration={300}
                   />
                   <Bar
                     dataKey="listings_active"
                     fill={CHART_COLORS.secondary}
                     name="Active Listings"
-                    hide={activeSeries["listings_active"]}
+                    hide={!selectedMetrics.includes("listings_active")}
                     animationDuration={300}
                   />
                 </BarChart>
@@ -380,7 +378,7 @@ export const DashboardCharts = () => {
                     fill={CHART_COLORS.primary}
                     fillOpacity={0.3}
                     name="Market Value"
-                    hide={activeSeries["market_value_usd"]}
+                    hide={!selectedMetrics.includes("market_value_usd")}
                     animationDuration={300}
                   />
                   <Area
@@ -391,7 +389,7 @@ export const DashboardCharts = () => {
                     fill={CHART_COLORS.secondary}
                     fillOpacity={0.3}
                     name="Production (MT)"
-                    hide={activeSeries["production_mt"]}
+                    hide={!selectedMetrics.includes("production_mt")}
                     animationDuration={300}
                   />
                 </AreaChart>

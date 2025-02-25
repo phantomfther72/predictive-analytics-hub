@@ -47,6 +47,16 @@ const FINANCIAL_METRICS: Metric[] = [
   { key: "predicted_change", name: "Prediction", color: CHART_COLORS.prediction },
 ];
 
+const HOUSING_METRICS: Metric[] = [
+  { key: "avg_price_usd", name: "Average Price", color: CHART_COLORS.primary },
+  { key: "listings_active", name: "Active Listings", color: CHART_COLORS.secondary },
+];
+
+const MINING_METRICS: Metric[] = [
+  { key: "market_value_usd", name: "Market Value", color: CHART_COLORS.primary },
+  { key: "production_mt", name: "Production (MT)", color: CHART_COLORS.secondary },
+];
+
 const commonChartProps = {
   margin: { top: 10, right: 30, left: 0, bottom: 0 },
   className: "transition-all duration-300 ease-in-out",
@@ -62,7 +72,14 @@ const commonAxisProps = {
 export const DashboardCharts = () => {
   const { toast } = useToast();
   const [timeRange, setTimeRange] = useState(1);
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(["current_price", "volume"]);
+  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([
+    "current_price",
+    "volume",
+    "avg_price_usd",
+    "listings_active",
+    "market_value_usd",
+    "production_mt"
+  ]);
 
   const handleMetricToggle = useCallback((metric: string) => {
     setSelectedMetrics(prev => 
@@ -214,11 +231,29 @@ export const DashboardCharts = () => {
         <h1 className="text-3xl font-bold">Interactive Charts</h1>
         <div className="flex flex-col md:flex-row gap-6">
           <TimeRangeSlider value={timeRange} onChange={setTimeRange} />
-          <MetricSelector
-            metrics={FINANCIAL_METRICS}
-            selectedMetrics={selectedMetrics}
-            onMetricToggle={handleMetricToggle}
-          />
+          <div className="flex flex-col gap-4">
+            {financialData && (
+              <MetricSelector
+                metrics={FINANCIAL_METRICS}
+                selectedMetrics={selectedMetrics}
+                onMetricToggle={handleMetricToggle}
+              />
+            )}
+            {housingData && (
+              <MetricSelector
+                metrics={HOUSING_METRICS}
+                selectedMetrics={selectedMetrics}
+                onMetricToggle={handleMetricToggle}
+              />
+            )}
+            {miningData && (
+              <MetricSelector
+                metrics={MINING_METRICS}
+                selectedMetrics={selectedMetrics}
+                onMetricToggle={handleMetricToggle}
+              />
+            )}
+          </div>
         </div>
       </div>
 

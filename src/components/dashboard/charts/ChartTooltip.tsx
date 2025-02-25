@@ -8,12 +8,15 @@ import {
 import { Info } from "lucide-react";
 import { TooltipProps } from "recharts";
 
-interface ChartTooltipProps {
+interface ChartTooltipProps extends Omit<TooltipProps<any, any>, 'payload'> {
   active?: boolean;
   payload?: Array<{
-    value: number;
+    value: number | string;
     name: string;
     dataKey: string | number;
+    color?: string;
+    fill?: string;
+    stroke?: string;
   }>;
   label?: string;
   prediction?: {
@@ -40,7 +43,7 @@ export function ChartTooltip({ active, payload, label, prediction }: ChartToolti
       <p className="font-medium mb-2">{formattedDate}</p>
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center justify-between gap-4">
-          <span style={{ color: entry.color }}>{entry.name}:</span>
+          <span style={{ color: entry.color || entry.fill || entry.stroke }}>{entry.name}:</span>
           <span className="font-medium">
             {typeof entry.value === 'number' 
               ? new Intl.NumberFormat('en-US', {

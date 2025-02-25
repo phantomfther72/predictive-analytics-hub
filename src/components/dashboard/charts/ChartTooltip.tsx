@@ -40,7 +40,7 @@ export function ChartTooltip({ active, payload, label, prediction }: ChartToolti
       <p className="font-medium mb-2">{formattedDate}</p>
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center justify-between gap-4">
-          <span style={{ color: entry.color || entry.fill || entry.stroke }}>
+          <span style={{ color: entry.color }}>
             {typeof entry.name === 'string' || typeof entry.name === 'number' ? entry.name : ''}:
           </span>
           <span className="font-medium">

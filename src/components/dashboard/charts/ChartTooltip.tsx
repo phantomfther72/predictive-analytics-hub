@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   HoverCard,
@@ -8,18 +9,16 @@ import { Info, TrendingUp, TrendingDown } from "lucide-react";
 import { TooltipProps } from "recharts";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
-type ChartTooltipPayload = Omit<Payload<any, any>, 'unit' | 'dataKey'> & {
-  color?: string;
-  fill?: string;
-  stroke?: string;
-  dataKey?: string | number;
-  unit?: string;
+// Create a base type that extends Recharts Payload
+interface BasePayload extends Omit<Payload<any, any>, 'payload'> {
+  payload?: any;
   percentageChange?: number;
-};
+}
 
-type ChartTooltipProps = {
+// Define the props type for the ChartTooltip component
+export type ChartTooltipProps = {
   active?: boolean;
-  payload?: ChartTooltipPayload[];
+  payload?: BasePayload[];
   label?: string;
   prediction?: {
     value: number;
@@ -33,7 +32,7 @@ type ChartTooltipProps = {
   };
 };
 
-const formatValue = (value: any, name: string | number | undefined, unit?: string) => {
+const formatValue = (value: any, name: string | number | undefined, unit: React.ReactNode) => {
   if (typeof value !== 'number') return value;
   
   const config: Intl.NumberFormatOptions = {
@@ -80,7 +79,7 @@ export function ChartTooltip({ active, payload, label, prediction }: ChartToolti
               </span>
             </div>
             <span className="font-medium text-sm">
-              {formatValue(entry.value, entry.name, typeof entry.unit === 'string' ? entry.unit : undefined)}
+              {formatValue(entry.value, entry.name, entry.unit)}
               {entry.percentageChange && (
                 <span 
                   className={`ml-2 inline-flex items-center ${

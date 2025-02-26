@@ -10,7 +10,11 @@ import { TooltipProps } from "recharts";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
 // Define a type that matches Recharts' Payload type more closely
-type ChartTooltipPayload = Payload<any, any>;
+type ChartTooltipPayload = Payload<any, any> & {
+  color?: string;
+  fill?: string;
+  stroke?: string;
+};
 
 interface ChartTooltipProps {
   active?: boolean;
@@ -40,7 +44,7 @@ export function ChartTooltip({ active, payload, label, prediction }: ChartToolti
       <p className="font-medium mb-2">{formattedDate}</p>
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center justify-between gap-4">
-          <span style={{ color: entry.color }}>
+          <span style={{ color: entry.color || entry.fill || entry.stroke }}>
             {typeof entry.name === 'string' || typeof entry.name === 'number' ? entry.name : ''}:
           </span>
           <span className="font-medium">

@@ -10,7 +10,7 @@ import { TooltipProps } from "recharts";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
 // Extend the base Payload type while preserving its original properties
-type ChartTooltipPayload = Payload<any, any> & {
+type ChartTooltipPayload = Omit<Payload<any, any>, 'unit'> & {
   color?: string;
   fill?: string;
   stroke?: string;
@@ -81,7 +81,7 @@ export function ChartTooltip({ active, payload, label, prediction }: ChartToolti
               </span>
             </div>
             <span className="font-medium text-sm">
-              {formatValue(entry.value, entry.name, entry.unit)}
+              {formatValue(entry.value, entry.name, typeof entry.unit === 'string' ? entry.unit : undefined)}
               {entry.percentageChange && (
                 <span 
                   className={`ml-2 inline-flex items-center ${

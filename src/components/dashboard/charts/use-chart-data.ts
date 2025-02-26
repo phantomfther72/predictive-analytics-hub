@@ -80,12 +80,64 @@ export const useChartData = (timeRange: number) => {
     },
   });
 
+  const { data: agricultureData, isLoading: isLoadingAgriculture } = useQuery({
+    queryKey: ["agricultureMetrics", timeRange],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("agriculture_market_data")
+        .select("*")
+        .order("timestamp", { ascending: true });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch agriculture data",
+          variant: "destructive",
+        });
+        throw error;
+      }
+
+      return data.map(item => ({
+        ...item,
+        prediction_factors: parsePredictionFactors(item.prediction_factors)
+      }));
+    },
+  });
+
+  const { data: hydrogenData, isLoading: isLoadingHydrogen } = useQuery({
+    queryKey: ["hydrogenMetrics", timeRange],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("green_hydrogen_metrics")
+        .select("*")
+        .order("timestamp", { ascending: true });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch green hydrogen data",
+          variant: "destructive",
+        });
+        throw error;
+      }
+
+      return data.map(item => ({
+        ...item,
+        prediction_factors: parsePredictionFactors(item.prediction_factors)
+      }));
+    },
+  });
+
   return {
     financialData,
     housingData,
     miningData,
+    agricultureData,
+    hydrogenData,
     isLoadingFinancial,
     isLoadingHousing,
     isLoadingMining,
+    isLoadingAgriculture,
+    isLoadingHydrogen,
   };
 };

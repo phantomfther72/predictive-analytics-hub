@@ -7,9 +7,17 @@ import { ChartLayout } from "./charts/ChartLayout";
 import { FinancialChart } from "./charts/FinancialChart";
 import { HousingChart } from "./charts/HousingChart";
 import { MiningChart } from "./charts/MiningChart";
+import { AgricultureChart } from "./charts/AgricultureChart";
+import { GreenHydrogenChart } from "./charts/GreenHydrogenChart";
 import { useChartState } from "./charts/use-chart-state";
 import { useChartData } from "./charts/use-chart-data";
-import { FINANCIAL_METRICS, HOUSING_METRICS, MINING_METRICS } from "./charts/chart-config";
+import {
+  FINANCIAL_METRICS,
+  HOUSING_METRICS,
+  MINING_METRICS,
+  AGRICULTURE_METRICS,
+  GREEN_HYDROGEN_METRICS,
+} from "./charts/chart-config";
 
 export const DashboardCharts = () => {
   const {
@@ -26,9 +34,13 @@ export const DashboardCharts = () => {
     financialData,
     housingData,
     miningData,
+    agricultureData,
+    hydrogenData,
     isLoadingFinancial,
     isLoadingHousing,
     isLoadingMining,
+    isLoadingAgriculture,
+    isLoadingHydrogen,
   } = useChartData(timeRange);
 
   return (
@@ -55,6 +67,20 @@ export const DashboardCharts = () => {
             {miningData && (
               <MetricSelector
                 metrics={MINING_METRICS}
+                selectedMetrics={selectedMetrics}
+                onMetricToggle={handleMetricToggle}
+              />
+            )}
+            {agricultureData && (
+              <MetricSelector
+                metrics={AGRICULTURE_METRICS}
+                selectedMetrics={selectedMetrics}
+                onMetricToggle={handleMetricToggle}
+              />
+            )}
+            {hydrogenData && (
+              <MetricSelector
+                metrics={GREEN_HYDROGEN_METRICS}
                 selectedMetrics={selectedMetrics}
                 onMetricToggle={handleMetricToggle}
               />
@@ -98,6 +124,32 @@ export const DashboardCharts = () => {
           <MiningChart
             data={miningData}
             isLoading={isLoadingMining}
+            selectedMetrics={selectedMetrics}
+            onLegendClick={handleLegendClick}
+          />
+        </ChartContainer>
+
+        <ChartContainer
+          id="agriculture"
+          title="Agriculture Market Insights"
+          description="Crop yields, prices, and environmental factors"
+        >
+          <AgricultureChart
+            data={agricultureData}
+            isLoading={isLoadingAgriculture}
+            selectedMetrics={selectedMetrics}
+            onLegendClick={handleLegendClick}
+          />
+        </ChartContainer>
+
+        <ChartContainer
+          id="green-hydrogen"
+          title="Green Hydrogen Metrics"
+          description="Production capacity and market dynamics"
+        >
+          <GreenHydrogenChart
+            data={hydrogenData}
+            isLoading={isLoadingHydrogen}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
           />

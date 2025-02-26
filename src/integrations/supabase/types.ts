@@ -9,6 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      agriculture_market_data: {
+        Row: {
+          created_at: string | null
+          crop_type: string
+          cultivated_acreage: number
+          export_volume_tons: number
+          fertilizer_usage_kg_ha: number
+          id: string
+          import_volume_tons: number
+          irrigation_volume_m3: number
+          market_price_usd: number
+          predicted_change: number | null
+          prediction_confidence: number | null
+          prediction_explanation: string | null
+          prediction_factors: Json | null
+          prediction_timestamp: string | null
+          rainfall_mm: number
+          region: string
+          timestamp: string
+          yield_per_hectare: number
+        }
+        Insert: {
+          created_at?: string | null
+          crop_type: string
+          cultivated_acreage: number
+          export_volume_tons: number
+          fertilizer_usage_kg_ha: number
+          id?: string
+          import_volume_tons: number
+          irrigation_volume_m3: number
+          market_price_usd: number
+          predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
+          prediction_timestamp?: string | null
+          rainfall_mm: number
+          region: string
+          timestamp?: string
+          yield_per_hectare: number
+        }
+        Update: {
+          created_at?: string | null
+          crop_type?: string
+          cultivated_acreage?: number
+          export_volume_tons?: number
+          fertilizer_usage_kg_ha?: number
+          id?: string
+          import_volume_tons?: number
+          irrigation_volume_m3?: number
+          market_price_usd?: number
+          predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
+          prediction_timestamp?: string | null
+          rainfall_mm?: number
+          region?: string
+          timestamp?: string
+          yield_per_hectare?: number
+        }
+        Relationships: []
+      }
       financial_market_metrics: {
         Row: {
           asset: string
@@ -51,6 +114,57 @@ export type Database = {
           prediction_timestamp?: string | null
           timestamp?: string
           volume?: number
+        }
+        Relationships: []
+      }
+      green_hydrogen_metrics: {
+        Row: {
+          created_at: string | null
+          facility_uptime_pct: number
+          funding_round: string | null
+          id: string
+          investment_amount_usd: number
+          market_demand_tons: number
+          operational_efficiency_pct: number
+          predicted_change: number | null
+          prediction_confidence: number | null
+          prediction_explanation: string | null
+          prediction_factors: Json | null
+          prediction_timestamp: string | null
+          production_capacity_mw: number
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string | null
+          facility_uptime_pct: number
+          funding_round?: string | null
+          id?: string
+          investment_amount_usd: number
+          market_demand_tons: number
+          operational_efficiency_pct: number
+          predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
+          prediction_timestamp?: string | null
+          production_capacity_mw: number
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string | null
+          facility_uptime_pct?: number
+          funding_round?: string | null
+          id?: string
+          investment_amount_usd?: number
+          market_demand_tons?: number
+          operational_efficiency_pct?: number
+          predicted_change?: number | null
+          prediction_confidence?: number | null
+          prediction_explanation?: string | null
+          prediction_factors?: Json | null
+          prediction_timestamp?: string | null
+          production_capacity_mw?: number
+          timestamp?: string
         }
         Relationships: []
       }
@@ -407,7 +521,12 @@ export type Database = {
     }
     Enums: {
       industry_type: "housing" | "agriculture" | "mining" | "cryptocurrency"
-      market_type: "housing" | "agriculture" | "mining" | "cryptocurrency"
+      market_type:
+        | "housing"
+        | "agriculture"
+        | "mining"
+        | "cryptocurrency"
+        | "green_hydrogen"
       payment_status: "pending" | "success" | "failed"
       subscription_tier: "free" | "premium"
     }

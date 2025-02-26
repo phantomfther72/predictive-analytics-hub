@@ -9,20 +9,19 @@ import { Info, TrendingUp, TrendingDown } from "lucide-react";
 import { TooltipProps } from "recharts";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
-// Define a type that matches Recharts' Payload type more closely
+// Extend the base Payload type while preserving its original properties
 type ChartTooltipPayload = Payload<any, any> & {
   color?: string;
   fill?: string;
   stroke?: string;
-  dataKey?: string;
+  dataKey?: string | number;
   unit?: string;
   percentageChange?: number;
 };
 
-interface ChartTooltipProps {
-  active?: boolean;
+// Now we can use TooltipProps from Recharts directly
+type ChartTooltipProps = Omit<TooltipProps<any, any>, 'payload'> & {
   payload?: ChartTooltipPayload[];
-  label?: string;
   prediction?: {
     value: number;
     confidence: number;
@@ -33,7 +32,7 @@ interface ChartTooltipProps {
       sentiment: number;
     };
   };
-}
+};
 
 const formatValue = (value: any, name: string | number | undefined, unit?: string) => {
   if (typeof value !== 'number') return value;

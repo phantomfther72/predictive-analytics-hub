@@ -12,6 +12,9 @@ import { Payload } from "recharts/types/component/DefaultTooltipContent";
 // Create a base type that extends Recharts Payload
 interface BasePayload extends Omit<Payload<any, any>, 'payload'> {
   payload?: any;
+  color?: string;
+  fill?: string;
+  stroke?: string;
   percentageChange?: number;
 }
 

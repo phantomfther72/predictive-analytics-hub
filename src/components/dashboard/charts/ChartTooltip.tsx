@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   HoverCard,
@@ -9,8 +8,7 @@ import { Info, TrendingUp, TrendingDown } from "lucide-react";
 import { TooltipProps } from "recharts";
 import { Payload } from "recharts/types/component/DefaultTooltipContent";
 
-// Extend the base Payload type while preserving its original properties
-type ChartTooltipPayload = Omit<Payload<any, any>, 'unit'> & {
+type ChartTooltipPayload = Omit<Payload<any, any>, 'unit' | 'dataKey'> & {
   color?: string;
   fill?: string;
   stroke?: string;
@@ -19,9 +17,10 @@ type ChartTooltipPayload = Omit<Payload<any, any>, 'unit'> & {
   percentageChange?: number;
 };
 
-// Now we can use TooltipProps from Recharts directly
-type ChartTooltipProps = Omit<TooltipProps<any, any>, 'payload'> & {
+type ChartTooltipProps = {
+  active?: boolean;
   payload?: ChartTooltipPayload[];
+  label?: string;
   prediction?: {
     value: number;
     confidence: number;

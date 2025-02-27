@@ -13,12 +13,13 @@ import {
 import { ChartTooltip } from "./ChartTooltip";
 import type { AgricultureMarketData } from "@/types/market";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { Payload } from "recharts/types/component/DefaultLegendContent";
 
 interface AgricultureChartProps {
   data?: AgricultureMarketData[];
   isLoading?: boolean;
   selectedMetrics: string[];
-  onLegendClick: (dataKey: string) => void;
+  onLegendClick: (data: Payload) => void;
 }
 
 export function AgricultureChart({
@@ -49,7 +50,7 @@ export function AgricultureChart({
         <YAxis />
         <Tooltip content={<ChartTooltip />} />
         <Legend
-          onClick={(e) => onLegendClick(e.dataKey)}
+          onClick={onLegendClick}
         />
         {selectedMetrics.includes("market_price_usd") && (
           <Line

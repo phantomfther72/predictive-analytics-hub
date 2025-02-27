@@ -13,12 +13,13 @@ import {
 import { ChartTooltip } from "./ChartTooltip";
 import type { GreenHydrogenMetrics } from "@/types/market";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { Payload } from "recharts/types/component/DefaultLegendContent";
 
 interface GreenHydrogenChartProps {
   data?: GreenHydrogenMetrics[];
   isLoading?: boolean;
   selectedMetrics: string[];
-  onLegendClick: (dataKey: string) => void;
+  onLegendClick: (data: Payload) => void;
 }
 
 export function GreenHydrogenChart({
@@ -49,7 +50,7 @@ export function GreenHydrogenChart({
         <YAxis />
         <Tooltip content={<ChartTooltip />} />
         <Legend
-          onClick={(e) => onLegendClick(e.dataKey)}
+          onClick={onLegendClick}
         />
         {selectedMetrics.includes("production_capacity_mw") && (
           <Line

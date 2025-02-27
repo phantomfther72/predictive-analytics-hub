@@ -26,7 +26,12 @@ export const useChartData = (timeRange: number) => {
 
       return data.map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors)
+        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        alternative_models: {
+          optimistic: item.predicted_change * 1.5,
+          pessimistic: item.predicted_change * 0.6,
+          seasonal: item.predicted_change * (Math.random() > 0.5 ? 1.2 : 0.8),
+        }
       }));
     },
     refetchInterval: 60000,
@@ -51,7 +56,11 @@ export const useChartData = (timeRange: number) => {
 
       return data.map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors)
+        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        alternative_models: {
+          regional: item.predicted_change * 1.3,
+          national: item.predicted_change * 0.7,
+        }
       }));
     },
   });
@@ -75,7 +84,11 @@ export const useChartData = (timeRange: number) => {
 
       return data.map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors)
+        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        alternative_models: {
+          "resource-driven": item.predicted_change * 1.4,
+          "market-driven": item.predicted_change * 0.65,
+        }
       }));
     },
   });
@@ -99,7 +112,11 @@ export const useChartData = (timeRange: number) => {
 
       return data.map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors)
+        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        alternative_models: {
+          "weather-based": item.predicted_change * 1.25,
+          "market-based": item.predicted_change * 0.75,
+        }
       }));
     },
   });
@@ -123,7 +140,11 @@ export const useChartData = (timeRange: number) => {
 
       return data.map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors)
+        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        alternative_models: {
+          "tech-focused": item.predicted_change * 1.6,
+          "policy-driven": item.predicted_change * 0.85,
+        }
       }));
     },
   });

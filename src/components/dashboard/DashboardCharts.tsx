@@ -11,6 +11,10 @@ import { AgricultureChart } from "./charts/AgricultureChart";
 import { GreenHydrogenChart } from "./charts/GreenHydrogenChart";
 import { useChartState } from "./charts/use-chart-state";
 import { useChartData } from "./charts/use-chart-data";
+import { InteractiveFeatures } from "./InteractiveFeatures";
+import { Button } from "@/components/ui/button";
+import { Plus, MessageCircle, SplitSquareVertical } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   FINANCIAL_METRICS,
   HOUSING_METRICS,
@@ -28,6 +32,8 @@ export const DashboardCharts = () => {
     setLayout,
     handleLegendClick,
     handleMetricToggle,
+    simulationMode,
+    models,
   } = useChartState();
 
   const {
@@ -44,49 +50,71 @@ export const DashboardCharts = () => {
   } = useChartData(timeRange);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h1 className="text-3xl font-bold">Interactive Charts</h1>
-        <div className="flex flex-col md:flex-row gap-6">
-          <TimeRangeSlider value={timeRange} onChange={setTimeRange} />
-          <div className="flex flex-col gap-4">
-            {financialData && (
-              <MetricSelector
-                metrics={FINANCIAL_METRICS}
-                selectedMetrics={selectedMetrics}
-                onMetricToggle={handleMetricToggle}
-              />
-            )}
-            {housingData && (
-              <MetricSelector
-                metrics={HOUSING_METRICS}
-                selectedMetrics={selectedMetrics}
-                onMetricToggle={handleMetricToggle}
-              />
-            )}
-            {miningData && (
-              <MetricSelector
-                metrics={MINING_METRICS}
-                selectedMetrics={selectedMetrics}
-                onMetricToggle={handleMetricToggle}
-              />
-            )}
-            {agricultureData && (
-              <MetricSelector
-                metrics={AGRICULTURE_METRICS}
-                selectedMetrics={selectedMetrics}
-                onMetricToggle={handleMetricToggle}
-              />
-            )}
-            {hydrogenData && (
-              <MetricSelector
-                metrics={GREEN_HYDROGEN_METRICS}
-                selectedMetrics={selectedMetrics}
-                onMetricToggle={handleMetricToggle}
-              />
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold">Interactive Analytics</h1>
+            {simulationMode && (
+              <Badge variant="secondary" className="ml-2">Simulation Mode</Badge>
             )}
           </div>
+          <p className="text-muted-foreground mt-1">
+            Compare models, run simulations, and collaborate with your team
+          </p>
         </div>
+        <div className="flex items-center gap-3">
+          <TimeRangeSlider value={timeRange} onChange={setTimeRange} />
+          <Button variant="outline" size="sm" className="flex items-center gap-1">
+            <Plus className="h-4 w-4" />
+            <span>Add Chart</span>
+          </Button>
+          <Button variant="outline" size="sm" className="flex items-center gap-1">
+            <SplitSquareVertical className="h-4 w-4" />
+            <span>Layout</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Advanced Interactive Features */}
+      <InteractiveFeatures />
+
+      <div className="flex flex-wrap gap-4 mb-6">
+        {financialData && (
+          <MetricSelector
+            metrics={FINANCIAL_METRICS}
+            selectedMetrics={selectedMetrics}
+            onMetricToggle={handleMetricToggle}
+          />
+        )}
+        {housingData && (
+          <MetricSelector
+            metrics={HOUSING_METRICS}
+            selectedMetrics={selectedMetrics}
+            onMetricToggle={handleMetricToggle}
+          />
+        )}
+        {miningData && (
+          <MetricSelector
+            metrics={MINING_METRICS}
+            selectedMetrics={selectedMetrics}
+            onMetricToggle={handleMetricToggle}
+          />
+        )}
+        {agricultureData && (
+          <MetricSelector
+            metrics={AGRICULTURE_METRICS}
+            selectedMetrics={selectedMetrics}
+            onMetricToggle={handleMetricToggle}
+          />
+        )}
+        {hydrogenData && (
+          <MetricSelector
+            metrics={GREEN_HYDROGEN_METRICS}
+            selectedMetrics={selectedMetrics}
+            onMetricToggle={handleMetricToggle}
+          />
+        )}
       </div>
 
       <ChartLayout onLayoutChange={setLayout}>
@@ -100,6 +128,8 @@ export const DashboardCharts = () => {
             isLoading={isLoadingFinancial}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
+            enabledModels={models.filter(m => m.enabled)}
+            simulationMode={simulationMode}
           />
         </ChartContainer>
 
@@ -113,6 +143,8 @@ export const DashboardCharts = () => {
             isLoading={isLoadingHousing}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
+            enabledModels={models.filter(m => m.enabled)}
+            simulationMode={simulationMode}
           />
         </ChartContainer>
 
@@ -126,6 +158,8 @@ export const DashboardCharts = () => {
             isLoading={isLoadingMining}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
+            enabledModels={models.filter(m => m.enabled)}
+            simulationMode={simulationMode}
           />
         </ChartContainer>
 
@@ -139,6 +173,8 @@ export const DashboardCharts = () => {
             isLoading={isLoadingAgriculture}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
+            enabledModels={models.filter(m => m.enabled)}
+            simulationMode={simulationMode}
           />
         </ChartContainer>
 
@@ -152,6 +188,8 @@ export const DashboardCharts = () => {
             isLoading={isLoadingHydrogen}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
+            enabledModels={models.filter(m => m.enabled)}
+            simulationMode={simulationMode}
           />
         </ChartContainer>
       </ChartLayout>

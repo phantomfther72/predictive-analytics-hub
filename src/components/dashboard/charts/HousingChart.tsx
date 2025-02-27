@@ -29,9 +29,32 @@ export function HousingChart({
     return <Skeleton className="w-full h-full animate-pulse" />;
   }
 
+  // Process data to include model predictions
+  const chartData = React.useMemo(() => {
+    if (!data || !simulationMode || enabledModels.length === 0) {
+      return data;
+    }
+
+    return data.map(item => {
+      const modelPredictions: Record<string, number> = {};
+      
+      enabledModels
+        .filter(m => m.id !== "primary")
+        .forEach(model => {
+          const modelKey = `model_${model.id}`;
+          modelPredictions[modelKey] = item.avg_price_usd * (1 + (item.predicted_change || 0) / 100 * model.weight);
+        });
+
+      return {
+        ...item,
+        ...modelPredictions
+      };
+    });
+  }, [data, enabledModels, simulationMode]);
+
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={data} {...commonChartProps}>
+      <BarChart data={chartData} {...commonChartProps}>
         <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
         <XAxis {...commonAxisProps} dataKey="region" />
         <YAxis 
@@ -64,14 +87,11 @@ export function HousingChart({
           hide={!selectedMetrics.includes("listings_active")}
           animationDuration={300}
         />
-        {enabledModels.length > 0 && simulationMode && data && 
+        {enabledModels.length > 0 && simulationMode && chartData && 
           enabledModels.filter(m => m.id !== "primary").map(model => (
             <Bar
               key={`model-${model.id}`}
-              dataKey={(_, index) => {
-                const item = data[index];
-                return item.avg_price_usd * (1 + (item.predicted_change || 0) / 100 * model.weight);
-              }}
+              dataKey={`model_${model.id}`}
               fill={model.color}
               name={`${model.name} Prediction`}
               opacity={0.6}

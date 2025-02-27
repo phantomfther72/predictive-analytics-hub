@@ -91,9 +91,9 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
   }
 
   // Agriculture-specific view
-  if (industry === "agriculture" && agricultureData) {
+  if (industry === "agriculture" && agricultureData && agricultureData.length > 0) {
     // Get the latest data point for summary cards
-    const latestData = agricultureData[agricultureData.length - 1] || {};
+    const latestData = agricultureData[agricultureData.length - 1];
     
     return (
       <div className="space-y-6">
@@ -106,7 +106,7 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ${latestData.market_price_usd?.toLocaleString()}
+                ${latestData.market_price_usd.toLocaleString()}
                 <span className="text-xs text-muted-foreground ml-1">per ton</span>
               </div>
             </CardContent>
@@ -118,7 +118,7 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {latestData.yield_per_hectare?.toLocaleString()}
+                {latestData.yield_per_hectare.toLocaleString()}
                 <span className="text-xs text-muted-foreground ml-1">tons</span>
               </div>
             </CardContent>
@@ -130,7 +130,7 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {latestData.rainfall_mm?.toLocaleString()}
+                {latestData.rainfall_mm.toLocaleString()}
                 <span className="text-xs text-muted-foreground ml-1">mm</span>
               </div>
             </CardContent>
@@ -204,10 +204,20 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
         </div>
       </div>
     );
+  } else if (industry === "agriculture") {
+    // No agriculture data available
+    return (
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold">Agriculture Market Insights</h2>
+        <div className="text-center py-8">
+          <p className="text-slate-600">No agriculture data available at this time.</p>
+        </div>
+      </div>
+    );
   }
 
   // Mining-specific view
-  if (industry === "mining" && miningData) {
+  if (industry === "mining" && miningData && miningData.length > 0) {
     return (
       <div className="space-y-6">
         <h2 className="text-3xl font-bold">Mining Industry Insights</h2>
@@ -245,6 +255,16 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </div>
+    );
+  } else if (industry === "mining") {
+    // No mining data available
+    return (
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold">Mining Industry Insights</h2>
+        <div className="text-center py-8">
+          <p className="text-slate-600">No mining data available at this time.</p>
         </div>
       </div>
     );

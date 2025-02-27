@@ -8,18 +8,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MarketType } from "@/types/market";
 
+// Define market types
+type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "general";
+
+// Define insight metric interface
+interface InsightMetric {
+  label: string;
+  value: string | number;
+  change?: number;
+}
+
+// Define market insight interface
 interface MarketInsight {
   id: string;
   title: string;
   description: string;
   icon: React.ReactNode;
-  metrics: {
-    label: string;
-    value: string | number;
-    change?: number;
-  }[];
+  metrics: InsightMetric[];
   type: MarketType;
   link?: string;
 }
@@ -41,12 +47,32 @@ export function MarketInsightsCarousel({
   const carouselRef = useRef<HTMLDivElement>(null);
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Create default insights if nothing is available
+  const defaultInsights: MarketInsight[] = [
+    {
+      id: "default-market",
+      title: "Market Overview",
+      description: "Summary of key market indicators and predictions",
+      icon: <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-blue-600"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+      </div>,
+      metrics: [
+        { label: "Market Index", value: 10500, change: 1.8 },
+        { label: "Trading Volume", value: "2.4M", change: 3.2 },
+        { label: "Market Cap", value: "1.2T", change: 0.5 },
+        { label: "Volatility Index", value: 15.3, change: -2.1 }
+      ],
+      type: "general",
+      link: "/dashboard"
+    }
+  ];
+
   // Fetch market metrics if not provided as props
   const { data: fetchedInsights, isLoading, error } = useQuery({
     queryKey: ["marketMetrics"],
     queryFn: async () => {
       try {
-        // For demo purposes, use mock data if no access to Supabase
+        // For demo purposes, use mock data
         const mockData = [
           {
             id: "housing-1",
@@ -122,8 +148,9 @@ export function MarketInsightsCarousel({
           }
         ];
 
+        let data = mockData;
+
         // Try to get data from Supabase, fall back to mock data if needed
-        let data;
         try {
           const { data: supabaseData, error } = await supabase
             .from("market_metrics")
@@ -131,25 +158,39 @@ export function MarketInsightsCarousel({
             .order("timestamp", { ascending: false });
 
           if (error) {
-            throw error;
+            console.warn("Supabase error, using mock data:", error);
+          } else if (supabaseData && supabaseData.length > 0) {
+            data = supabaseData;
           }
-          data = supabaseData.length > 0 ? supabaseData : mockData;
         } catch (supabaseError) {
-          console.warn("Falling back to mock data:", supabaseError);
-          data = mockData;
+          console.warn("Supabase access error, using mock data:", supabaseError);
         }
 
-        // Group by market type and transform into carousel format
+        // Group by market type
         const groupedMetrics: Record<string, any[]> = {};
+        
+        // Initialize market types to ensure we always have them
+        ["housing", "agriculture", "mining", "cryptocurrency", "general"].forEach(type => {
+          groupedMetrics[type] = [];
+        });
+        
+        // Add data to appropriate market type
         data.forEach(metric => {
-          if (!groupedMetrics[metric.market_type]) {
-            groupedMetrics[metric.market_type] = [];
+          if (metric && metric.market_type) {
+            if (!groupedMetrics[metric.market_type]) {
+              groupedMetrics[metric.market_type] = [];
+            }
+            groupedMetrics[metric.market_type].push(metric);
           }
-          groupedMetrics[metric.market_type].push(metric);
         });
 
-        // Map to carousel format
-        return Object.entries(groupedMetrics).map(([type, metrics]) => {
+        // Transform to carousel format
+        const insights: MarketInsight[] = [];
+        
+        for (const [type, metrics] of Object.entries(groupedMetrics)) {
+          // Skip empty market types
+          if (metrics.length === 0) continue;
+          
           // Get icon based on market type
           let icon;
           switch (type as MarketType) {
@@ -179,84 +220,94 @@ export function MarketInsightsCarousel({
               </div>;
           }
 
-          // Format metrics from this market type, ensure values exist
-          const formattedMetrics = metrics
-            .filter(m => m !== null && m !== undefined && m.metric_name !== undefined)
-            .map(m => ({
-              label: m.metric_name || "Metric",
-              value: m.value !== undefined && m.value !== null ? m.value : 0,
-              change: m.predicted_change
-            }))
-            .slice(0, 4); // limit to 4 metrics per card
+          // Format metrics for this market type
+          const formattedMetrics: InsightMetric[] = [];
+          metrics.forEach(m => {
+            if (m && m.metric_name) {
+              formattedMetrics.push({
+                label: m.metric_name,
+                value: m.value !== undefined ? m.value : "N/A",
+                change: m.predicted_change !== undefined ? m.predicted_change : undefined
+              });
+            }
+          });
 
-          return {
-            id: type || "unknown",
-            title: `${(type || "Market").charAt(0).toUpperCase() + (type || "Market").slice(1)} Market`,
-            description: `Latest insights and predictions for the ${type || "market"} sector`,
-            icon,
-            metrics: formattedMetrics,
-            type: (type as MarketType) || "general",
-            link: `/dashboard/industry/${type || "general"}`
-          };
-        });
+          // Only add insight if it has metrics
+          if (formattedMetrics.length > 0) {
+            insights.push({
+              id: type,
+              title: `${type.charAt(0).toUpperCase() + type.slice(1)} Market`,
+              description: `Latest insights and predictions for the ${type} sector`,
+              icon,
+              metrics: formattedMetrics.slice(0, 4), // limit to 4 metrics
+              type: type as MarketType,
+              link: `/dashboard/industry/${type}`
+            });
+          }
+        }
+
+        return insights.length > 0 ? insights : defaultInsights;
       } catch (error) {
         console.error("Error fetching market metrics:", error);
         toast({
           title: "Error",
-          description: "Failed to load market insights. Please try again later.",
+          description: "Using default market insights due to data loading issues.",
           variant: "destructive",
         });
         
-        // Return a basic insight so the component doesn't crash
-        return [{
-          id: "fallback",
-          title: "Market Insights",
-          description: "Summary of market performance",
-          icon: <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-slate-600"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-          </div>,
-          metrics: [
-            { label: "Market Index", value: 10500 },
-            { label: "Growth Rate", value: "2.4%", change: 2.4 },
-          ],
-          type: "general",
-          link: "/dashboard"
-        }];
+        // Return default insights if there's an error
+        return defaultInsights;
       }
     },
     enabled: !propInsights,
     refetchInterval: 60000 // Refetch every minute
   });
 
-  const insights = propInsights || fetchedInsights;
+  // Use prop insights, fetched insights, or default insights
+  const insights = propInsights || fetchedInsights || defaultInsights;
   const totalInsights = insights?.length || 0;
 
   // Handle auto-rotation
   useEffect(() => {
+    // Clean up existing interval if any
+    if (autoplayTimerRef.current) {
+      clearInterval(autoplayTimerRef.current);
+      autoplayTimerRef.current = null;
+    }
+
+    // Only set up interval if we have multiple insights and not paused
     if (!isPaused && totalInsights > 1) {
       autoplayTimerRef.current = setInterval(() => {
         setActiveIndex((current) => (current + 1) % totalInsights);
       }, autoplayInterval);
     }
 
+    // Clean up function
     return () => {
       if (autoplayTimerRef.current) {
         clearInterval(autoplayTimerRef.current);
+        autoplayTimerRef.current = null;
       }
     };
   }, [isPaused, totalInsights, autoplayInterval]);
 
   // Navigation functions
   const goToNext = () => {
-    setActiveIndex((current) => (current + 1) % totalInsights);
+    if (totalInsights > 1) {
+      setActiveIndex((current) => (current + 1) % totalInsights);
+    }
   };
 
   const goToPrevious = () => {
-    setActiveIndex((current) => (current - 1 + totalInsights) % totalInsights);
+    if (totalInsights > 1) {
+      setActiveIndex((current) => (current - 1 + totalInsights) % totalInsights);
+    }
   };
 
   const goToIndex = (index: number) => {
-    setActiveIndex(index);
+    if (index >= 0 && index < totalInsights) {
+      setActiveIndex(index);
+    }
   };
 
   // Pause autoplay on hover
@@ -293,33 +344,7 @@ export function MarketInsightsCarousel({
     );
   }
 
-  // Render error state or empty state
-  if (error || !insights || insights.length === 0) {
-    return (
-      <div className={cn("relative", className)}>
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Market Insights Unavailable</CardTitle>
-            <CardDescription>
-              We're unable to load the latest market insights at this time.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-slate-500">
-              Please check your connection and try again. If the problem persists, our team has been notified.
-            </p>
-            <Button 
-              className="mt-4"
-              onClick={() => window.location.reload()}
-            >
-              Refresh Page
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
+  // Render carousel
   return (
     <div 
       className={cn("relative", className)}

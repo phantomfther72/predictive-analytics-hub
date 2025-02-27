@@ -23,28 +23,101 @@ const MarketDataTables: React.FC = () => {
     queryKey: ["marketMetrics"],
     queryFn: async () => {
       try {
-        const { data: session } = await supabase.auth.getSession();
-        if (!session.session) {
-          navigate("/auth");
-          return [];
+        // For demo purposes, use mock data if no access to Supabase session
+        const mockMetrics = [
+          {
+            id: "1",
+            market_type: "housing",
+            metric_name: "Average Price",
+            value: 325000,
+            source: "Housing Authority",
+            timestamp: new Date().toISOString(),
+            predicted_change: 2.3,
+            prediction_confidence: 0.85
+          },
+          {
+            id: "2",
+            market_type: "housing",
+            metric_name: "Inventory",
+            value: 1250,
+            source: "MLS Database",
+            timestamp: new Date().toISOString(),
+            predicted_change: -3.1,
+            prediction_confidence: 0.78
+          },
+          {
+            id: "3",
+            market_type: "agriculture",
+            metric_name: "Crop Yield",
+            value: 4200,
+            source: "Agriculture Dept",
+            timestamp: new Date().toISOString(),
+            predicted_change: 1.5,
+            prediction_confidence: 0.72
+          },
+          {
+            id: "4",
+            market_type: "agriculture",
+            metric_name: "Land Value",
+            value: 8500,
+            source: "Land Registry",
+            timestamp: new Date().toISOString(),
+            predicted_change: 4.2,
+            prediction_confidence: 0.81
+          },
+          {
+            id: "5",
+            market_type: "mining",
+            metric_name: "Production Volume",
+            value: 12500,
+            source: "Mining Association",
+            timestamp: new Date().toISOString(),
+            predicted_change: 0.8,
+            prediction_confidence: 0.69
+          },
+          {
+            id: "6",
+            market_type: "mining",
+            metric_name: "Commodity Price",
+            value: 1850,
+            source: "Commodity Exchange",
+            timestamp: new Date().toISOString(),
+            predicted_change: 3.7,
+            prediction_confidence: 0.77
+          }
+        ];
+
+        // Try to get Supabase data first
+        try {
+          const { data: session } = await supabase.auth.getSession();
+          
+          // If session exists, get real data
+          if (session.session) {
+            const { data, error } = await supabase
+              .from("market_metrics")
+              .select("*")
+              .order("timestamp", { ascending: false });
+
+            if (error) {
+              console.error("Error fetching market metrics:", error);
+              toast({
+                title: "Error",
+                description: "Failed to fetch market data. Please try again later.",
+                variant: "destructive",
+              });
+              throw error;
+            }
+
+            return data as MarketMetric[];
+          } else {
+            // Demo mode - use mock data for unauthenticated users
+            console.log("No auth session, using mock data");
+            return mockMetrics as MarketMetric[];
+          }
+        } catch (authError) {
+          console.warn("Auth error, falling back to mock data:", authError);
+          return mockMetrics as MarketMetric[];
         }
-
-        const { data, error } = await supabase
-          .from("market_metrics")
-          .select("*")
-          .order("timestamp", { ascending: false });
-
-        if (error) {
-          console.error("Error fetching market metrics:", error);
-          toast({
-            title: "Error",
-            description: "Failed to fetch market data. Please try again later.",
-            variant: "destructive",
-          });
-          throw error;
-        }
-
-        return data as MarketMetric[];
       } catch (error) {
         console.error("Error in query function:", error);
         throw error;
@@ -98,14 +171,14 @@ const MarketDataTables: React.FC = () => {
                       </p>
                       <div className="flex justify-between items-baseline mt-1">
                         <p className="text-2xl font-bold">
-                          {metric.value.toLocaleString()}
+                          {metric.value ? metric.value.toLocaleString() : 'N/A'}
                         </p>
                         <span className="text-sm text-gray-500">
                           {metric.source}
                         </span>
                       </div>
                       <p className="text-xs text-gray-400 mt-1">
-                        Updated: {new Date(metric.timestamp).toLocaleDateString()}
+                        Updated: {metric.timestamp ? new Date(metric.timestamp).toLocaleDateString() : 'N/A'}
                       </p>
                     </div>
                   ))}
@@ -129,7 +202,7 @@ const MarketDataTables: React.FC = () => {
                 {metric.metric_name}
               </p>
               <p className="text-lg font-bold mt-1">
-                {metric.value.toLocaleString()}
+                {metric.value ? metric.value.toLocaleString() : 'N/A'}
               </p>
               <p className="text-xs text-gray-500 mt-1">{metric.source}</p>
             </div>

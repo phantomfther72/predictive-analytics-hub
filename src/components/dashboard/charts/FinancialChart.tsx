@@ -6,15 +6,25 @@ import { type FinancialMarketMetric } from "@/types/market";
 import { ChartTooltip } from "./ChartTooltip";
 import { CHART_COLORS, commonChartProps, commonAxisProps } from "./chart-constants";
 import type { Payload } from "recharts/types/component/DefaultLegendContent";
+import { ModelSettings } from "../charts/use-chart-state";
 
 interface FinancialChartProps {
   data: FinancialMarketMetric[] | undefined;
   isLoading: boolean;
   selectedMetrics: string[];
   onLegendClick: (data: Payload) => void;
+  enabledModels?: ModelSettings[];
+  simulationMode?: boolean;
 }
 
-export function FinancialChart({ data, isLoading, selectedMetrics, onLegendClick }: FinancialChartProps) {
+export function FinancialChart({ 
+  data, 
+  isLoading, 
+  selectedMetrics, 
+  onLegendClick, 
+  enabledModels = [],
+  simulationMode = false 
+}: FinancialChartProps) {
   if (isLoading) {
     return <Skeleton className="w-full h-full animate-pulse" />;
   }
@@ -71,6 +81,24 @@ export function FinancialChart({ data, isLoading, selectedMetrics, onLegendClick
           hide={!selectedMetrics.includes("volume")}
           animationDuration={300}
         />
+        {enabledModels.length > 0 && data && data.map((item, index) => (
+          enabledModels.map(model => (
+            model.id !== "primary" && item.predicted_change && (
+              <ReferenceArea
+                key={`${model.id}-${index}`}
+                x1={item.timestamp}
+                x2={item.prediction_timestamp}
+                y1={item.current_price}
+                y2={item.current_price * (1 + ((item.predicted_change / 100) * model.weight))}
+                yAxisId="price"
+                fill={model.color}
+                fillOpacity={0.1}
+                stroke={model.color}
+                strokeOpacity={0.3}
+              />
+            )
+          ))
+        ))}
         {selectedMetrics.includes("predicted_change") && data?.map((item, index) => (
           item.predicted_change && (
             <ReferenceArea

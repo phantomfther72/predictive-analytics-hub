@@ -14,12 +14,15 @@ import { ChartTooltip } from "./ChartTooltip";
 import type { AgricultureMarketData } from "@/types/market";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Payload } from "recharts/types/component/DefaultLegendContent";
+import { ModelSettings } from "../charts/use-chart-state";
 
 interface AgricultureChartProps {
   data?: AgricultureMarketData[];
   isLoading?: boolean;
   selectedMetrics: string[];
   onLegendClick: (data: Payload) => void;
+  enabledModels?: ModelSettings[];
+  simulationMode?: boolean;
 }
 
 export function AgricultureChart({
@@ -27,6 +30,8 @@ export function AgricultureChart({
   isLoading,
   selectedMetrics,
   onLegendClick,
+  enabledModels = [],
+  simulationMode = false
 }: AgricultureChartProps) {
   if (isLoading) {
     return <Skeleton className="h-[400px] w-full" />;
@@ -79,6 +84,22 @@ export function AgricultureChart({
             dot={false}
           />
         )}
+        {enabledModels.length > 0 && simulationMode && 
+          enabledModels.filter(m => m.id !== "primary").map(model => (
+            selectedMetrics.includes("market_price_usd") && (
+              <Line
+                key={`${model.id}-price`}
+                type="monotone"
+                dataKey={(dataPoint) => dataPoint.market_price_usd * (1 + model.weight * 0.15)}
+                name={`${model.name} - Price`}
+                stroke={model.color}
+                dot={false}
+                strokeDasharray="5 5"
+                opacity={0.7}
+              />
+            )
+          ))
+        }
       </LineChart>
     </ResponsiveContainer>
   );

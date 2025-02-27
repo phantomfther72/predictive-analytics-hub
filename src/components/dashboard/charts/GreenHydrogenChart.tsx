@@ -14,12 +14,15 @@ import { ChartTooltip } from "./ChartTooltip";
 import type { GreenHydrogenMetrics } from "@/types/market";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Payload } from "recharts/types/component/DefaultLegendContent";
+import { ModelSettings } from "../charts/use-chart-state";
 
 interface GreenHydrogenChartProps {
   data?: GreenHydrogenMetrics[];
   isLoading?: boolean;
   selectedMetrics: string[];
   onLegendClick: (data: Payload) => void;
+  enabledModels?: ModelSettings[];
+  simulationMode?: boolean;
 }
 
 export function GreenHydrogenChart({
@@ -27,6 +30,8 @@ export function GreenHydrogenChart({
   isLoading,
   selectedMetrics,
   onLegendClick,
+  enabledModels = [],
+  simulationMode = false
 }: GreenHydrogenChartProps) {
   if (isLoading) {
     return <Skeleton className="h-[400px] w-full" />;
@@ -79,6 +84,22 @@ export function GreenHydrogenChart({
             dot={false}
           />
         )}
+        {enabledModels.length > 0 && simulationMode && 
+          enabledModels.filter(m => m.id !== "primary").map(model => (
+            selectedMetrics.includes("production_capacity_mw") && (
+              <Line
+                key={`${model.id}-capacity`}
+                type="monotone"
+                dataKey={(dataPoint) => dataPoint.production_capacity_mw * (1 + model.weight * 0.2)}
+                name={`${model.name} - Capacity`}
+                stroke={model.color}
+                dot={false}
+                strokeDasharray="5 5"
+                opacity={0.7}
+              />
+            )
+          ))
+        }
       </LineChart>
     </ResponsiveContainer>
   );

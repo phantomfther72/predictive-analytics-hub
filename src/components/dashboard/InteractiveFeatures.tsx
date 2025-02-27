@@ -5,7 +5,7 @@ import { ModelComparisonPanel } from "./interactive/ModelComparisonPanel";
 import { SimulationPanel } from "./interactive/SimulationPanel";
 import { CollaborationPanel } from "./interactive/CollaborationPanel";
 import { VoiceCommandPanel } from "./interactive/VoiceCommandPanel";
-import { ChartModes, LineChart, BarChart, Microphone, Users } from "lucide-react";
+import { BarChart, LineChart, Users, Mic } from "lucide-react";
 
 export const InteractiveFeatures: React.FC = () => {
   return (
@@ -15,7 +15,7 @@ export const InteractiveFeatures: React.FC = () => {
       <Tabs defaultValue="models">
         <TabsList className="grid grid-cols-4 mb-4">
           <TabsTrigger value="models" className="flex items-center gap-2">
-            <ChartModes className="w-4 h-4" />
+            <BarChart className="w-4 h-4" />
             <span className="hidden sm:inline">Model Comparison</span>
           </TabsTrigger>
           <TabsTrigger value="simulation" className="flex items-center gap-2">
@@ -27,7 +27,7 @@ export const InteractiveFeatures: React.FC = () => {
             <span className="hidden sm:inline">Collaboration</span>
           </TabsTrigger>
           <TabsTrigger value="voice" className="flex items-center gap-2">
-            <Microphone className="w-4 h-4" />
+            <Mic className="w-4 h-4" />
             <span className="hidden sm:inline">Voice Commands</span>
           </TabsTrigger>
         </TabsList>

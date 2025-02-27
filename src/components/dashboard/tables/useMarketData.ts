@@ -8,7 +8,7 @@ import type {
   HousingMarketData,
   MiningSectorInsight,
   AgricultureMarketData,
-  GreenHydrogenMetric,
+  GreenHydrogenMetrics,
 } from "@/types/market";
 
 export const useMarketData = () => {
@@ -185,7 +185,7 @@ export const useMarketData = () => {
             confidence: Math.min(item.prediction_confidence * 0.9, 1)
           }
         ]
-      })) as GreenHydrogenMetric[];
+      })) as GreenHydrogenMetrics[];
     },
   });
 

@@ -8,9 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// Define market types
-type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "general";
+import { MarketType } from "@/types/market";
 
 // Define insight metric interface
 interface InsightMetric {
@@ -26,7 +24,7 @@ interface MarketInsight {
   description: string;
   icon: React.ReactNode;
   metrics: InsightMetric[];
-  type: MarketType;
+  type: MarketType | "general";
   link?: string;
 }
 
@@ -193,7 +191,7 @@ export function MarketInsightsCarousel({
           
           // Get icon based on market type
           let icon;
-          switch (type as MarketType) {
+          switch (type as MarketType | "general") {
             case "housing":
               icon = <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-blue-600"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -240,7 +238,7 @@ export function MarketInsightsCarousel({
               description: `Latest insights and predictions for the ${type} sector`,
               icon,
               metrics: formattedMetrics.slice(0, 4), // limit to 4 metrics
-              type: type as MarketType,
+              type: type as MarketType | "general",
               link: `/dashboard/industry/${type}`
             });
           }

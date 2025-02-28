@@ -1,3 +1,4 @@
+
 export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency";
 
 export type PredictionFactors = {

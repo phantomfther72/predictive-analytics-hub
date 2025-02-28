@@ -28,6 +28,19 @@ interface MarketInsight {
   link?: string;
 }
 
+// Define our expected database schema for market metrics
+// Making predicted_change optional to handle Supabase data
+interface MarketMetricData {
+  id: string;
+  market_type: string;
+  metric_name: string;
+  value: number;
+  timestamp: string;
+  source: string;
+  predicted_change?: number;  // Make this optional
+  created_at?: string;  // Add this optional field from Supabase
+}
+
 interface MarketInsightsCarouselProps {
   insights?: MarketInsight[];
   autoplayInterval?: number;
@@ -71,7 +84,7 @@ export function MarketInsightsCarousel({
     queryFn: async () => {
       try {
         // For demo purposes, use mock data
-        const mockData = [
+        const mockData: MarketMetricData[] = [
           {
             id: "housing-1",
             market_type: "housing",
@@ -146,7 +159,7 @@ export function MarketInsightsCarousel({
           }
         ];
 
-        let data = mockData;
+        let data: MarketMetricData[] = mockData;
 
         // Try to get data from Supabase, fall back to mock data if needed
         try {
@@ -158,14 +171,15 @@ export function MarketInsightsCarousel({
           if (error) {
             console.warn("Supabase error, using mock data:", error);
           } else if (supabaseData && supabaseData.length > 0) {
-            data = supabaseData;
+            // Cast the data from Supabase to our MarketMetricData type
+            data = supabaseData as MarketMetricData[];
           }
         } catch (supabaseError) {
           console.warn("Supabase access error, using mock data:", supabaseError);
         }
 
         // Group by market type
-        const groupedMetrics: Record<string, any[]> = {};
+        const groupedMetrics: Record<string, MarketMetricData[]> = {};
         
         // Initialize market types to ensure we always have them
         ["housing", "agriculture", "mining", "cryptocurrency", "general"].forEach(type => {
@@ -175,10 +189,11 @@ export function MarketInsightsCarousel({
         // Add data to appropriate market type
         data.forEach(metric => {
           if (metric && metric.market_type) {
-            if (!groupedMetrics[metric.market_type]) {
-              groupedMetrics[metric.market_type] = [];
+            const marketType = metric.market_type;
+            if (!groupedMetrics[marketType]) {
+              groupedMetrics[marketType] = [];
             }
-            groupedMetrics[metric.market_type].push(metric);
+            groupedMetrics[marketType].push(metric);
           }
         });
 
@@ -225,20 +240,25 @@ export function MarketInsightsCarousel({
               formattedMetrics.push({
                 label: m.metric_name,
                 value: m.value !== undefined ? m.value : "N/A",
-                change: m.predicted_change !== undefined ? m.predicted_change : undefined
+                change: m.predicted_change  // This is now optional
               });
             }
           });
 
           // Only add insight if it has metrics
           if (formattedMetrics.length > 0) {
+            // Handle potentially unknown market types
+            const marketType = (type === "housing" || type === "agriculture" || 
+                               type === "mining" || type === "cryptocurrency") 
+                               ? type as MarketType : "general";
+            
             insights.push({
               id: type,
               title: `${type.charAt(0).toUpperCase() + type.slice(1)} Market`,
               description: `Latest insights and predictions for the ${type} sector`,
               icon,
               metrics: formattedMetrics.slice(0, 4), // limit to 4 metrics
-              type: type as MarketType | "general",
+              type: marketType === "general" ? "general" : marketType,
               link: `/dashboard/industry/${type}`
             });
           }

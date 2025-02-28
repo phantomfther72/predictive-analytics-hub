@@ -1,5 +1,5 @@
 
-export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency";
+export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen";
 
 export type PredictionFactors = {
   market_trend: number;
@@ -14,6 +14,7 @@ export type MarketMetric = {
   value: number;
   timestamp: string;
   source: string;
+  predicted_change?: number; // Make this optional to match Supabase data
 };
 
 export type NewsItem = {

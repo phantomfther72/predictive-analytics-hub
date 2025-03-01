@@ -1,3 +1,4 @@
+
 export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen";
 
 export type PredictionFactors = {
@@ -52,10 +53,36 @@ export type HousingMarketData = {
   listings_active: number;
   timestamp: string;
   predicted_change: number | null;
-  prediction_timestamp: string;
+  prediction_timestamp?: string;
   prediction_confidence: number;
-  prediction_explanation: string | null;
-  prediction_factors: PredictionFactors | null;
+  prediction_explanation?: string | null;
+  prediction_factors?: PredictionFactors | null;
+  predicted?: boolean;
+  confidence?: number;
+  date?: string;
+};
+
+export type RentalMarketData = {
+  id: string;
+  region: string;
+  avg_rental_price: number;
+  vacancy_rate: number;
+  rental_yield: number;
+  yoy_change: number;
+  timestamp: string;
+  predicted_change?: number | null;
+  prediction_confidence?: number;
+};
+
+export type HousingIndicator = {
+  id: string;
+  indicator_name: string;
+  value: number;
+  previous_value: number;
+  change_percentage: number;
+  timestamp: string;
+  region: string | null;
+  notes: string | null;
 };
 
 export type MiningSectorInsight = {

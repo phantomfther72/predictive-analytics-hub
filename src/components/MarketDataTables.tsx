@@ -171,6 +171,10 @@ const MarketDataTables: React.FC = () => {
     }, {} as Record<string, MarketMetric[]>);
   }, [marketMetrics]);
 
+  const handleHousingClick = () => {
+    navigate('/housing-market');
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-8">
@@ -187,9 +191,20 @@ const MarketDataTables: React.FC = () => {
         <h2 className="text-3xl font-bold mb-6">Latest Market Insights</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Object.entries(groupedMetrics).map(([marketType, metrics]) => (
-            <Card key={marketType} className="hover:shadow-lg transition-shadow">
+            <Card 
+              key={marketType} 
+              className={`hover:shadow-lg transition-shadow ${marketType === 'housing' ? 'cursor-pointer border-blue-200 hover:border-blue-400' : ''}`}
+              onClick={marketType === 'housing' ? handleHousingClick : undefined}
+            >
               <CardHeader>
-                <CardTitle className="capitalize">{marketType.replace('_', ' ')} Market</CardTitle>
+                <CardTitle className="capitalize flex items-center justify-between">
+                  <span>{marketType.replace('_', ' ')} Market</span>
+                  {marketType === 'housing' && (
+                    <Badge variant="outline" className="text-xs text-blue-600 border-blue-300 ml-2">
+                      Detailed View
+                    </Badge>
+                  )}
+                </CardTitle>
                 <CardDescription>
                   Latest metrics and predictions
                 </CardDescription>
@@ -215,6 +230,16 @@ const MarketDataTables: React.FC = () => {
                       <p className="text-xs text-gray-400 mt-1">
                         Updated: {new Date(metric.timestamp).toLocaleDateString()}
                       </p>
+                      {metric.predicted_change !== undefined && metric.prediction_confidence !== undefined && (
+                        <div className="mt-2">
+                          <p className={`text-xs font-medium ${parseFloat(String(metric.predicted_change)) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            Predicted change: {parseFloat(String(metric.predicted_change)) > 0 ? '+' : ''}{metric.predicted_change}%
+                            <span className="text-gray-500 ml-1">
+                              (Confidence: {Math.round(metric.prediction_confidence * 100)}%)
+                            </span>
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -254,3 +279,6 @@ const MarketDataTables: React.FC = () => {
 };
 
 export default MarketDataTables;
+
+// Missing imports that were needed:
+import { Badge } from "@/components/ui/badge";

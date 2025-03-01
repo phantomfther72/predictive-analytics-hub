@@ -1,20 +1,12 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { PredictionCell } from "./dashboard/tables/PredictionCell";
 import type { MarketMetric } from "@/types/market";
+import MarketCard from "./market-data/MarketCard";
+import MarketAlerts from "./market-data/MarketAlerts";
 
 const MarketDataTables: React.FC = () => {
   const { toast } = useToast();
@@ -192,89 +184,21 @@ const MarketDataTables: React.FC = () => {
         <h2 className="text-3xl font-bold mb-6">Latest Market Insights</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Object.entries(groupedMetrics || {}).map(([marketType, metrics]) => (
-            <Card 
-              key={marketType} 
-              className={`hover:shadow-lg transition-shadow ${marketType === 'housing' ? 'cursor-pointer border-blue-200 hover:border-blue-400' : ''}`}
-              onClick={marketType === 'housing' ? handleHousingClick : undefined}
-            >
-              <CardHeader>
-                <CardTitle className="capitalize flex items-center justify-between">
-                  <span>{marketType.replace('_', ' ')} Market</span>
-                  {marketType === 'housing' && (
-                    <Badge variant="outline" className="text-xs text-blue-600 border-blue-300 ml-2">
-                      Detailed View
-                    </Badge>
-                  )}
-                </CardTitle>
-                <CardDescription>
-                  Latest metrics and predictions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {metrics.map((metric) => (
-                    <div
-                      key={metric.id}
-                      className="border-b border-gray-100 last:border-0 pb-3 last:pb-0"
-                    >
-                      <p className="text-sm font-medium text-gray-600">
-                        {metric.metric_name}
-                      </p>
-                      <div className="flex justify-between items-baseline mt-1">
-                        <p className="text-2xl font-bold">
-                          {typeof metric.value === 'number' ? metric.value.toLocaleString() : metric.value}
-                        </p>
-                        <span className="text-sm text-gray-500">
-                          {metric.source}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Updated: {new Date(metric.timestamp).toLocaleDateString()}
-                      </p>
-                      {metric.predicted_change !== undefined && metric.prediction_confidence !== undefined && (
-                        <div className="mt-2">
-                          <p className={`text-xs font-medium ${parseFloat(String(metric.predicted_change)) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            Predicted change: {parseFloat(String(metric.predicted_change)) > 0 ? '+' : ''}{metric.predicted_change}%
-                            <span className="text-gray-500 ml-1">
-                              (Confidence: {Math.round((metric.prediction_confidence || 0) * 100)}%)
-                            </span>
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <MarketCard 
+              key={marketType}
+              marketType={marketType}
+              metrics={metrics}
+              onCardClick={marketType === 'housing' ? handleHousingClick : undefined}
+              isClickable={marketType === 'housing'}
+            />
           ))}
         </div>
       </div>
 
       {/* Real-time alerts section */}
-      <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-6">
-        <h3 className="text-xl font-semibold mb-4">Market Alerts</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {marketMetrics?.slice(0, 3).map((metric) => (
-            <div
-              key={metric.id}
-              className="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
-            >
-              <p className="text-sm font-medium text-gray-600">
-                {metric.metric_name}
-              </p>
-              <p className="text-lg font-bold mt-1">
-                {typeof metric.value === 'number' ? metric.value.toLocaleString() : metric.value}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">{metric.source}</p>
-              {metric.predicted_change !== undefined && (
-                <p className={`text-xs font-medium ${parseFloat(String(metric.predicted_change)) > 0 ? 'text-green-600' : 'text-red-600'} mt-1`}>
-                  Predicted change: {parseFloat(String(metric.predicted_change)) > 0 ? '+' : ''}{metric.predicted_change}%
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
+      {marketMetrics && marketMetrics.length > 0 && (
+        <MarketAlerts metrics={marketMetrics} />
+      )}
     </div>
   );
 };

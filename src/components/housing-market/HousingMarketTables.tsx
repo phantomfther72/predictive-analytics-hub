@@ -1,8 +1,5 @@
 
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import {
   Table,
   TableBody,
@@ -12,48 +9,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, ChevronDown, InfoIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
+import { HousingMarketData, RentalMarketData, HousingIndicator, PredictionFactors } from "@/types/market";
 import { PredictionCell } from "../dashboard/tables/PredictionCell";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import type { HousingMarketData, RentalMarketData, PredictionFactors } from "@/types/market";
+import { parsePredictionFactors } from "../dashboard/tables/PredictionFactorsUtils";
 
-export const HousingMarketTables: React.FC = () => {
+// Import JSON type from Supabase
+import { Json } from "@/integrations/supabase/types";
+
+const HousingMarketTables: React.FC = () => {
   const { toast } = useToast();
-  const [sortColumn, setSortColumn] = useState<string>("avg_price_usd");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [selectedRegion, setSelectedRegion] = useState<string>("all");
-
-  // Fetch housing market data
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  
+  // Query to fetch housing market data
   const { data: housingData, isLoading: isLoadingHousing } = useQuery({
     queryKey: ["housingMarketData"],
     queryFn: async () => {
@@ -62,572 +44,524 @@ export const HousingMarketTables: React.FC = () => {
           .from("housing_market_data")
           .select("*")
           .order("timestamp", { ascending: false });
-
+        
         if (error) {
-          console.error("Error fetching housing data:", error);
           toast({
             title: "Error",
-            description: "Failed to fetch housing market data.",
+            description: "Failed to fetch housing market data",
             variant: "destructive",
           });
           throw error;
         }
-
-        // If no data returned, use mock data
-        if (!data || data.length === 0) {
-          return [
-            {
-              id: "1",
-              region: "Windhoek",
-              avg_price_usd: 325000,
-              yoy_change: 4.2,
-              listings_active: 420,
-              timestamp: new Date().toISOString(),
-              predicted_change: 2.7,
-              prediction_confidence: 0.85,
-              prediction_explanation: "Based on economic indicators and seasonal patterns",
-              prediction_factors: { market_trend: 0.7, volatility: 0.3, sentiment: 0.8 }
-            },
-            {
-              id: "2",
-              region: "Walvis Bay",
-              avg_price_usd: 280000,
-              yoy_change: 3.5,
-              listings_active: 210,
-              timestamp: new Date().toISOString(),
-              predicted_change: 1.8,
-              prediction_confidence: 0.78,
-              prediction_explanation: "Coastal demand continues to drive prices",
-              prediction_factors: { market_trend: 0.6, volatility: 0.4, sentiment: 0.7 }
-            },
-            {
-              id: "3",
-              region: "Swakopmund",
-              avg_price_usd: 310000,
-              yoy_change: 5.1,
-              listings_active: 180,
-              timestamp: new Date().toISOString(),
-              predicted_change: 3.2,
-              prediction_confidence: 0.82,
-              prediction_explanation: "Tourism and second-home market remain strong",
-              prediction_factors: { market_trend: 0.8, volatility: 0.3, sentiment: 0.9 }
-            },
-            {
-              id: "4",
-              region: "Oshakati",
-              avg_price_usd: 195000,
-              yoy_change: 2.8,
-              listings_active: 150,
-              timestamp: new Date().toISOString(),
-              predicted_change: 1.5,
-              prediction_confidence: 0.72,
-              prediction_explanation: "Steady growth with potential for acceleration",
-              prediction_factors: { market_trend: 0.5, volatility: 0.5, sentiment: 0.6 }
-            },
-            {
-              id: "5",
-              region: "Otjiwarongo",
-              avg_price_usd: 175000,
-              yoy_change: 2.2,
-              listings_active: 85,
-              timestamp: new Date().toISOString(),
-              predicted_change: 1.3,
-              prediction_confidence: 0.68,
-              prediction_explanation: "Moderate growth in regional center",
-              prediction_factors: { market_trend: 0.4, volatility: 0.4, sentiment: 0.6 }
-            },
-            {
-              id: "6",
-              region: "Keetmanshoop",
-              avg_price_usd: 160000,
-              yoy_change: 1.8,
-              listings_active: 65,
-              timestamp: new Date().toISOString(),
-              predicted_change: 0.9,
-              prediction_confidence: 0.65,
-              prediction_explanation: "Stable market with limited growth prospects",
-              prediction_factors: { market_trend: 0.3, volatility: 0.5, sentiment: 0.5 }
-            }
-          ] as HousingMarketData[];
+        
+        // If we have real data, process and return it
+        if (data && data.length > 0) {
+          return data.map(item => ({
+            ...item,
+            prediction_factors: parsePredictionFactors(item.prediction_factors) as PredictionFactors | null
+          })) as HousingMarketData[];
         }
-
-        return data as HousingMarketData[];
-      } catch (err) {
-        console.error("Error in query function:", err);
-        return [] as HousingMarketData[];
+        
+        // If no data, return mock data
+        return generateMockHousingData();
+      } catch (error) {
+        console.error("Error fetching housing data:", error);
+        
+        // Fallback to mock data in case of error
+        return generateMockHousingData();
       }
     },
   });
-
-  // Fetch rental market data
+  
+  // Query to fetch rental market data
   const { data: rentalData, isLoading: isLoadingRental } = useQuery({
     queryKey: ["rentalMarketData"],
     queryFn: async () => {
       try {
-        // For demo purposes, return mock rental data
-        return [
-          {
-            id: "1",
-            region: "Windhoek",
-            avg_rental_price: 1200,
-            vacancy_rate: 4.2,
-            rental_yield: 6.5,
-            yoy_change: 3.8,
-            timestamp: new Date().toISOString(),
-            predicted_change: 2.1,
-            prediction_confidence: 0.81
-          },
-          {
-            id: "2",
-            region: "Walvis Bay",
-            avg_rental_price: 950,
-            vacancy_rate: 5.1,
-            rental_yield: 5.8,
-            yoy_change: 2.9,
-            timestamp: new Date().toISOString(),
-            predicted_change: 1.7,
-            prediction_confidence: 0.75
-          },
-          {
-            id: "3",
-            region: "Swakopmund",
-            avg_rental_price: 1100,
-            vacancy_rate: 3.8,
-            rental_yield: 7.1,
-            yoy_change: 4.2,
-            timestamp: new Date().toISOString(),
-            predicted_change: 3.0,
-            prediction_confidence: 0.79
-          },
-          {
-            id: "4",
-            region: "Oshakati",
-            avg_rental_price: 680,
-            vacancy_rate: 5.6,
-            rental_yield: 6.2,
-            yoy_change: 2.2,
-            timestamp: new Date().toISOString(),
-            predicted_change: 1.2,
-            prediction_confidence: 0.68
-          },
-          {
-            id: "5",
-            region: "Otjiwarongo",
-            avg_rental_price: 580,
-            vacancy_rate: 6.2,
-            rental_yield: 5.9,
-            yoy_change: 1.9,
-            timestamp: new Date().toISOString(),
-            predicted_change: 0.8,
-            prediction_confidence: 0.64
-          },
-          {
-            id: "6",
-            region: "Keetmanshoop",
-            avg_rental_price: 520,
-            vacancy_rate: 7.1,
-            rental_yield: 5.5,
-            yoy_change: 1.2,
-            timestamp: new Date().toISOString(),
-            predicted_change: 0.5,
-            prediction_confidence: 0.61
+        // First try to fetch from Supabase
+        try {
+          const { data, error } = await supabase
+            .from("rental_market_data")
+            .select("*")
+            .order("timestamp", { ascending: false });
+            
+          if (!error && data && data.length > 0) {
+            return data as RentalMarketData[];
           }
-        ] as RentalMarketData[];
-      } catch (err) {
-        console.error("Error in rental data query:", err);
-        return [] as RentalMarketData[];
+        } catch (e) {
+          console.log("Rental data table may not exist, using mock data");
+        }
+        
+        // If failed or no data, return mock data
+        return generateMockRentalData();
+      } catch (error) {
+        console.error("Error fetching rental data:", error);
+        return generateMockRentalData();
       }
-    }
+    },
+  });
+  
+  // Query to fetch housing indicators
+  const { data: indicatorData, isLoading: isLoadingIndicators } = useQuery({
+    queryKey: ["housingIndicators"],
+    queryFn: async () => {
+      try {
+        // First try to fetch from Supabase
+        try {
+          const { data, error } = await supabase
+            .from("housing_indicators")
+            .select("*")
+            .order("timestamp", { ascending: false });
+            
+          if (!error && data && data.length > 0) {
+            return data as HousingIndicator[];
+          }
+        } catch (e) {
+          console.log("Housing indicators table may not exist, using mock data");
+        }
+        
+        // If failed or no data, return mock data
+        return generateMockHousingIndicators();
+      } catch (error) {
+        console.error("Error fetching housing indicators:", error);
+        return generateMockHousingIndicators();
+      }
+    },
   });
 
-  // Filter data by selected region
-  const filteredHousingData = React.useMemo(() => {
-    if (!housingData) return [];
-    if (selectedRegion === "all") return housingData;
-    return housingData.filter(item => item.region === selectedRegion);
-  }, [housingData, selectedRegion]);
+  // Function to generate mock housing market data
+  const generateMockHousingData = (): HousingMarketData[] => {
+    const regions = ["Windhoek", "Swakopmund", "Walvis Bay", "Oshakati", "Katima Mulilo", "Otjiwarongo"];
+    const mockData: HousingMarketData[] = [];
 
-  const filteredRentalData = React.useMemo(() => {
-    if (!rentalData) return [];
-    if (selectedRegion === "all") return rentalData;
-    return rentalData.filter(item => item.region === selectedRegion);
-  }, [rentalData, selectedRegion]);
+    regions.forEach((region, index) => {
+      const basePrice = 300000 + Math.floor(Math.random() * 700000);
+      const yoyChange = (Math.random() * 10) - 2; // Between -2% and 8%
+      const predictedChange = (Math.random() * 8) - 3; // Between -3% and 5%
+      const predictionConfidence = 0.65 + (Math.random() * 0.3); // Between 65% and 95%
+      
+      const predictionFactors: PredictionFactors = {
+        market_trend: Math.random() * 100,
+        volatility: Math.random() * 100,
+        sentiment: Math.random() * 100
+      };
 
-  // Sort data by selected column and direction
-  const sortedHousingData = React.useMemo(() => {
-    if (!filteredHousingData) return [];
-    return [...filteredHousingData].sort((a, b) => {
-      const aValue = a[sortColumn as keyof HousingMarketData];
-      const bValue = b[sortColumn as keyof HousingMarketData];
-      
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
-      }
-      
-      // For string comparison
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return sortDirection === 'asc' 
-          ? aValue.localeCompare(bValue) 
-          : bValue.localeCompare(aValue);
-      }
-      
-      return 0;
+      mockData.push({
+        id: `mock-housing-${index}`,
+        region: region,
+        avg_price_usd: basePrice,
+        yoy_change: yoyChange,
+        listings_active: Math.floor(Math.random() * 200) + 50,
+        timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        predicted_change: predictedChange,
+        prediction_confidence: predictionConfidence,
+        prediction_explanation: "Based on historical trends and regional market dynamics",
+        prediction_factors: predictionFactors,
+        prediction_timestamp: new Date().toISOString()
+      });
     });
-  }, [filteredHousingData, sortColumn, sortDirection]);
 
-  // Region options derived from data
-  const regionOptions = React.useMemo(() => {
-    if (!housingData) return ["all"];
-    const regions = housingData.map(item => item.region);
-    return ["all", ...new Set(regions)];
-  }, [housingData]);
-
-  // Handle sort change
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortDirection("desc");
-    }
+    return mockData;
   };
+  
+  // Function to generate mock rental market data
+  const generateMockRentalData = (): RentalMarketData[] => {
+    const regions = ["Windhoek", "Swakopmund", "Walvis Bay", "Oshakati", "Katima Mulilo", "Otjiwarongo"];
+    const mockData: RentalMarketData[] = [];
 
-  // Parse prediction factors for display
-  const parsePredictionFactors = (factors: PredictionFactors | null | any) => {
-    if (!factors) return { market_trend: 0, volatility: 0, sentiment: 0 };
+    regions.forEach((region, index) => {
+      const rentalPrice = 800 + Math.floor(Math.random() * 1200);
+      const vacancyRate = 2 + (Math.random() * 6); // Between 2% and 8%
+      const rentalYield = 4 + (Math.random() * 4); // Between 4% and 8%
+      const yoyChange = (Math.random() * 8) - 2; // Between -2% and 6%
+      
+      mockData.push({
+        id: `mock-rental-${index}`,
+        region: region,
+        avg_rental_price: rentalPrice,
+        vacancy_rate: vacancyRate,
+        rental_yield: rentalYield,
+        yoy_change: yoyChange,
+        timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        predicted_change: (Math.random() * 5) - 2,
+        prediction_confidence: 0.7 + (Math.random() * 0.2)
+      });
+    });
+
+    return mockData;
+  };
+  
+  // Function to generate mock housing indicators
+  const generateMockHousingIndicators = (): HousingIndicator[] => {
+    const indicators = [
+      "Mortgage Rate (%)",
+      "Housing Affordability Index",
+      "Construction Cost Index",
+      "Days on Market",
+      "Home Ownership Rate (%)",
+      "New Building Permits"
+    ];
     
-    // If already a PredictionFactors object, return as is
-    if (
-      typeof factors === 'object' &&
-      'market_trend' in factors &&
-      'volatility' in factors &&
-      'sentiment' in factors
-    ) {
-      return factors as PredictionFactors;
-    }
-    
-    // Parse from JSON string if needed
-    try {
-      if (typeof factors === 'string') {
-        const parsed = JSON.parse(factors);
-        return {
-          market_trend: parsed.market_trend || 0,
-          volatility: parsed.volatility || 0,
-          sentiment: parsed.sentiment || 0
-        };
+    const mockData: HousingIndicator[] = [];
+
+    indicators.forEach((indicator, index) => {
+      // Generate appropriate values based on indicator type
+      let value, previousValue;
+      
+      switch (indicator) {
+        case "Mortgage Rate (%)":
+          value = 6 + (Math.random() * 3);
+          previousValue = value + (Math.random() * 1 - 0.5);
+          break;
+        case "Housing Affordability Index":
+          value = 80 + (Math.random() * 40);
+          previousValue = value + (Math.random() * 20 - 10);
+          break;
+        case "Construction Cost Index":
+          value = 110 + (Math.random() * 20);
+          previousValue = value - (Math.random() * 10);
+          break;
+        case "Days on Market":
+          value = 20 + (Math.random() * 40);
+          previousValue = value + (Math.random() * 20 - 10);
+          break;
+        case "Home Ownership Rate (%)":
+          value = 40 + (Math.random() * 30);
+          previousValue = value + (Math.random() * 5 - 2.5);
+          break;
+        case "New Building Permits":
+          value = 100 + (Math.random() * 200);
+          previousValue = value + (Math.random() * 100 - 50);
+          break;
+        default:
+          value = 100 + (Math.random() * 50);
+          previousValue = value + (Math.random() * 20 - 10);
       }
-    } catch (e) {
-      console.error("Error parsing prediction factors:", e);
-    }
-    
-    // Default fallback
-    return { market_trend: 0, volatility: 0, sentiment: 0 };
+      
+      // Calculate change percentage
+      const changePercentage = ((value - previousValue) / previousValue) * 100;
+      
+      mockData.push({
+        id: `mock-indicator-${index}`,
+        indicator_name: indicator,
+        value: value,
+        previous_value: previousValue,
+        change_percentage: changePercentage,
+        timestamp: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
+        region: index % 3 === 0 ? null : "Namibia",
+        notes: index % 4 === 0 ? "Seasonal adjustment applied" : null
+      });
+    });
+
+    return mockData;
   };
 
-  if (isLoadingHousing || isLoadingRental) {
+  // Handle region selection for filtering data
+  const handleRegionSelect = (region: string) => {
+    setActiveRegion(region === activeRegion ? null : region);
+  };
+  
+  // Filter data based on selected region
+  const filteredHousingData = activeRegion
+    ? housingData?.filter(item => item.region === activeRegion)
+    : housingData;
+    
+  const filteredRentalData = activeRegion
+    ? rentalData?.filter(item => item.region === activeRegion)
+    : rentalData;
+
+  // Check if all data is loading
+  const isLoading = isLoadingHousing || isLoadingRental || isLoadingIndicators;
+
+  if (isLoading) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-96" />
-        <Skeleton className="h-96" />
+      <div className="space-y-8">
+        <Skeleton className="h-10 w-1/4" />
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-8 w-24" />
+        </div>
+        <Skeleton className="h-[400px] w-full" />
+        <Skeleton className="h-[300px] w-full" />
+        <Skeleton className="h-[250px] w-full" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold">Market Data Tables</h2>
+      
+      {/* Region filter buttons */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {housingData?.map(item => item.region).filter((v, i, a) => a.indexOf(v) === i).map(region => (
+          <Button
+            key={region}
+            variant={region === activeRegion ? "secondary" : "outline"}
+            size="sm"
+            onClick={() => handleRegionSelect(region)}
+            className="transition-all duration-200"
+          >
+            {region}
+          </Button>
+        ))}
+        {activeRegion && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setActiveRegion(null)}
+            className="ml-2"
+          >
+            Clear Filter
+          </Button>
+        )}
+      </div>
+      
+      {/* Housing Market Table */}
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            <div>
-              <CardTitle>Housing Sales Market Data</CardTitle>
-              <CardDescription>
-                Comprehensive pricing and market metrics across Namibian regions
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Select
-                value={selectedRegion}
-                onValueChange={setSelectedRegion}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select region" />
-                </SelectTrigger>
-                <SelectContent>
-                  {regionOptions.map((region) => (
-                    <SelectItem key={region} value={region}>
-                      {region === "all" ? "All Regions" : region}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <CardTitle className="flex items-center justify-between">
+            <span>Housing Market Data</span>
+            {activeRegion && (
+              <Badge variant="outline" className="ml-2">
+                {activeRegion}
+              </Badge>
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border overflow-hidden">
-            <Table>
-              <TableCaption>
-                Housing market data as of{" "}
-                {housingData && housingData.length > 0
-                  ? new Date(housingData[0].timestamp).toLocaleDateString()
-                  : "N/A"}
-              </TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Region</TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort("avg_price_usd")}
-                      className="flex items-center gap-1 font-medium"
-                    >
-                      Average Price
-                      <ArrowUpDown size={16} />
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort("yoy_change")}
-                      className="flex items-center gap-1 font-medium"
-                    >
-                      YoY Change
-                      <ArrowUpDown size={16} />
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort("listings_active")}
-                      className="flex items-center gap-1 font-medium"
-                    >
-                      Active Listings
-                      <ArrowUpDown size={16} />
-                    </Button>
-                  </TableHead>
-                  <TableHead>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort("predicted_change")}
-                      className="flex items-center gap-1 font-medium"
-                    >
-                      Predicted Change
-                      <ArrowUpDown size={16} />
-                    </Button>
-                  </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+          <Table>
+            <TableCaption>
+              Housing market data showing average prices, year-over-year changes, and active listings
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Region</TableHead>
+                <TableHead>Average Price (USD)</TableHead>
+                <TableHead>YoY Change (%)</TableHead>
+                <TableHead>Active Listings</TableHead>
+                <TableHead>Predicted Change (%)</TableHead>
+                <TableHead>Last Updated</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredHousingData?.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">{item.region}</TableCell>
+                  <TableCell>${item.avg_price_usd.toLocaleString()}</TableCell>
+                  <TableCell className={item.yoy_change >= 0 ? "text-green-600" : "text-red-600"}>
+                    {item.yoy_change.toFixed(2)}%
+                  </TableCell>
+                  <TableCell>{item.listings_active}</TableCell>
+                  <TableCell>
+                    <PredictionCell
+                      value={item.predicted_change}
+                      confidence={item.prediction_confidence}
+                      explanation={item.prediction_explanation || null}
+                      factors={item.prediction_factors || null}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {new Date(item.timestamp).toLocaleDateString()}
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedHousingData.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.region}</TableCell>
-                    <TableCell>
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                        maximumFractionDigits: 0,
-                      }).format(item.avg_price_usd)}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={
-                          item.yoy_change > 0
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }
-                      >
-                        {item.yoy_change > 0 ? "+" : ""}
-                        {item.yoy_change.toFixed(1)}%
-                      </span>
-                    </TableCell>
-                    <TableCell>{item.listings_active}</TableCell>
-                    <TableCell>
-                      <PredictionCell
-                        value={item.predicted_change || 0}
-                        confidence={item.prediction_confidence}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <span className="sr-only">Open menu</span>
-                            <ChevronDown size={16} />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => {
-                              toast({
-                                title: "Details",
-                                description: `Viewing details for ${item.region}`,
-                              });
-                            }}
-                          >
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              toast({
-                                title: "Historical Data",
-                                description: `Viewing historical data for ${item.region}`,
-                              });
-                            }}
-                          >
-                            Historical Data
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div className="flex items-center">
-                                    <InfoIcon className="mr-2" size={14} />
-                                    Prediction Factors
-                                  </div>
-                                </TooltipTrigger>
-                                <TooltipContent className="w-80 p-4">
-                                  <h4 className="font-semibold mb-2">
-                                    Prediction Factors for {item.region}
-                                  </h4>
-                                  <div className="space-y-2">
-                                    {item.prediction_factors && (
-                                      <>
-                                        <div className="grid grid-cols-2 gap-1">
-                                          <span className="text-sm text-gray-500">
-                                            Market Trend:
-                                          </span>
-                                          <span className="text-sm font-medium">
-                                            {parsePredictionFactors(item.prediction_factors).market_trend.toFixed(2)}
-                                          </span>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-1">
-                                          <span className="text-sm text-gray-500">
-                                            Volatility:
-                                          </span>
-                                          <span className="text-sm font-medium">
-                                            {parsePredictionFactors(item.prediction_factors).volatility.toFixed(2)}
-                                          </span>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-1">
-                                          <span className="text-sm text-gray-500">
-                                            Sentiment:
-                                          </span>
-                                          <span className="text-sm font-medium">
-                                            {parsePredictionFactors(item.prediction_factors).sentiment.toFixed(2)}
-                                          </span>
-                                        </div>
-                                      </>
-                                    )}
-                                    {item.prediction_explanation && (
-                                      <div className="mt-2 pt-2 border-t border-gray-100">
-                                        <p className="text-sm">
-                                          {item.prediction_explanation}
-                                        </p>
-                                      </div>
-                                    )}
-                                  </div>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
-
+      
+      {/* Rental Market Table */}
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            <div>
-              <CardTitle>Rental Market Data</CardTitle>
-              <CardDescription>
-                Rental prices, yields, and vacancy rates
-              </CardDescription>
-            </div>
-          </div>
+          <CardTitle className="flex items-center justify-between">
+            <span>Rental Market Data</span>
+            {activeRegion && (
+              <Badge variant="outline" className="ml-2">
+                {activeRegion}
+              </Badge>
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border overflow-hidden">
-            <Table>
-              <TableCaption>
-                Rental market data as of{" "}
-                {rentalData && rentalData.length > 0
-                  ? new Date(rentalData[0].timestamp).toLocaleDateString()
-                  : "N/A"}
-              </TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Region</TableHead>
-                  <TableHead>Average Rental</TableHead>
-                  <TableHead>Vacancy Rate</TableHead>
-                  <TableHead>Rental Yield</TableHead>
-                  <TableHead>YoY Change</TableHead>
-                  <TableHead>Prediction</TableHead>
+          <Table>
+            <TableCaption>
+              Rental market data showing average rental prices, vacancy rates, and rental yields
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Region</TableHead>
+                <TableHead>Avg. Rental Price (USD)</TableHead>
+                <TableHead>Vacancy Rate (%)</TableHead>
+                <TableHead>Rental Yield (%)</TableHead>
+                <TableHead>YoY Change (%)</TableHead>
+                <TableHead>Last Updated</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRentalData?.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">{item.region}</TableCell>
+                  <TableCell>${item.avg_rental_price.toLocaleString()}</TableCell>
+                  <TableCell>{item.vacancy_rate.toFixed(1)}%</TableCell>
+                  <TableCell>{item.rental_yield.toFixed(1)}%</TableCell>
+                  <TableCell className={item.yoy_change >= 0 ? "text-green-600" : "text-red-600"}>
+                    {item.yoy_change.toFixed(2)}%
+                  </TableCell>
+                  <TableCell>
+                    {new Date(item.timestamp).toLocaleDateString()}
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredRentalData.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.region}</TableCell>
-                    <TableCell>
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                        maximumFractionDigits: 0,
-                      }).format(item.avg_rental_price)}
-                      /mo
-                    </TableCell>
-                    <TableCell>{item.vacancy_rate.toFixed(1)}%</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          item.rental_yield > 6
-                            ? "success"
-                            : item.rental_yield > 5
-                            ? "outline"
-                            : "secondary"
-                        }
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      
+      {/* Housing Indicators Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Housing Market Indicators</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableCaption>
+              Key indicators affecting the housing market
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Indicator</TableHead>
+                <TableHead>Value</TableHead>
+                <TableHead>Change (%)</TableHead>
+                <TableHead>Region</TableHead>
+                <TableHead>Last Updated</TableHead>
+                <TableHead>Details</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {indicatorData?.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">{item.indicator_name}</TableCell>
+                  <TableCell>{item.value.toLocaleString()}</TableCell>
+                  <TableCell className={item.change_percentage >= 0 ? "text-green-600" : "text-red-600"}>
+                    {item.change_percentage.toFixed(2)}%
+                  </TableCell>
+                  <TableCell>{item.region || "National"}</TableCell>
+                  <TableCell>
+                    {new Date(item.timestamp).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {item.notes ? (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            Notes
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>{item.indicator_name}</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4 pt-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-sm font-medium text-muted-foreground">Current Value</p>
+                                <p className="text-lg font-medium">{item.value.toLocaleString()}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-muted-foreground">Previous Value</p>
+                                <p className="text-lg font-medium">{item.previous_value.toLocaleString()}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-muted-foreground">Change</p>
+                                <p className={`text-lg font-medium ${item.change_percentage >= 0 ? "text-green-600" : "text-red-600"}`}>
+                                  {item.change_percentage.toFixed(2)}%
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-muted-foreground">Last Updated</p>
+                                <p className="text-lg font-medium">
+                                  {format(new Date(item.timestamp), 'dd MMM yyyy')}
+                                </p>
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">Notes</p>
+                              <p className="text-base">{item.notes}</p>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">No notes</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      
+      {/* Summary section */}
+      <Card className="bg-gradient-to-r from-blue-50 to-slate-50 border-blue-100">
+        <CardHeader>
+          <CardTitle>Market Data Insights</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <p className="text-sm text-slate-700">
+              The Namibian housing market data reveals trends across different regions, with prices 
+              averaging ${housingData && housingData.length > 0 
+                ? Math.round(housingData.reduce((sum, item) => sum + item.avg_price_usd, 0) / housingData.length).toLocaleString()
+                : "N/A"} 
+              and a year-over-year change of {housingData && housingData.length > 0 
+                ? (housingData.reduce((sum, item) => sum + item.yoy_change, 0) / housingData.length).toFixed(1) + "%"
+                : "N/A"}.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <h3 className="font-medium text-blue-800 mb-2">Regional Analysis</h3>
+                <ul className="space-y-2">
+                  {housingData?.slice(0, 3).map((item) => (
+                    <li key={item.id} className="flex justify-between items-center">
+                      <span className="font-medium">{item.region}</span>
+                      <Badge 
+                        variant={item.predicted_change && item.predicted_change > 0 ? "secondary" : "outline"} 
+                        className="ml-2"
                       >
-                        {item.rental_yield.toFixed(1)}%
+                        {item.predicted_change ? `${item.predicted_change > 0 ? '+' : ''}${item.predicted_change.toFixed(1)}%` : 'N/A'}
                       </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={
-                          item.yoy_change > 0
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }
-                      >
-                        {item.yoy_change > 0 ? "+" : ""}
-                        {item.yoy_change.toFixed(1)}%
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      {item.predicted_change !== undefined && item.prediction_confidence !== undefined && (
-                        <PredictionCell
-                          value={item.predicted_change}
-                          confidence={item.prediction_confidence}
-                        />
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <h3 className="font-medium text-blue-800 mb-2">Rental Market Highlights</h3>
+                <ul className="space-y-2">
+                  {rentalData?.slice(0, 3).map((item) => (
+                    <li key={item.id} className="flex justify-between items-center text-sm">
+                      <div>
+                        <span className="font-medium">{item.region}</span>
+                        <span className="text-slate-500 ml-2">${item.avg_rental_price}/mo</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-600">Yield: </span>
+                        <span className="font-medium">{item.rental_yield.toFixed(1)}%</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
     </div>
   );
 };
+
+export default HousingMarketTables;

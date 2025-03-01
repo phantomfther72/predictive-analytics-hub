@@ -9,6 +9,7 @@ import type {
   MiningSectorInsight,
   AgricultureMarketData,
   GreenHydrogenMetrics,
+  PredictionFactors,
 } from "@/types/market";
 
 export const useMarketData = () => {
@@ -31,7 +32,7 @@ export const useMarketData = () => {
       }
       return (data as any[]).map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        prediction_factors: parsePredictionFactors(item.prediction_factors) as PredictionFactors | null,
         alternative_model_predictions: [
           {
             model: "optimistic",
@@ -70,7 +71,7 @@ export const useMarketData = () => {
       }
       return (data as any[]).map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        prediction_factors: parsePredictionFactors(item.prediction_factors) as PredictionFactors | null,
         alternative_model_predictions: [
           {
             model: "regional",
@@ -104,7 +105,7 @@ export const useMarketData = () => {
       }
       return (data as any[]).map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        prediction_factors: parsePredictionFactors(item.prediction_factors) as PredictionFactors | null,
         alternative_model_predictions: [
           {
             model: "resource-driven",
@@ -138,7 +139,7 @@ export const useMarketData = () => {
       }
       return (data as any[]).map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        prediction_factors: parsePredictionFactors(item.prediction_factors) as PredictionFactors | null,
         alternative_model_predictions: [
           {
             model: "weather-based",
@@ -172,7 +173,7 @@ export const useMarketData = () => {
       }
       return (data as any[]).map(item => ({
         ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors),
+        prediction_factors: parsePredictionFactors(item.prediction_factors) as PredictionFactors | null,
         alternative_model_predictions: [
           {
             model: "tech-focused",

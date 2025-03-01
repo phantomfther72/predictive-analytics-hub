@@ -8,6 +8,7 @@ import { DashboardProfile } from "./DashboardProfile";
 import { IndustryView } from "@/components/industry/IndustryView";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatePresence, motion } from "framer-motion";
+import HousingMarket from "@/pages/HousingMarket";
 
 export const DashboardContent = () => {
   const isMobile = useIsMobile();
@@ -28,6 +29,7 @@ export const DashboardContent = () => {
             <Route path="/charts" element={<DashboardCharts />} />
             <Route path="/tables" element={<DashboardTables />} />
             <Route path="/profile" element={<DashboardProfile />} />
+            <Route path="/housing-market" element={<HousingMarket />} />
             <Route 
               path="/industry/housing" 
               element={<IndustryView industry="housing" />} 

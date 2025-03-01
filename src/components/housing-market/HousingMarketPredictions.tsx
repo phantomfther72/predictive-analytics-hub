@@ -1,5 +1,19 @@
-
-import React, { useState } from "react";
+import React from "react";
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell
+} from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { parsePredictionFactors } from "../dashboard/tables/PredictionFactorsUtils";
@@ -15,7 +29,6 @@ import { CHART_COLORS } from "../dashboard/charts/chart-constants";
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, Area, AreaChart, ComposedChart, Bar } from "recharts";
 import type { HousingMarketData, AlternativeModelPrediction } from "@/types/market";
 
-// Extended Chart Colors
 const extendedChartColors = {
   ...CHART_COLORS,
   axis: "#94a3b8",
@@ -27,7 +40,6 @@ export default function HousingMarketPredictions() {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [confidenceThreshold, setConfidenceThreshold] = useState(70);
   
-  // For housing market data with predictions
   const { data: housingData, isLoading } = useQuery({
     queryKey: ["housingPredictionData"],
     queryFn: async () => {
@@ -42,7 +54,6 @@ export default function HousingMarketPredictions() {
           throw error;
         }
         
-        // If no data, return mock data
         if (!data || data.length === 0) {
           return generateMockPredictionData();
         }
@@ -50,7 +61,6 @@ export default function HousingMarketPredictions() {
         return data.map(item => ({
           ...item,
           prediction_factors: parsePredictionFactors(item.prediction_factors),
-          // Add alternative model predictions
           alternativeModelPredictions: [
             {
               model: "regional",
@@ -71,13 +81,11 @@ export default function HousingMarketPredictions() {
     }
   });
   
-  // Generate mock prediction data for demo purposes
   function generateMockPredictionData(): (HousingMarketData & { alternativeModelPredictions: AlternativeModelPrediction[] })[] {
     const regions = ["Windhoek", "Swakopmund", "Walvis Bay", "Oshakati", "Rundu"];
     const baseTimestamp = new Date();
     const mockData: (HousingMarketData & { alternativeModelPredictions: AlternativeModelPrediction[] })[] = [];
     
-    // Generate historical data and predictions
     for (let i = 0; i < regions.length; i++) {
       const region = regions[i];
       const predictedChange = (Math.random() * 8) - 2;
@@ -122,7 +130,6 @@ export default function HousingMarketPredictions() {
     return mockData;
   }
   
-  // Generate historical and forecast data for selected region
   const generateTimeseriesData = (region: string) => {
     if (!housingData) return [];
     
@@ -132,18 +139,15 @@ export default function HousingMarketPredictions() {
     const basePrice = selectedRegionData.avg_price_usd;
     const predictedChange = selectedRegionData.predicted_change || 0;
     
-    // Generate 12 months of historical data and 6 months of predictions
     const historicalMonths = 12;
     const predictionMonths = 6;
     const today = new Date();
     const data = [];
     
-    // Add historical data points
     for (let i = historicalMonths; i >= 1; i--) {
       const historyDate = new Date();
       historyDate.setMonth(today.getMonth() - i);
       
-      // Random fluctuation that follows a general trend
       const monthlyChange = selectedRegionData.yoy_change / 12 + (Math.random() * 2 - 1);
       const historicalPrice = basePrice * (1 - (monthlyChange * i / 100));
       
@@ -154,22 +158,18 @@ export default function HousingMarketPredictions() {
       });
     }
     
-    // Add current price
     data.push({
       date: today.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       price: basePrice,
       type: 'current'
     });
     
-    // Add prediction data points
     for (let i = 1; i <= predictionMonths; i++) {
       const futureDate = new Date();
       futureDate.setMonth(today.getMonth() + i);
       
-      // Use the predicted change to calculate future prices
       const predictedPrice = basePrice * (1 + (predictedChange * i / (100 * predictionMonths)));
       
-      // Add model predictions if available
       const predictions: Record<string, number> = {
         price: Math.round(predictedPrice),
       };
@@ -192,13 +192,11 @@ export default function HousingMarketPredictions() {
     return data;
   };
   
-  // Filter data based on confidence threshold
   const filteredData = React.useMemo(() => {
     if (!housingData) return [];
     return housingData.filter(item => (item.prediction_confidence * 100) >= confidenceThreshold);
   }, [housingData, confidenceThreshold]);
   
-  // Get time series data for selected region
   const timeseriesData = React.useMemo(() => {
     if (!selectedRegion) return [];
     return generateTimeseriesData(selectedRegion);
@@ -310,15 +308,12 @@ export default function HousingMarketPredictions() {
                     labelFormatter={(label) => `Date: ${label}`}
                   />
                   <Legend />
-                  {/* Vertical line separating historical and prediction */}
                   <ReferenceLine
                     x={timeseriesData.findIndex(d => d.type === 'current')}
                     stroke="#666"
                     strokeDasharray="3 3"
                     label={{ value: "Today", position: "top", fill: extendedChartColors.text }}
                   />
-                  
-                  {/* Historical data */}
                   <Line 
                     type="monotone" 
                     dataKey="price" 
@@ -328,8 +323,6 @@ export default function HousingMarketPredictions() {
                     dot={{ r: 4 }}
                     activeDot={{ r: 6 }}
                   />
-                  
-                  {/* Alternative model predictions */}
                   {selectedRegion && housingData?.find(d => d.region === selectedRegion)?.alternativeModelPredictions?.map(model => (
                     <Line 
                       key={`model-${model.model}`}

@@ -45,6 +45,10 @@ export type FinancialMarketMetric = {
   prediction_factors: PredictionFactors | null;
 };
 
+export type FinancialMarketData = FinancialMarketMetric & {
+  alternative_model_predictions?: AlternativeModelPrediction[];
+};
+
 export type HousingMarketData = {
   id: string;
   region: string;

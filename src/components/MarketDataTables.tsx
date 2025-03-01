@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -190,7 +191,7 @@ const MarketDataTables: React.FC = () => {
       <div>
         <h2 className="text-3xl font-bold mb-6">Latest Market Insights</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Object.entries(groupedMetrics).map(([marketType, metrics]) => (
+          {Object.entries(groupedMetrics || {}).map(([marketType, metrics]) => (
             <Card 
               key={marketType} 
               className={`hover:shadow-lg transition-shadow ${marketType === 'housing' ? 'cursor-pointer border-blue-200 hover:border-blue-400' : ''}`}
@@ -235,7 +236,7 @@ const MarketDataTables: React.FC = () => {
                           <p className={`text-xs font-medium ${parseFloat(String(metric.predicted_change)) > 0 ? 'text-green-600' : 'text-red-600'}`}>
                             Predicted change: {parseFloat(String(metric.predicted_change)) > 0 ? '+' : ''}{metric.predicted_change}%
                             <span className="text-gray-500 ml-1">
-                              (Confidence: {Math.round(metric.prediction_confidence * 100)}%)
+                              (Confidence: {Math.round((metric.prediction_confidence || 0) * 100)}%)
                             </span>
                           </p>
                         </div>

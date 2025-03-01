@@ -27,7 +27,7 @@ const MarketDataTables: React.FC = () => {
         const mockMetrics = [
           {
             id: "1",
-            market_type: "housing",
+            market_type: "housing" as const,
             metric_name: "Average Price",
             value: 325000,
             source: "Namibian Housing Authority",
@@ -37,7 +37,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "2",
-            market_type: "housing",
+            market_type: "housing" as const,
             metric_name: "Inventory",
             value: 1250,
             source: "Windhoek MLS Database",
@@ -47,7 +47,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "3",
-            market_type: "agriculture",
+            market_type: "agriculture" as const,
             metric_name: "Crop Yield",
             value: 4200,
             source: "Namibian Agriculture Dept",
@@ -57,7 +57,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "4",
-            market_type: "agriculture",
+            market_type: "agriculture" as const,
             metric_name: "Land Value",
             value: 8500,
             source: "Namibian Land Registry",
@@ -67,7 +67,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "5",
-            market_type: "mining",
+            market_type: "mining" as const,
             metric_name: "Production Volume",
             value: 12500,
             source: "Namibian Mining Association",
@@ -77,7 +77,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "6",
-            market_type: "mining",
+            market_type: "mining" as const,
             metric_name: "Commodity Price",
             value: 1850,
             source: "Namibian Commodity Exchange",
@@ -87,7 +87,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "7",
-            market_type: "green_hydrogen",
+            market_type: "green_hydrogen" as const,
             metric_name: "Production Capacity",
             value: 145,
             source: "Namibian Energy Authority",
@@ -97,7 +97,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "8",
-            market_type: "green_hydrogen",
+            market_type: "green_hydrogen" as const,
             metric_name: "Investment Amount",
             value: 285000000,
             source: "Namibian Investment Board",
@@ -133,10 +133,13 @@ const MarketDataTables: React.FC = () => {
               return data.map(item => ({
                 ...item,
                 value: item.value || Math.floor(Math.random() * 10000),
-                predicted_change: item.predicted_change !== undefined ? 
+                // Add predicted_change if it doesn't exist
+                predicted_change: typeof item.predicted_change !== 'undefined' ? 
                   item.predicted_change : 
                   parseFloat((Math.random() * 10 - 5).toFixed(1)),
-                prediction_confidence: 0.7 + Math.random() * 0.3
+                prediction_confidence: typeof item.prediction_confidence !== 'undefined' ?
+                  item.prediction_confidence :
+                  0.7 + Math.random() * 0.3
               })) as MarketMetric[];
             }
             
@@ -237,9 +240,9 @@ const MarketDataTables: React.FC = () => {
                 {metric.value.toLocaleString()}
               </p>
               <p className="text-xs text-gray-500 mt-1">{metric.source}</p>
-              {metric.predicted_change && (
-                <p className={`text-xs font-medium ${metric.predicted_change > 0 ? 'text-green-600' : 'text-red-600'} mt-1`}>
-                  Predicted change: {metric.predicted_change > 0 ? '+' : ''}{metric.predicted_change}%
+              {metric.predicted_change !== undefined && (
+                <p className={`text-xs font-medium ${(metric.predicted_change || 0) > 0 ? 'text-green-600' : 'text-red-600'} mt-1`}>
+                  Predicted change: {(metric.predicted_change || 0) > 0 ? '+' : ''}{metric.predicted_change}%
                 </p>
               )}
             </div>

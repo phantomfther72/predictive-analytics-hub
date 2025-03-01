@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -28,12 +29,19 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0 flex items-center">
-            <span className="text-lg sm:text-xl font-semibold text-slate-900">
+            <Link to="/" className="text-lg sm:text-xl font-semibold text-slate-900">
               Predictive Pulse
-            </span>
+            </Link>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
+            <Link
+              to="/"
+              className="flex items-center text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              <Home className="h-4 w-4 mr-1" />
+              <span className="font-medium">Home</span>
+            </Link>
             <a
               href="#features"
               className="text-slate-600 hover:text-slate-900 transition-colors"
@@ -77,6 +85,14 @@ const Navbar = () => {
         )}
       >
         <div className="px-4 py-3 space-y-2 border-t border-slate-100">
+          <Link
+            to="/"
+            className="flex items-center px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <Home className="h-4 w-4 mr-1" />
+            <span>Home</span>
+          </Link>
           <a
             href="#features"
             className="block px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"

@@ -14,7 +14,7 @@ export type MarketMetric = {
   value: number;
   timestamp: string;
   source: string;
-  predicted_change?: number; // Make this optional to match Supabase data
+  predicted_change?: number; // Optional to match Supabase data
 };
 
 export type NewsItem = {

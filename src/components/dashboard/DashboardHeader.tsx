@@ -9,8 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { User, Settings, LogOut, Menu } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { User, Settings, LogOut, Menu, Home } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -82,6 +82,12 @@ export const DashboardHeader = () => {
           </span>
         </div>
         <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" asChild className="mr-2">
+            <Link to="/" className="flex items-center gap-1">
+              <Home className="h-4 w-4" />
+              <span className="hidden sm:inline">Home</span>
+            </Link>
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">

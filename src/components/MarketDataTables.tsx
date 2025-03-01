@@ -134,10 +134,10 @@ const MarketDataTables: React.FC = () => {
                 ...item,
                 value: item.value || Math.floor(Math.random() * 10000),
                 // Add predicted_change if it doesn't exist
-                predicted_change: typeof item.predicted_change !== 'undefined' ? 
+                predicted_change: item.predicted_change !== undefined ? 
                   item.predicted_change : 
                   parseFloat((Math.random() * 10 - 5).toFixed(1)),
-                prediction_confidence: typeof item.prediction_confidence !== 'undefined' ?
+                prediction_confidence: item.prediction_confidence !== undefined ?
                   item.prediction_confidence :
                   0.7 + Math.random() * 0.3
               })) as MarketMetric[];
@@ -206,7 +206,7 @@ const MarketDataTables: React.FC = () => {
                       </p>
                       <div className="flex justify-between items-baseline mt-1">
                         <p className="text-2xl font-bold">
-                          {metric.value.toLocaleString()}
+                          {typeof metric.value === 'number' ? metric.value.toLocaleString() : metric.value}
                         </p>
                         <span className="text-sm text-gray-500">
                           {metric.source}
@@ -237,12 +237,12 @@ const MarketDataTables: React.FC = () => {
                 {metric.metric_name}
               </p>
               <p className="text-lg font-bold mt-1">
-                {metric.value.toLocaleString()}
+                {typeof metric.value === 'number' ? metric.value.toLocaleString() : metric.value}
               </p>
               <p className="text-xs text-gray-500 mt-1">{metric.source}</p>
               {metric.predicted_change !== undefined && (
-                <p className={`text-xs font-medium ${(metric.predicted_change || 0) > 0 ? 'text-green-600' : 'text-red-600'} mt-1`}>
-                  Predicted change: {(metric.predicted_change || 0) > 0 ? '+' : ''}{metric.predicted_change}%
+                <p className={`text-xs font-medium ${parseFloat(String(metric.predicted_change)) > 0 ? 'text-green-600' : 'text-red-600'} mt-1`}>
+                  Predicted change: {parseFloat(String(metric.predicted_change)) > 0 ? '+' : ''}{metric.predicted_change}%
                 </p>
               )}
             </div>

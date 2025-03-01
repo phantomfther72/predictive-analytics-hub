@@ -1,4 +1,3 @@
-
 export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen";
 
 export type PredictionFactors = {
@@ -11,10 +10,11 @@ export type MarketMetric = {
   id: string;
   market_type: MarketType;
   metric_name: string;
-  value: number;
+  value: number | string;
   timestamp: string;
   source: string;
-  predicted_change?: number; // Make predicted_change optional
+  predicted_change?: number | string;
+  prediction_confidence?: number;
 };
 
 export type NewsItem = {

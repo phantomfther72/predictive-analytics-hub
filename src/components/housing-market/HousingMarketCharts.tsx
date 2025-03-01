@@ -1,352 +1,465 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  BarChart, 
-  Bar, 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  LineChart,
+  Line,
+  Area,
   AreaChart,
-  Area
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
-import { HousingChart } from "../dashboard/charts/HousingChart";
-import type { HousingMarketData } from "@/types/market";
-import { CHART_COLORS } from "../dashboard/charts/chart-constants";
-import { ChartTooltip } from "../dashboard/charts/ChartTooltip";
-import { ArrowUpRight } from "lucide-react";
+import { CHART_COLORS } from "@/components/dashboard/charts/chart-constants";
+import { HousingMarketData, AlternativeModelPrediction } from "@/types/market";
 
-export function HousingMarketCharts() {
-  const [selectedTimeframe, setSelectedTimeframe] = useState("1year");
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(["avg_price_usd", "listings_active"]);
+export const HousingMarketCharts: React.FC = () => {
+  const { toast } = useToast();
+  const [timeRange, setTimeRange] = useState<"1m" | "6m" | "1y" | "5y">("1y");
+  const [chartType, setChartType] = useState<"price" | "listings" | "change" | "forecast">("price");
 
+  // Fetch housing market data
   const { data: housingData, isLoading } = useQuery({
-    queryKey: ["housingChartData", selectedTimeframe],
+    queryKey: ["housingMarketData", timeRange],
     queryFn: async () => {
       try {
-        // Try to get data from Supabase
-        const { data: session } = await supabase.auth.getSession();
+        // For demo purposes, generate mock data with time series based on the selected range
+        const regions = ["Windhoek", "Walvis Bay", "Swakopmund", "Oshakati", "Otjiwarongo", "Keetmanshoop"];
+        const baseData = regions.map((region, index) => ({
+          id: `${index + 1}`,
+          region,
+          avg_price_usd: 150000 + (index === 0 ? 175000 : index * 30000),
+          yoy_change: 2 + (Math.random() * 4),
+          listings_active: 100 + (index === 0 ? 320 : index * 30),
+          timestamp: new Date().toISOString(),
+          predicted_change: 1 + (Math.random() * 3),
+          prediction_confidence: 0.65 + (Math.random() * 0.25),
+          prediction_explanation: `Forecast based on historical data and market conditions for ${region}`,
+          prediction_factors: { market_trend: 0.5 + (Math.random() * 0.4), volatility: 0.3 + (Math.random() * 0.4), sentiment: 0.6 + (Math.random() * 0.3) }
+        }));
+
+        // Generate time series data based on the selected range
+        const timeSeriesMonths = timeRange === "1m" ? 1 : timeRange === "6m" ? 6 : timeRange === "1y" ? 12 : 60;
+        const timeSeriesIntervalMonths = timeRange === "5y" ? 6 : 1; // For 5y, show data every 6 months
+        const numberOfDataPoints = timeRange === "5y" ? (60 / 6) : timeSeriesMonths;
         
-        // If authenticated, fetch real data
-        if (session.session) {
-          const { data, error } = await supabase
-            .from("housing_market_data")
-            .select("*")
-            .order("timestamp", { ascending: true });
+        // Generate historical data points for each region
+        const timeSeriesData = baseData.map(region => {
+          const regionHistory = [];
+          let currentPrice = region.avg_price_usd;
+          let currentListings = region.listings_active;
+          
+          // Generate data points going back in time
+          for (let i = 0; i < numberOfDataPoints; i++) {
+            const monthsAgo = i * timeSeriesIntervalMonths;
+            const date = new Date();
+            date.setMonth(date.getMonth() - monthsAgo);
             
-          if (error) {
-            throw error;
+            // Simulate price changes over time (with some randomness)
+            const priceChangePercent = (timeRange === "5y" ? -0.8 : -0.2) - (Math.random() * 0.5);
+            currentPrice = currentPrice / (1 + (priceChangePercent / 100));
+            
+            // Simulate listing changes over time (with some randomness)
+            const listingChangePercent = (timeRange === "5y" ? -1 : -0.3) - (Math.random() * 0.5);
+            currentListings = currentListings / (1 + (listingChangePercent / 100));
+            
+            regionHistory.unshift({
+              id: `${region.id}-${i}`,
+              region: region.region,
+              date: date.toISOString().split('T')[0],
+              avg_price_usd: Math.round(currentPrice),
+              listings_active: Math.round(currentListings),
+              yoy_change: region.yoy_change * (0.8 + (Math.random() * 0.4)), // Vary historical YoY changes
+              predicted: i === 0, // Only the most recent data point has a prediction
+              predicted_change: i === 0 ? region.predicted_change : null,
+              prediction_confidence: i === 0 ? region.prediction_confidence : null,
+              prediction_factors: i === 0 ? region.prediction_factors : null,
+              timestamp: date.toISOString()
+            });
           }
           
-          return data;
-        }
+          return regionHistory;
+        });
         
-        // Generate mock historical data for time series
-        const regions = ["Windhoek", "Swakopmund", "Walvis Bay", "Oshakati"];
-        const mockHistoricalData = [];
+        // Flatten the array of arrays into a single array
+        const flatTimeSeriesData = timeSeriesData.flat();
         
-        // Generate data points for different timeframes
-        const months = selectedTimeframe === "1month" ? 1 : 
-                      selectedTimeframe === "6months" ? 6 : 
-                      selectedTimeframe === "1year" ? 12 : 24;
-                      
-        const now = new Date();
-        
-        for (let i = months; i >= 0; i--) {
-          const date = new Date(now);
-          date.setMonth(date.getMonth() - i);
-          
-          regions.forEach(region => {
-            // Base values
-            const basePrice = region === "Windhoek" ? 920000 : 
-                            region === "Swakopmund" ? 850000 : 
-                            region === "Walvis Bay" ? 720000 : 550000;
-                            
-            const baseListings = region === "Windhoek" ? 480 : 
-                                region === "Swakopmund" ? 320 : 
-                                region === "Walvis Bay" ? 260 : 150;
-            
-            // Add some randomization and trend over time
-            const trendFactor = 1 + (months - i) * 0.005; // Slight upward trend
-            const randomFactor = 0.98 + Math.random() * 0.04; // Add some random noise
-            
-            mockHistoricalData.push({
-              id: `${region}-${i}`,
-              region: region,
-              avg_price_usd: Math.round(basePrice * trendFactor * randomFactor),
-              yoy_change: 2 + Math.random() * 3,
-              listings_active: Math.round(baseListings * (1 + (Math.random() * 0.2 - 0.1))),
-              timestamp: date.toISOString(),
-              date: date.toISOString().split('T')[0],
-              predicted_change: 1.5 + Math.random() * 2,
-              prediction_confidence: 0.7 + Math.random() * 0.2
-            });
-          });
-        }
-        
-        return mockHistoricalData as HousingMarketData[];
-        
-      } catch (error) {
-        console.error("Error fetching housing chart data:", error);
-        return [];
+        return flatTimeSeriesData as HousingMarketData[];
+      } catch (err) {
+        console.error("Error in housing chart data query:", err);
+        toast({
+          title: "Error",
+          description: "Failed to load housing market chart data",
+          variant: "destructive",
+        });
+        return [] as HousingMarketData[];
       }
     },
   });
-  
-  // Process data for time series chart
-  const timeSeriesData = React.useMemo(() => {
-    if (!housingData) return [];
-    
-    // Group data by date for time series
+
+  // Process time series data for charts
+  const chartData = React.useMemo(() => {
+    if (!housingData || housingData.length === 0) return [];
+
+    // Group data by date
     const groupedByDate = housingData.reduce((acc, item) => {
       const date = item.timestamp.split('T')[0];
       if (!acc[date]) {
-        acc[date] = { 
-          date, 
-          avg_price_usd: 0,
-          listings_active: 0,
-          count: 0
-        };
+        acc[date] = [];
       }
-      
-      acc[date].avg_price_usd += item.avg_price_usd;
-      acc[date].listings_active += item.listings_active;
-      acc[date].count += 1;
-      
+      acc[date].push(item);
       return acc;
-    }, {} as Record<string, any>);
-    
-    // Calculate averages and format for chart
-    return Object.values(groupedByDate)
-      .map(item => ({
-        date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-        avg_price_usd: Math.round(item.avg_price_usd / item.count),
-        listings_active: Math.round(item.listings_active / item.count)
-      }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-  }, [housingData]);
-  
-  // Process data for regional comparison
-  const regionalData = React.useMemo(() => {
-    if (!housingData) return [];
-    
-    // Group the most recent data point for each region
-    const regionMap = new Map();
-    
-    housingData.forEach(item => {
-      const existingItem = regionMap.get(item.region);
+    }, {} as Record<string, HousingMarketData[]>);
+
+    // Calculate averages for each date
+    return Object.entries(groupedByDate).map(([date, items]) => {
+      const avgPrice = items.reduce((sum, item) => sum + item.avg_price_usd, 0) / items.length;
+      const avgYoyChange = items.reduce((sum, item) => sum + item.yoy_change, 0) / items.length;
+      const totalListings = items.reduce((sum, item) => sum + item.listings_active, 0);
       
-      if (!existingItem || new Date(item.timestamp) > new Date(existingItem.timestamp)) {
-        regionMap.set(item.region, item);
-      }
-    });
-    
-    return Array.from(regionMap.values());
+      return {
+        date,
+        avg_price_usd: Math.round(avgPrice),
+        avg_yoy_change: Number(avgYoyChange.toFixed(1)),
+        total_listings: totalListings,
+        // Include predictions if available (for the latest date only)
+        predicted_change: items[0].predicted_change,
+        prediction_confidence: items[0].prediction_confidence
+      };
+    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [housingData]);
 
-  const handleLegendClick = (data: any) => {
-    if (data && data.dataKey) {
-      setSelectedMetrics(prev => 
-        prev.includes(data.dataKey)
-          ? prev.filter(m => m !== data.dataKey)
-          : [...prev, data.dataKey]
-      );
-    }
-  };
+  // For the regional comparison chart
+  const regionalData = React.useMemo(() => {
+    if (!housingData || housingData.length === 0) return [];
+    
+    // Get the most recent date
+    const dates = housingData.map(item => new Date(item.timestamp).getTime());
+    const maxDate = new Date(Math.max(...dates)).toISOString().split('T')[0];
+    
+    // Filter data for the most recent date and organize by region
+    return housingData
+      .filter(item => item.timestamp.startsWith(maxDate))
+      .sort((a, b) => b.avg_price_usd - a.avg_price_usd);
+  }, [housingData]);
 
   if (isLoading) {
-    return <Skeleton className="h-[400px] w-full" />;
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-96" />
+      </div>
+    );
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle>Housing Market Trends</CardTitle>
-          <Tabs 
-            value={selectedTimeframe} 
-            onValueChange={setSelectedTimeframe}
-            className="w-auto"
-          >
-            <TabsList className="grid grid-cols-4 w-fit">
-              <TabsTrigger value="1month">1M</TabsTrigger>
-              <TabsTrigger value="6months">6M</TabsTrigger>
-              <TabsTrigger value="1year">1Y</TabsTrigger>
-              <TabsTrigger value="2years">2Y</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Tabs defaultValue="price_trends">
-          <div className="px-6 pt-2">
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="price_trends">Price Trends</TabsTrigger>
-              <TabsTrigger value="regional_comparison">Regional Analysis</TabsTrigger>
-              <TabsTrigger value="market_dynamics">Market Dynamics</TabsTrigger>
-            </TabsList>
+    <div className="space-y-12">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div>
+              <CardTitle>Housing Market Trends</CardTitle>
+              <CardDescription>
+                Historical price trends and market activity
+              </CardDescription>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Tabs
+                value={chartType}
+                onValueChange={(value) => setChartType(value as any)}
+                className="w-full sm:w-auto"
+              >
+                <TabsList>
+                  <TabsTrigger value="price">Price</TabsTrigger>
+                  <TabsTrigger value="listings">Listings</TabsTrigger>
+                  <TabsTrigger value="change">YoY Change</TabsTrigger>
+                  <TabsTrigger value="forecast">Forecast</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              
+              <Select
+                value={timeRange}
+                onValueChange={(value) => setTimeRange(value as any)}
+              >
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue placeholder="Time range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1m">1 Month</SelectItem>
+                  <SelectItem value="6m">6 Months</SelectItem>
+                  <SelectItem value="1y">1 Year</SelectItem>
+                  <SelectItem value="5y">5 Years</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          
-          <TabsContent value="price_trends" className="m-0 p-6 pt-4">
-            <div className="h-80">
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px]">
+            <TabsContent value="price" className="mt-0 h-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={timeSeriesData}
-                  margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                <LineChart data={chartData}>
+                  <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" />
                   <XAxis 
                     dataKey="date" 
-                    tick={{ fontSize: 12 }}
-                    stroke={CHART_COLORS.axis}
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
                   />
                   <YAxis 
-                    yAxisId="left"
-                    tick={{ fontSize: 12 }}
-                    stroke={CHART_COLORS.axis}
-                    tickFormatter={(value) => `N$${value.toLocaleString(undefined, {
-                      notation: 'compact',
-                      compactDisplay: 'short'
-                    })}`}
-                    domain={['auto', 'auto']}
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
+                    tickFormatter={(value) => {
+                      return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        notation: 'compact',
+                        maximumFractionDigits: 1
+                      }).format(value);
+                    }}
                   />
-                  <YAxis 
-                    yAxisId="right"
-                    orientation="right"
-                    tick={{ fontSize: 12 }}
-                    stroke={CHART_COLORS.secondary}
-                    tickFormatter={(value) => value.toLocaleString()}
-                    domain={['auto', 'auto']}
+                  <Tooltip
+                    formatter={(value: number) => {
+                      return [
+                        new Intl.NumberFormat('en-US', {
+                          style: 'currency',
+                          currency: 'USD',
+                          maximumFractionDigits: 0
+                        }).format(value),
+                        "Average Price"
+                      ];
+                    }}
                   />
-                  <Tooltip content={(props) => <ChartTooltip {...props} />} />
-                  <Legend 
-                    onClick={handleLegendClick}
-                    wrapperStyle={{ fontSize: '12px' }}
-                  />
+                  <Legend />
                   <Line
-                    yAxisId="left"
                     type="monotone"
                     dataKey="avg_price_usd"
-                    name="Average Price (N$)"
+                    name="Average Price"
                     stroke={CHART_COLORS.primary}
-                    strokeWidth={2}
-                    dot={{ r: 2 }}
-                    activeDot={{ r: 4 }}
-                    hide={!selectedMetrics.includes("avg_price_usd")}
-                    animationDuration={1000}
-                  />
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="listings_active"
-                    name="Active Listings"
-                    stroke={CHART_COLORS.secondary}
-                    strokeWidth={2}
-                    dot={{ r: 2 }}
-                    activeDot={{ r: 4 }}
-                    hide={!selectedMetrics.includes("listings_active")}
-                    animationDuration={1000}
+                    activeDot={{ r: 8 }}
+                    strokeWidth={3}
                   />
                 </LineChart>
               </ResponsiveContainer>
-            </div>
+            </TabsContent>
             
-            <div className="mt-6 bg-blue-50 p-4 rounded-lg">
-              <div className="flex items-center">
-                <ArrowUpRight className="h-5 w-5 text-blue-600 mr-2" />
-                <h4 className="font-medium text-blue-800">Market Insight</h4>
-              </div>
-              <p className="text-sm text-blue-700 mt-1">
-                The housing market in Namibia has shown consistent appreciation over {selectedTimeframe === "1month" ? "the past month" : selectedTimeframe === "6months" ? "the past 6 months" : selectedTimeframe === "1year" ? "the past year" : "the past 2 years"}, 
-                with an average increase of 3.7% in property values. Active listings have {timeSeriesData.length > 1 && timeSeriesData[timeSeriesData.length-1].listings_active > timeSeriesData[0].listings_active ? "increased" : "decreased"}, 
-                indicating a {timeSeriesData.length > 1 && timeSeriesData[timeSeriesData.length-1].listings_active > timeSeriesData[0].listings_active ? "growing" : "tightening"} market.
-              </p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="regional_comparison" className="m-0 p-6 pt-4">
-            <div className="h-80">
-              <HousingChart 
-                data={regionalData} 
-                isLoading={isLoading} 
-                selectedMetrics={selectedMetrics}
-                onLegendClick={handleLegendClick}
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-800">Regional Hotspots</h4>
-                <p className="text-sm text-blue-700 mt-1">
-                  Coastal areas like Swakopmund and Walvis Bay continue to attract premium buyers, with average prices increasing faster than the national average.
-                </p>
-              </div>
-              
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-800">Investment Opportunities</h4>
-                <p className="text-sm text-blue-700 mt-1">
-                  Northern regions like Oshakati show strong growth potential with more affordable entry points and steady appreciation rates.
-                </p>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="market_dynamics" className="m-0 p-6 pt-4">
-            <div className="h-80">
+            <TabsContent value="listings" className="mt-0 h-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
-                  data={timeSeriesData}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                <AreaChart data={chartData}>
+                  <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" />
                   <XAxis 
                     dataKey="date" 
-                    tick={{ fontSize: 12 }}
-                    stroke={CHART_COLORS.axis}
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
                   />
                   <YAxis 
-                    tick={{ fontSize: 12 }}
-                    stroke={CHART_COLORS.axis}
-                    tickFormatter={(value) => value.toLocaleString()}
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
                   />
-                  <Tooltip content={(props) => <ChartTooltip {...props} />} />
-                  <Legend 
-                    onClick={handleLegendClick}
-                    wrapperStyle={{ fontSize: '12px' }}
-                  />
+                  <Tooltip />
+                  <Legend />
                   <Area
                     type="monotone"
-                    dataKey="listings_active"
+                    dataKey="total_listings"
                     name="Active Listings"
-                    stroke={CHART_COLORS.tertiary}
-                    fill={CHART_COLORS.tertiary + "40"}
-                    hide={!selectedMetrics.includes("listings_active")}
-                    animationDuration={1000}
+                    stroke={CHART_COLORS.accent}
+                    fill={CHART_COLORS.accent}
+                    fillOpacity={0.3}
                   />
                 </AreaChart>
               </ResponsiveContainer>
-            </div>
+            </TabsContent>
             
-            <div className="mt-6 bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-800">Supply and Demand Balance</h4>
-              <p className="text-sm text-blue-700 mt-1">
-                The inventory of active listings has {timeSeriesData.length > 1 && timeSeriesData[timeSeriesData.length-1].listings_active > timeSeriesData[0].listings_active ? "expanded" : "contracted"} by approximately 
-                {timeSeriesData.length > 1 ? Math.abs(Math.round(((timeSeriesData[timeSeriesData.length-1].listings_active - timeSeriesData[0].listings_active) / timeSeriesData[0].listings_active) * 100)) : 5}% 
-                over this period, suggesting a {timeSeriesData.length > 1 && timeSeriesData[timeSeriesData.length-1].listings_active > timeSeriesData[0].listings_active ? "buyer's" : "seller's"} market is forming.
-              </p>
+            <TabsContent value="change" className="mt-0 h-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
+                  <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
+                    domain={['dataMin - 1', 'dataMax + 1']}
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <Tooltip formatter={(value: number) => [`${value}%`, "YoY Change"]} />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="avg_yoy_change"
+                    name="Year-over-Year Change"
+                    stroke={CHART_COLORS.secondary}
+                    activeDot={{ r: 8 }}
+                    strokeWidth={3}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="predicted_change"
+                    name="Predicted Change"
+                    stroke={CHART_COLORS.prediction}
+                    strokeDasharray="5 5"
+                    activeDot={{ r: 8 }}
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </TabsContent>
+            
+            <TabsContent value="forecast" className="mt-0 h-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={regionalData}>
+                  <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="region" 
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
+                    tickFormatter={(value) => `${value}%`}
+                    domain={[0, 'dataMax + 1']}
+                  />
+                  <Tooltip formatter={(value: number) => [`${value}%`, "Predicted Change"]} />
+                  <Legend />
+                  <Bar
+                    dataKey="predicted_change"
+                    name="Predicted Price Change"
+                    fill={CHART_COLORS.prediction}
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="yoy_change"
+                    name="Current YoY Change"
+                    fill={CHART_COLORS.accent}
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </TabsContent>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div>
+              <CardTitle>Regional Market Comparison</CardTitle>
+              <CardDescription>
+                Housing prices and market activity across Namibian regions
+              </CardDescription>
             </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={regionalData} barSize={20} barGap={4}>
+                <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="region" 
+                  stroke={CHART_COLORS.text} 
+                  tick={{ fill: CHART_COLORS.text }}
+                  fontSize={12}
+                />
+                <YAxis 
+                  yAxisId="left"
+                  orientation="left"
+                  stroke={CHART_COLORS.text} 
+                  tick={{ fill: CHART_COLORS.text }}
+                  fontSize={12}
+                  tickFormatter={(value) => {
+                    return new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                      notation: 'compact',
+                      maximumFractionDigits: 0
+                    }).format(value);
+                  }}
+                />
+                <YAxis 
+                  yAxisId="right"
+                  orientation="right"
+                  stroke={CHART_COLORS.accent} 
+                  tick={{ fill: CHART_COLORS.accent }}
+                  fontSize={12}
+                />
+                <Tooltip 
+                  formatter={(value: number, name: string) => {
+                    if (name === "Average Price") {
+                      return [
+                        new Intl.NumberFormat('en-US', {
+                          style: 'currency',
+                          currency: 'USD',
+                          maximumFractionDigits: 0
+                        }).format(value),
+                        name
+                      ];
+                    }
+                    return [value, name];
+                  }}
+                />
+                <Legend />
+                <Bar
+                  yAxisId="left"
+                  dataKey="avg_price_usd"
+                  name="Average Price"
+                  fill={CHART_COLORS.primary}
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  yAxisId="right"
+                  dataKey="listings_active"
+                  name="Active Listings"
+                  fill={CHART_COLORS.accent}
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
-}
+};

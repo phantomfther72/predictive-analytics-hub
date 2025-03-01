@@ -134,3 +134,23 @@ export type GreenHydrogenMetrics = {
   prediction_explanation: string | null;
   prediction_factors: PredictionFactors | null;
 };
+
+// Let's extend the CHART_COLORS to include all needed color properties
+export type ExtendedChartColors = {
+  readonly primary: string;
+  readonly secondary: string;
+  readonly accent: string;
+  readonly prediction: string;
+  readonly grid: string;
+  readonly text: string;
+  readonly axis: string;
+  readonly tertiary: string;
+  readonly quaternary: string;
+};
+
+// Define the AlternativeModelPrediction type for housing market and other predictions
+export type AlternativeModelPrediction = {
+  model: string;
+  value: number;
+  confidence: number;
+};

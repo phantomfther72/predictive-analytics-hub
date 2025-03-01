@@ -1,343 +1,431 @@
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as RechartsTooltip, 
-  Legend, 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Radar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
   RadarChart,
+  Radar,
   PolarGrid,
   PolarAngleAxis,
-  PolarRadiusAxis
+  PolarRadiusAxis,
+  ComposedChart,
 } from "recharts";
-import { CHART_COLORS } from "../dashboard/charts/chart-constants";
-import { ChartTooltip } from "../dashboard/charts/ChartTooltip";
-import { Info, ArrowUpRight, BrainCircuit } from "lucide-react";
-import type { HousingMarketData } from "@/types/market";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { CHART_COLORS } from "@/components/dashboard/charts/chart-constants";
+import type { HousingMarketData, AlternativeModelPrediction } from "@/types/market";
 
-export function HousingMarketPredictions() {
+export const HousingMarketPredictions: React.FC = () => {
+  const { toast } = useToast();
+  const [confidenceThreshold, setConfidenceThreshold] = useState<number>(60);
+  const [scenario, setScenario] = useState<"base" | "optimistic" | "pessimistic">("base");
+
+  // Fetch housing market data with predictions
   const { data: housingData, isLoading } = useQuery({
-    queryKey: ["housingPredictionData"],
+    queryKey: ["housingMarketPredictions"],
     queryFn: async () => {
       try {
-        // Mock prediction data
-        // In a real application, this would come from Supabase
-        
-        const regions = ["Windhoek", "Swakopmund", "Walvis Bay", "Oshakati"];
-        const now = new Date();
-        
-        // Historical data (past 6 months)
-        const historicalData = [];
-        for (let i = 6; i >= 0; i--) {
-          const date = new Date(now);
-          date.setMonth(date.getMonth() - i);
-          
-          regions.forEach(region => {
-            const basePrice = region === "Windhoek" ? 900000 : 
-                            region === "Swakopmund" ? 830000 : 
-                            region === "Walvis Bay" ? 700000 : 540000;
-            
-            const trendFactor = 1 + (6 - i) * 0.005;
-            const randomFactor = 0.98 + Math.random() * 0.04;
-            
-            historicalData.push({
-              id: `hist-${region}-${i}`,
-              region: region,
-              avg_price_usd: Math.round(basePrice * trendFactor * randomFactor),
-              timestamp: date.toISOString(),
-              date: date.toISOString().split('T')[0],
-              predicted: false
-            });
+        const { data, error } = await supabase
+          .from("housing_market_data")
+          .select("*")
+          .order("region", { ascending: true });
+
+        if (error) {
+          console.error("Error fetching housing predictions:", error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch housing market predictions.",
+            variant: "destructive",
           });
+          throw error;
         }
-        
-        // Future predictions (next 6 months)
-        const futureData = [];
-        for (let i = 1; i <= 6; i++) {
-          const date = new Date(now);
-          date.setMonth(date.getMonth() + i);
+
+        // If no data returned, use mock data
+        if (!data || data.length === 0) {
+          const mockData = [
+            {
+              id: "1",
+              region: "Windhoek",
+              avg_price_usd: 325000,
+              yoy_change: 4.2,
+              listings_active: 420,
+              timestamp: new Date().toISOString(),
+              predicted_change: 2.7,
+              prediction_confidence: 0.85,
+              prediction_explanation: "Based on economic indicators and seasonal patterns",
+              prediction_factors: { market_trend: 0.7, volatility: 0.3, sentiment: 0.8 }
+            },
+            {
+              id: "2",
+              region: "Walvis Bay",
+              avg_price_usd: 280000,
+              yoy_change: 3.5,
+              listings_active: 210,
+              timestamp: new Date().toISOString(),
+              predicted_change: 1.8,
+              prediction_confidence: 0.78,
+              prediction_explanation: "Coastal demand continues to drive prices",
+              prediction_factors: { market_trend: 0.6, volatility: 0.4, sentiment: 0.7 }
+            },
+            {
+              id: "3",
+              region: "Swakopmund",
+              avg_price_usd: 310000,
+              yoy_change: 5.1,
+              listings_active: 180,
+              timestamp: new Date().toISOString(),
+              predicted_change: 3.2,
+              prediction_confidence: 0.82,
+              prediction_explanation: "Tourism and second-home market remain strong",
+              prediction_factors: { market_trend: 0.8, volatility: 0.3, sentiment: 0.9 }
+            },
+            {
+              id: "4",
+              region: "Oshakati",
+              avg_price_usd: 195000,
+              yoy_change: 2.8,
+              listings_active: 150,
+              timestamp: new Date().toISOString(),
+              predicted_change: 1.5,
+              prediction_confidence: 0.72,
+              prediction_explanation: "Steady growth with potential for acceleration",
+              prediction_factors: { market_trend: 0.5, volatility: 0.5, sentiment: 0.6 }
+            },
+            {
+              id: "5",
+              region: "Otjiwarongo",
+              avg_price_usd: 175000,
+              yoy_change: 2.2,
+              listings_active: 85,
+              timestamp: new Date().toISOString(),
+              predicted_change: 1.3,
+              prediction_confidence: 0.68,
+              prediction_explanation: "Moderate growth in regional center",
+              prediction_factors: { market_trend: 0.4, volatility: 0.4, sentiment: 0.6 }
+            },
+            {
+              id: "6",
+              region: "Keetmanshoop",
+              avg_price_usd: 160000,
+              yoy_change: 1.8,
+              listings_active: 65,
+              timestamp: new Date().toISOString(),
+              predicted_change: 0.9,
+              prediction_confidence: 0.65,
+              prediction_explanation: "Stable market with limited growth prospects",
+              prediction_factors: { market_trend: 0.3, volatility: 0.5, sentiment: 0.5 }
+            }
+          ] as HousingMarketData[];
           
-          regions.forEach(region => {
-            // Get the latest historical price for this region
-            const latestPrice = historicalData
-              .filter(item => item.region === region)
-              .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0]
-              .avg_price_usd;
-            
-            // Calculate predicted price based on region growth rates
-            const monthlyGrowthRate = region === "Windhoek" ? 0.003 : 
-                                    region === "Swakopmund" ? 0.0035 : 
-                                    region === "Walvis Bay" ? 0.0025 : 0.002;
-            
-            // Add some randomization to predictions with increasing uncertainty
-            const uncertaintyFactor = 1 + ((Math.random() * 0.02) - 0.01) * i;
-            
-            futureData.push({
-              id: `pred-${region}-${i}`,
-              region: region,
-              avg_price_usd: Math.round(latestPrice * Math.pow(1 + monthlyGrowthRate, i) * uncertaintyFactor),
-              timestamp: date.toISOString(),
-              date: date.toISOString().split('T')[0],
-              confidence: Math.max(0.95 - (i * 0.05), 0.7),
-              predicted: true
-            });
-          });
+          // Add alternative model predictions for each scenario
+          return mockData.map(item => ({
+            ...item,
+            alternativeModelPredictions: [
+              {
+                model: "optimistic",
+                value: Number(item.predicted_change) * 1.5,
+                confidence: item.prediction_confidence * 0.9
+              },
+              {
+                model: "pessimistic",
+                value: Number(item.predicted_change) * 0.6,
+                confidence: item.prediction_confidence * 0.85
+              }
+            ] as AlternativeModelPrediction[]
+          }));
         }
-        
-        // Combine historical and prediction data
-        return [...historicalData, ...futureData] as HousingMarketData[];
-        
-      } catch (error) {
-        console.error("Error fetching housing prediction data:", error);
-        return [];
+
+        // For real data, add alternative model predictions
+        return data.map(item => ({
+          ...item,
+          alternativeModelPredictions: [
+            {
+              model: "optimistic",
+              value: Number(item.predicted_change) * 1.5,
+              confidence: item.prediction_confidence * 0.9
+            },
+            {
+              model: "pessimistic",
+              value: Number(item.predicted_change) * 0.6,
+              confidence: item.prediction_confidence * 0.85
+            }
+          ] as AlternativeModelPrediction[]
+        })) as (HousingMarketData & { alternativeModelPredictions: AlternativeModelPrediction[] })[];
+      } catch (err) {
+        console.error("Error in prediction query:", err);
+        return [] as (HousingMarketData & { alternativeModelPredictions: AlternativeModelPrediction[] })[];
       }
-    },
+    }
   });
 
-  // Process data for predictions chart
-  const predictionData = React.useMemo(() => {
-    if (!housingData) return { timeSeriesData: [], factorsData: [], regionImpactData: [] };
+  // Filter data based on confidence threshold
+  const filteredData = React.useMemo(() => {
+    if (!housingData) return [];
+    return housingData.filter(item => 
+      (item.prediction_confidence * 100) >= confidenceThreshold
+    );
+  }, [housingData, confidenceThreshold]);
+
+  // Get prediction value based on selected scenario
+  const getPredictionValue = (item: HousingMarketData & { alternativeModelPredictions?: AlternativeModelPrediction[] }) => {
+    if (scenario === "base") return item.predicted_change || 0;
     
-    // Group data by date and region for time series
-    const timeSeriesMap = new Map();
+    if (item.alternativeModelPredictions && item.alternativeModelPredictions.length > 0) {
+      const matchingModel = item.alternativeModelPredictions.find(model => model.model === scenario);
+      if (matchingModel) return matchingModel.value;
+    }
     
-    housingData.forEach(item => {
-      const date = new Date(item.timestamp).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-      const key = `${date}-${item.region}`;
+    // Fallback to base prediction if alternative not found
+    return item.predicted_change || 0;
+  };
+
+  // Prepare data for price forecast chart
+  const priceForecastData = React.useMemo(() => {
+    if (!filteredData || filteredData.length === 0) return [];
+    
+    return filteredData.map(item => {
+      const predictedValue = getPredictionValue(item);
+      const predictedPrice = item.avg_price_usd * (1 + (Number(predictedValue) / 100));
       
-      timeSeriesMap.set(key, {
-        date,
+      return {
         region: item.region,
-        avg_price_usd: item.avg_price_usd,
-        predicted: item.predicted,
-        confidence: item.confidence
-      });
+        current_price: item.avg_price_usd,
+        predicted_price: Math.round(predictedPrice),
+        prediction_change: predictedValue,
+        confidence: item.prediction_confidence * 100
+      };
     });
+  }, [filteredData, scenario]);
 
-    const timeSeriesData = Array.from(timeSeriesMap.values())
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      
-    // Create prediction factors data for radar chart
-    const factorsData = [
-      { factor: "Economic Growth", value: 72 },
-      { factor: "Population Growth", value: 65 },
-      { factor: "Infrastructure Development", value: 78 },
-      { factor: "Foreign Investment", value: 56 },
-      { factor: "Tourism Influence", value: 83 },
-      { factor: "Construction Costs", value: 70 }
-    ];
+  // Prepare data for prediction factors radar chart
+  const predictionFactorsData = React.useMemo(() => {
+    if (!filteredData || filteredData.length === 0) return [];
     
-    // Create region impact data for pie chart
-    const regionImpactData = [
-      { name: "Windhoek", value: 42 },
-      { name: "Coastal Regions", value: 28 },
-      { name: "Northern Regions", value: 18 },
-      { name: "Other Areas", value: 12 }
-    ];
+    // Calculate average prediction factors across all regions
+    const factors = filteredData.reduce((acc, item) => {
+      if (item.prediction_factors) {
+        acc.market_trend += item.prediction_factors.market_trend || 0;
+        acc.volatility += item.prediction_factors.volatility || 0;
+        acc.sentiment += item.prediction_factors.sentiment || 0;
+      }
+      return acc;
+    }, { market_trend: 0, volatility: 0, sentiment: 0 });
     
-    return { timeSeriesData, factorsData, regionImpactData };
-  }, [housingData]);
-
-  const COLORS = [CHART_COLORS.primary, CHART_COLORS.secondary, CHART_COLORS.tertiary, CHART_COLORS.quaternary];
+    const count = filteredData.length;
+    
+    return [
+      { factor: "Market Trend", value: factors.market_trend / count },
+      { factor: "Market Volatility", value: factors.volatility / count },
+      { factor: "Market Sentiment", value: factors.sentiment / count }
+    ];
+  }, [filteredData]);
 
   if (isLoading) {
-    return <Skeleton className="h-[400px] w-full" />;
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-96" />
+      </div>
+    );
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="flex items-center">
-          <BrainCircuit className="h-5 w-5 mr-2 text-blue-600" />
-          AI-Powered Market Predictions
-        </CardTitle>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="cursor-help">
-                <Info className="h-4 w-4 text-gray-400" />
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-xs">
-              <p className="text-sm">
-                These predictions are generated using machine learning models trained on historical housing data, 
-                economic indicators, and market trends specific to the Namibian context.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Tabs defaultValue="price_forecast">
-          <div className="px-6 pt-2">
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="price_forecast">Price Forecast</TabsTrigger>
-              <TabsTrigger value="market_factors">Market Factors</TabsTrigger>
-              <TabsTrigger value="regional_impact">Regional Impact</TabsTrigger>
-            </TabsList>
-          </div>
-          
-          <TabsContent value="price_forecast" className="m-0 p-6 pt-4">
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={predictionData.timeSeriesData.filter(d => d.region === "Windhoek")}
-                  margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
-                  <XAxis 
-                    dataKey="date" 
-                    tick={{ fontSize: 12 }}
-                    stroke={CHART_COLORS.axis}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 12 }}
-                    stroke={CHART_COLORS.axis}
-                    tickFormatter={(value) => `N$${value.toLocaleString(undefined, {
-                      notation: 'compact',
-                      compactDisplay: 'short'
-                    })}`}
-                  />
-                  <RechartsTooltip content={(props) => <ChartTooltip {...props} />} />
-                  <Legend wrapperStyle={{ fontSize: '12px' }} />
-                  
-                  <Line
-                    type="monotone"
-                    dataKey="avg_price_usd"
-                    name="Historical Price"
-                    stroke={CHART_COLORS.primary}
-                    strokeWidth={2}
-                    dot={{ r: 2 }}
-                    activeDot={{ r: 4 }}
-                    animationDuration={1000}
-                    connectNulls
-                  />
-                  
-                  <Line
-                    type="monotone"
-                    dataKey="avg_price_usd"
-                    name="Predicted Price"
-                    stroke={CHART_COLORS.tertiary}
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                    dot={{ r: 2 }}
-                    activeDot={{ r: 4 }}
-                    animationDuration={1000}
-                    connectNulls
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+    <div className="space-y-12">
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <div>
+              <CardTitle>Housing Market Predictions</CardTitle>
+              <CardDescription>
+                AI-driven forecasts for the Namibian housing market
+              </CardDescription>
             </div>
-            
-            <div className="mt-6">
-              <div className="flex items-center space-x-2 mb-2">
-                <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-100">Windhoek</Badge>
-                <Badge variant="outline">Swakopmund</Badge>
-                <Badge variant="outline">Walvis Bay</Badge>
-                <Badge variant="outline">Oshakati</Badge>
-              </div>
-              
-              <div className="bg-gradient-to-r from-blue-50 to-teal-50 p-4 rounded-lg">
-                <div className="flex items-center">
-                  <ArrowUpRight className="h-5 w-5 text-blue-600 mr-2" />
-                  <h4 className="font-medium text-blue-800">Prediction Analysis</h4>
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">Confidence Threshold:</span>
+                <div className="w-[150px]">
+                  <Slider
+                    value={[confidenceThreshold]}
+                    onValueChange={(value) => setConfidenceThreshold(value[0])}
+                    max={100}
+                    step={5}
+                  />
                 </div>
-                <p className="text-sm text-blue-700 mt-1">
-                  Over the next 6 months, Windhoek's property prices are predicted to increase by approximately 
-                  3.2%, with coastal regions showing even stronger growth potential. The confidence interval narrows 
-                  for near-term forecasts and widens for predictions further into the future.
-                </p>
+                <Badge variant="outline">{confidenceThreshold}%</Badge>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">Scenario:</span>
+                <div>
+                  <Tabs
+                    value={scenario}
+                    onValueChange={(value) => setScenario(value as any)}
+                    className="w-full"
+                  >
+                    <TabsList className="grid w-full grid-cols-3">
+                      <TabsTrigger value="base">Base</TabsTrigger>
+                      <TabsTrigger value="optimistic">Optimistic</TabsTrigger>
+                      <TabsTrigger value="pessimistic">Pessimistic</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                </div>
               </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="market_factors" className="m-0 p-6 pt-4">
-            <div className="h-80">
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={priceForecastData}>
+                <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="region" 
+                  stroke={CHART_COLORS.text} 
+                  tick={{ fill: CHART_COLORS.text }}
+                  fontSize={12}
+                />
+                <YAxis 
+                  stroke={CHART_COLORS.text} 
+                  tick={{ fill: CHART_COLORS.text }}
+                  fontSize={12}
+                  tickFormatter={(value) => {
+                    return new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                      notation: 'compact',
+                      maximumFractionDigits: 0
+                    }).format(value);
+                  }}
+                />
+                <Tooltip
+                  formatter={(value: number, name: string) => {
+                    if (name === "Current Price" || name === "Predicted Price") {
+                      return [
+                        new Intl.NumberFormat('en-US', {
+                          style: 'currency',
+                          currency: 'USD',
+                          maximumFractionDigits: 0
+                        }).format(value),
+                        name
+                      ];
+                    } else if (name === "Confidence") {
+                      return [`${value.toFixed(0)}%`, name];
+                    }
+                    return [value, name];
+                  }}
+                />
+                <Legend />
+                <Bar
+                  dataKey="current_price"
+                  name="Current Price"
+                  fill={CHART_COLORS.primary}
+                  barSize={20}
+                />
+                <Bar
+                  dataKey="predicted_price"
+                  name="Predicted Price"
+                  fill={CHART_COLORS.prediction}
+                  barSize={20}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="confidence"
+                  name="Confidence"
+                  stroke={CHART_COLORS.accent}
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Prediction Factors</CardTitle>
+            <CardDescription>
+              Key factors influencing housing market predictions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <RadarChart outerRadius={90} data={predictionData.factorsData}>
-                  <PolarGrid stroke={CHART_COLORS.grid} />
-                  <PolarAngleAxis dataKey="factor" tick={{ fontSize: 12 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={predictionFactorsData}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="factor" />
+                  <PolarRadiusAxis angle={30} domain={[0, 1]} />
                   <Radar
-                    name="Market Influence Factors"
+                    name="Prediction Factors"
                     dataKey="value"
                     stroke={CHART_COLORS.primary}
                     fill={CHART_COLORS.primary}
                     fillOpacity={0.6}
-                    animationDuration={1000}
                   />
-                  <Legend wrapperStyle={{ fontSize: '12px' }} />
-                  <RechartsTooltip content={(props) => <ChartTooltip {...props} />} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
-            
-            <div className="mt-6 bg-gradient-to-r from-blue-50 to-teal-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-800">Key Predictive Factors</h4>
-              <p className="text-sm text-blue-700 mt-1">
-                Tourism influence and infrastructure development are the strongest factors driving Namibian 
-                housing market growth, particularly in coastal and urban areas. Economic growth continues to 
-                support sustainable market appreciation across all regions.
-              </p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="regional_impact" className="m-0 p-6 pt-4">
-            <div className="h-80">
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Growth Forecast by Region</CardTitle>
+            <CardDescription>
+              Predicted price change percentage by region
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={predictionData.regionImpactData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    animationDuration={1000}
-                  >
-                    {predictionData.regionImpactData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Legend wrapperStyle={{ fontSize: '12px' }} />
-                  <RechartsTooltip content={(props) => <ChartTooltip {...props} />} />
-                </PieChart>
+                <BarChart data={priceForecastData}>
+                  <CartesianGrid stroke={CHART_COLORS.grid} strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="region" 
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke={CHART_COLORS.text} 
+                    tick={{ fill: CHART_COLORS.text }}
+                    fontSize={12}
+                    tickFormatter={(value) => `${value}%`}
+                  />
+                  <Tooltip formatter={(value: number) => [`${value}%`, "Predicted Change"]} />
+                  <Legend />
+                  <Bar
+                    dataKey="prediction_change"
+                    name="Predicted Change"
+                    fill={CHART_COLORS.accent}
+                    barSize={20}
+                  />
+                </BarChart>
               </ResponsiveContainer>
             </div>
-            
-            <div className="mt-6 bg-gradient-to-r from-blue-50 to-teal-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-800">Regional Growth Distribution</h4>
-              <p className="text-sm text-blue-700 mt-1">
-                The capital region of Windhoek continues to dominate the market, accounting for 42% of total 
-                market value growth. Coastal regions show strong performance due to tourism and second home 
-                purchases, while northern regions are emerging as growth centers.
-              </p>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
-}
+};

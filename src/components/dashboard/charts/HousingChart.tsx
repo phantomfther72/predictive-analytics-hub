@@ -1,12 +1,20 @@
 
 import React from "react";
-import { Bar, BarChart, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Cell } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type HousingMarketData } from "@/types/market";
 import { ChartTooltip } from "./ChartTooltip";
 import { CHART_COLORS, commonChartProps, commonAxisProps } from "./chart-constants";
 import type { Payload } from "recharts/types/component/DefaultLegendContent";
 import { ModelSettings } from "../charts/use-chart-state";
+
+// Extended Chart Colors
+const extendedChartColors = {
+  ...CHART_COLORS,
+  axis: "#94a3b8",
+  tertiary: "#0ea5e9",
+  quaternary: "#8b5cf6"
+};
 
 interface HousingChartProps {
   data: HousingMarketData[] | undefined;
@@ -55,7 +63,7 @@ export function HousingChart({
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={chartData} {...commonChartProps}>
-        <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+        <CartesianGrid strokeDasharray="3 3" stroke={extendedChartColors.grid} />
         <XAxis {...commonAxisProps} dataKey="region" />
         <YAxis 
           {...commonAxisProps} 
@@ -75,14 +83,14 @@ export function HousingChart({
         />
         <Bar
           dataKey="avg_price_usd"
-          fill={CHART_COLORS.primary}
+          fill={extendedChartColors.primary}
           name="Average Price"
           hide={!selectedMetrics.includes("avg_price_usd")}
           animationDuration={300}
         />
         <Bar
           dataKey="listings_active"
-          fill={CHART_COLORS.secondary}
+          fill={extendedChartColors.secondary}
           name="Active Listings"
           hide={!selectedMetrics.includes("listings_active")}
           animationDuration={300}

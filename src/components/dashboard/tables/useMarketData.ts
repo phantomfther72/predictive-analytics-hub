@@ -10,6 +10,7 @@ import type {
   AgricultureMarketData,
   GreenHydrogenMetrics,
   PredictionFactors,
+  AlternativeModelPrediction,
 } from "@/types/market";
 
 export const useMarketData = () => {
@@ -83,7 +84,7 @@ export const useMarketData = () => {
             value: item.predicted_change * 0.7,
             confidence: Math.min(item.prediction_confidence * 0.95, 1)
           }
-        ]
+        ] as AlternativeModelPrediction[]
       })) as HousingMarketData[];
     },
   });
@@ -117,7 +118,7 @@ export const useMarketData = () => {
             value: item.predicted_change * 0.65,
             confidence: Math.min(item.prediction_confidence * 0.9, 1)
           }
-        ]
+        ] as AlternativeModelPrediction[]
       })) as MiningSectorInsight[];
     },
   });
@@ -151,7 +152,7 @@ export const useMarketData = () => {
             value: item.predicted_change * 0.75,
             confidence: Math.min(item.prediction_confidence * 0.92, 1)
           }
-        ]
+        ] as AlternativeModelPrediction[]
       })) as AgricultureMarketData[];
     },
   });
@@ -185,7 +186,7 @@ export const useMarketData = () => {
             value: item.predicted_change * 0.85,
             confidence: Math.min(item.prediction_confidence * 0.9, 1)
           }
-        ]
+        ] as AlternativeModelPrediction[]
       })) as GreenHydrogenMetrics[];
     },
   });

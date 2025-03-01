@@ -1,4 +1,3 @@
-
 export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen";
 
 export type PredictionFactors = {
@@ -16,6 +15,7 @@ export type MarketMetric = {
   source: string;
   predicted_change?: number | string;
   prediction_confidence?: number;
+  prediction_factors?: PredictionFactors | null;
 };
 
 export type NewsItem = {
@@ -135,7 +135,6 @@ export type GreenHydrogenMetrics = {
   prediction_factors: PredictionFactors | null;
 };
 
-// Let's extend the CHART_COLORS to include all needed color properties
 export type ExtendedChartColors = {
   readonly primary: string;
   readonly secondary: string;
@@ -148,7 +147,6 @@ export type ExtendedChartColors = {
   readonly quaternary: string;
 };
 
-// Define the AlternativeModelPrediction type for housing market and other predictions
 export type AlternativeModelPrediction = {
   model: string;
   value: number;

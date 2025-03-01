@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,7 +122,7 @@ const MarketDataTables: React.FC = () => {
               throw error;
             }
 
-            // Process data to ensure no N/A values
+            // Process data to ensure no N/A values and add missing properties
             if (data && data.length > 0) {
               return data.map(item => ({
                 ...item,

@@ -64,6 +64,7 @@ export type HousingMarketData = {
   predicted?: boolean;
   confidence?: number;
   date?: string;
+  alternative_model_predictions?: AlternativeModelPrediction[];
 };
 
 export type RentalMarketData = {

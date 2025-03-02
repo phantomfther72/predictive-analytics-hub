@@ -205,3 +205,4 @@ const MarketDataTables: React.FC = () => {
 };
 
 export default MarketDataTables;
+

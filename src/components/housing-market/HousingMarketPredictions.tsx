@@ -41,6 +41,22 @@ const processPredictionFactors = (rawFactors: any): PredictionFactors | null => 
   }
 };
 
+// Default alternative models to use if none are provided
+const getDefaultAlternativeModels = (baseItem: HousingMarketData): AlternativeModelPrediction[] => {
+  return [
+    { 
+      model: "regional", 
+      value: baseItem.avg_price_usd * 1.05, 
+      confidence: 0.8 
+    },
+    { 
+      model: "national", 
+      value: baseItem.avg_price_usd * 0.95, 
+      confidence: 0.9 
+    }
+  ];
+};
+
 const HousingMarketPredictions: React.FC = () => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [showAlternativeModels, setShowAlternativeModels] = useState<boolean>(false);
@@ -66,16 +82,13 @@ const HousingMarketPredictions: React.FC = () => {
         // Process the data to ensure it has the correct types
         const processedData = data.map(item => {
           // Create default alternative model predictions if not present
-          const defaultAlternativeModels = [
-            { model: "regional", value: item.avg_price_usd * 1.05, confidence: 0.8 },
-            { model: "national", value: item.avg_price_usd * 0.95, confidence: 0.9 }
-          ];
+          const alternativeModels = item.alternative_model_predictions || getDefaultAlternativeModels(item as HousingMarketData);
 
           return {
             ...item,
             prediction_factors: processPredictionFactors(item.prediction_factors),
             // Add empty alternative_model_predictions if not present
-            alternative_model_predictions: item.alternative_model_predictions || defaultAlternativeModels
+            alternative_model_predictions: alternativeModels
           };
         }) as HousingMarketData[];
         

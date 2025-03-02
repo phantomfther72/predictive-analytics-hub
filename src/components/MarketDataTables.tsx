@@ -164,7 +164,6 @@ const MarketDataTables: React.FC = () => {
     }, {} as Record<string, MarketMetric[]>);
   }, [marketMetrics]);
 
-  // Navigation handlers for each market type
   const handleMarketClick = (marketType: string) => {
     switch (marketType) {
       case 'housing':

@@ -18,10 +18,10 @@ const MarketDataTables: React.FC = () => {
     queryFn: async () => {
       try {
         // For demo purposes, use mock data with Namibian context if no access to Supabase session
-        const mockMetrics = [
+        const mockMetrics: MarketMetric[] = [
           {
             id: "1",
-            market_type: "housing" as const,
+            market_type: "housing",
             metric_name: "Average Price",
             value: 325000,
             source: "Namibian Housing Authority",
@@ -31,7 +31,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "2",
-            market_type: "housing" as const,
+            market_type: "housing",
             metric_name: "Inventory",
             value: 1250,
             source: "Windhoek MLS Database",
@@ -41,7 +41,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "3",
-            market_type: "agriculture" as const,
+            market_type: "agriculture",
             metric_name: "Crop Yield",
             value: 4200,
             source: "Namibian Agriculture Dept",
@@ -51,7 +51,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "4",
-            market_type: "agriculture" as const,
+            market_type: "agriculture",
             metric_name: "Land Value",
             value: 8500,
             source: "Namibian Land Registry",
@@ -61,7 +61,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "5",
-            market_type: "mining" as const,
+            market_type: "mining",
             metric_name: "Production Volume",
             value: 12500,
             source: "Namibian Mining Association",
@@ -71,7 +71,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "6",
-            market_type: "mining" as const,
+            market_type: "mining",
             metric_name: "Commodity Price",
             value: 1850,
             source: "Namibian Commodity Exchange",
@@ -81,7 +81,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "7",
-            market_type: "green_hydrogen" as const,
+            market_type: "green_hydrogen",
             metric_name: "Production Capacity",
             value: 145,
             source: "Namibian Energy Authority",
@@ -91,7 +91,7 @@ const MarketDataTables: React.FC = () => {
           },
           {
             id: "8",
-            market_type: "green_hydrogen" as const,
+            market_type: "green_hydrogen",
             metric_name: "Investment Amount",
             value: 285000000,
             source: "Namibian Investment Board",
@@ -99,7 +99,7 @@ const MarketDataTables: React.FC = () => {
             predicted_change: 12.5,
             prediction_confidence: 0.88
           }
-        ] as MarketMetric[];
+        ];
 
         // Try to get Supabase data first
         try {

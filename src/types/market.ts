@@ -1,3 +1,4 @@
+
 export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen";
 
 export type PredictionFactors = {
@@ -62,11 +63,21 @@ export type HousingMarketData = {
   prediction_confidence: number;
   prediction_explanation?: string | null;
   prediction_factors?: PredictionFactors | null;
-  predicted?: boolean;
-  confidence?: number;
-  date?: string;
   alternative_model_predictions?: AlternativeModelPrediction[];
   created_at?: string;
+  // Additional Namibian housing metrics
+  median_price_usd?: number;
+  min_price_usd?: number;
+  max_price_usd?: number;
+  mom_change?: number; // Month over month change
+  avg_days_on_market?: number;
+  sales_volume?: number;
+  new_listings?: number;
+  closed_sales?: number;
+  listing_to_sales_ratio?: number;
+  mortgage_rate?: number;
+  housing_affordability_index?: number;
+  price_per_sqm?: number;
 };
 
 export type RentalMarketData = {
@@ -79,6 +90,13 @@ export type RentalMarketData = {
   timestamp: string;
   predicted_change?: number | null;
   prediction_confidence?: number;
+  // Additional rental metrics
+  median_rental_price?: number;
+  min_rental_price?: number;
+  max_rental_price?: number;
+  occupancy_rate?: number;
+  avg_lease_duration?: number;
+  mom_change?: number; // Month over month change
 };
 
 export type HousingIndicator = {

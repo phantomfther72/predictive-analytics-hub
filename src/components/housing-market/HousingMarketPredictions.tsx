@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChartContainer } from "@/components/dashboard/charts/ChartContainer";
 import { toast } from "@/components/ui/use-toast";
-import { HousingMarketData, PredictionFactors } from "@/types/market";
+import { HousingMarketData, PredictionFactors, AlternativeModelPrediction } from "@/types/market";
 import { parsePredictionFactors } from "@/components/dashboard/tables/PredictionFactorsUtils";
 
 const processPredictionFactors = (rawFactors: any): PredictionFactors | null => {

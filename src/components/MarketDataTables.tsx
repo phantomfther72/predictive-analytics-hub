@@ -99,7 +99,7 @@ const MarketDataTables: React.FC = () => {
             predicted_change: 12.5,
             prediction_confidence: 0.88
           }
-        ];
+        ] as MarketMetric[];
 
         // Try to get Supabase data first
         try {
@@ -137,15 +137,15 @@ const MarketDataTables: React.FC = () => {
               })) as MarketMetric[];
             }
             
-            return mockMetrics as MarketMetric[];
+            return mockMetrics;
           } else {
             // Demo mode - use mock data for unauthenticated users
             console.log("No auth session, using mock data");
-            return mockMetrics as MarketMetric[];
+            return mockMetrics;
           }
         } catch (authError) {
           console.warn("Auth error, falling back to mock data:", authError);
-          return mockMetrics as MarketMetric[];
+          return mockMetrics;
         }
       } catch (error) {
         console.error("Error in query function:", error);

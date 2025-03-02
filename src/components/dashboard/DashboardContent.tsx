@@ -29,7 +29,8 @@ export const DashboardContent = () => {
             <Route path="/charts" element={<DashboardCharts />} />
             <Route path="/tables" element={<DashboardTables />} />
             <Route path="/profile" element={<DashboardProfile />} />
-            <Route path="/housing-market" element={<HousingMarket />} />
+            <Route path="/housing-market/*" element={<HousingMarket />} />
+            <Route path="/industry/housing-market" element={<HousingMarket />} />
             <Route 
               path="/industry/housing" 
               element={<IndustryView industry="housing" />} 

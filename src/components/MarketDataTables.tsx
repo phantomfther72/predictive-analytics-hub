@@ -164,8 +164,27 @@ const MarketDataTables: React.FC = () => {
     }, {} as Record<string, MarketMetric[]>);
   }, [marketMetrics]);
 
-  const handleHousingClick = () => {
-    navigate('/housing-market');
+  // Navigation handlers for each market type
+  const handleMarketClick = (marketType: string) => {
+    switch (marketType) {
+      case 'housing':
+        navigate('/housing-market');
+        break;
+      case 'agriculture':
+        navigate('/agriculture-market');
+        break;
+      case 'mining':
+        navigate('/mining-market');
+        break;
+      case 'green_hydrogen':
+        navigate('/green-hydrogen-market');
+        break;
+      case 'cryptocurrency':
+        navigate('/financial-market');
+        break;
+      default:
+        console.log(`No route defined for ${marketType}`);
+    }
   };
 
   if (isLoading) {
@@ -188,8 +207,8 @@ const MarketDataTables: React.FC = () => {
               key={marketType}
               marketType={marketType}
               metrics={metrics}
-              onCardClick={marketType === 'housing' ? handleHousingClick : undefined}
-              isClickable={marketType === 'housing'}
+              onCardClick={() => handleMarketClick(marketType)}
+              isClickable={true}
             />
           ))}
         </div>

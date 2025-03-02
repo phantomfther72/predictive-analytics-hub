@@ -2,11 +2,12 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +16,10 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleHomeClick = () => {
+    navigate('/');
+  };
 
   return (
     <nav
@@ -35,13 +40,13 @@ const Navbar = () => {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
+            <button
+              onClick={handleHomeClick}
               className="flex items-center text-slate-600 hover:text-slate-900 transition-colors"
             >
               <Home className="h-4 w-4 mr-1" />
               <span className="font-medium">Home</span>
-            </Link>
+            </button>
             <a
               href="#features"
               className="text-slate-600 hover:text-slate-900 transition-colors"
@@ -60,7 +65,10 @@ const Navbar = () => {
             >
               Testimonials
             </a>
-            <button className="bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+            >
               Get Started
             </button>
           </div>
@@ -85,14 +93,13 @@ const Navbar = () => {
         )}
       >
         <div className="px-4 py-3 space-y-2 border-t border-slate-100">
-          <Link
-            to="/"
-            className="flex items-center px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
-            onClick={() => setIsMobileMenuOpen(false)}
+          <button
+            onClick={handleHomeClick}
+            className="flex items-center w-full px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
           >
             <Home className="h-4 w-4 mr-1" />
             <span>Home</span>
-          </Link>
+          </button>
           <a
             href="#features"
             className="block px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
@@ -114,7 +121,13 @@ const Navbar = () => {
           >
             Testimonials
           </a>
-          <button className="w-full text-left px-3 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors">
+          <button 
+            onClick={() => {
+              navigate('/dashboard');
+              setIsMobileMenuOpen(false);
+            }}
+            className="w-full text-left px-3 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+          >
             Get Started
           </button>
         </div>

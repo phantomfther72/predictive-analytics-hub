@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { DashboardOverview } from "./DashboardOverview";
@@ -8,6 +9,10 @@ import { IndustryView } from "@/components/industry/IndustryView";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatePresence, motion } from "framer-motion";
 import HousingMarket from "@/pages/HousingMarket";
+import AgricultureMarket from "@/pages/AgricultureMarket";
+import MiningMarket from "@/pages/MiningMarket";
+import GreenHydrogenMarket from "@/pages/GreenHydrogenMarket";
+import FinancialMarket from "@/pages/FinancialMarket";
 
 export const DashboardContent = () => {
   const isMobile = useIsMobile();
@@ -28,24 +33,21 @@ export const DashboardContent = () => {
             <Route path="/charts" element={<DashboardCharts />} />
             <Route path="/tables" element={<DashboardTables />} />
             <Route path="/profile" element={<DashboardProfile />} />
+            
+            {/* Market-specific routes */}
             <Route path="/housing-market/*" element={<HousingMarket />} />
+            <Route path="/agriculture-market/*" element={<AgricultureMarket />} />
+            <Route path="/mining-market/*" element={<MiningMarket />} />
+            <Route path="/green-hydrogen-market/*" element={<GreenHydrogenMarket />} />
+            <Route path="/financial-market/*" element={<FinancialMarket />} />
+            
+            {/* Industry routes */}
             <Route path="/industry/housing-market" element={<HousingMarket />} />
-            <Route 
-              path="/industry/housing" 
-              element={<IndustryView industry="housing" />} 
-            />
-            <Route 
-              path="/industry/agriculture" 
-              element={<IndustryView industry="agriculture" />} 
-            />
-            <Route 
-              path="/industry/mining" 
-              element={<IndustryView industry="mining" />} 
-            />
-            <Route 
-              path="/industry/cryptocurrency" 
-              element={<IndustryView industry="cryptocurrency" />} 
-            />
+            <Route path="/industry/housing" element={<IndustryView industry="housing" />} />
+            <Route path="/industry/agriculture" element={<IndustryView industry="agriculture" />} />
+            <Route path="/industry/mining" element={<IndustryView industry="mining" />} />
+            <Route path="/industry/cryptocurrency" element={<IndustryView industry="cryptocurrency" />} />
+            <Route path="/industry/green-hydrogen" element={<IndustryView industry="green_hydrogen" />} />
           </Routes>
         </motion.div>
       </AnimatePresence>

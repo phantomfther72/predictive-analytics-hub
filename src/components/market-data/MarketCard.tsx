@@ -66,8 +66,8 @@ const MarketCard: React.FC<MarketCardProps> = ({
               </p>
               {metric.predicted_change !== undefined && metric.prediction_confidence !== undefined && (
                 <div className="mt-2">
-                  <p className={`text-xs font-medium ${parseFloat(String(metric.predicted_change)) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    Predicted change: {parseFloat(String(metric.predicted_change)) > 0 ? '+' : ''}{metric.predicted_change}%
+                  <p className={`text-xs font-medium ${Number(metric.predicted_change) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    Predicted change: {Number(metric.predicted_change) > 0 ? '+' : ''}{metric.predicted_change}%
                     <span className="text-gray-500 ml-1">
                       (Confidence: {Math.round((metric.prediction_confidence || 0) * 100)}%)
                     </span>

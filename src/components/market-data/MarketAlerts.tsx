@@ -24,8 +24,8 @@ const MarketAlerts: React.FC<MarketAlertsProps> = ({ metrics }) => {
             </p>
             <p className="text-xs text-gray-500 mt-1">{metric.source}</p>
             {metric.predicted_change !== undefined && (
-              <p className={`text-xs font-medium ${parseFloat(String(metric.predicted_change)) > 0 ? 'text-green-600' : 'text-red-600'} mt-1`}>
-                Predicted change: {parseFloat(String(metric.predicted_change)) > 0 ? '+' : ''}{metric.predicted_change}%
+              <p className={`text-xs font-medium ${Number(metric.predicted_change) > 0 ? 'text-green-600' : 'text-red-600'} mt-1`}>
+                Predicted change: {Number(metric.predicted_change) > 0 ? '+' : ''}{metric.predicted_change}%
               </p>
             )}
           </div>

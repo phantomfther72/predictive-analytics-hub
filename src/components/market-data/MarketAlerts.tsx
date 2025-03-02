@@ -36,4 +36,3 @@ const MarketAlerts: React.FC<MarketAlertsProps> = ({ metrics }) => {
 };
 
 export default MarketAlerts;
-

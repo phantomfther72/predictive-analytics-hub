@@ -83,4 +83,3 @@ const MarketCard: React.FC<MarketCardProps> = ({
 };
 
 export default MarketCard;
-

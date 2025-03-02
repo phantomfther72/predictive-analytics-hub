@@ -1,276 +1,179 @@
-
-import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { 
-  AreaChart, Area, BarChart, Bar, LineChart, Line, 
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
-  ResponsiveContainer 
-} from "recharts";
-import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ChartContainer } from "@/components/dashboard/charts/ChartContainer";
-import { toast } from "@/components/ui/use-toast";
-import { HousingMarketData, PredictionFactors, AlternativeModelPrediction } from "@/types/market";
-import { parsePredictionFactors } from "@/components/dashboard/tables/PredictionFactorsUtils";
+import { Badge } from "@/components/ui/badge";
+import { HousingMarketData } from "@/types/market";
+import { ArrowUpIcon, ArrowDownIcon, InfoIcon } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-const processPredictionFactors = (rawFactors: any): PredictionFactors | null => {
-  if (!rawFactors) return null;
+interface HousingMarketPredictionsProps {
+  data: HousingMarketData;
+}
+
+export const HousingMarketPredictions: React.FC<HousingMarketPredictionsProps> = ({
+  data,
+}) => {
+  // Format the prediction confidence as a percentage
+  const confidencePercentage = Math.round(data.prediction_confidence * 100);
   
-  try {
-    const factors = typeof rawFactors === 'string' ? JSON.parse(rawFactors) : rawFactors;
-    
-    // Ensure the object has all the required properties
-    if (
-      factors && 
-      typeof factors === 'object' && 
-      typeof factors.market_trend === 'number' && 
-      typeof factors.volatility === 'number' && 
-      typeof factors.sentiment === 'number'
-    ) {
-      return {
-        market_trend: factors.market_trend,
-        volatility: factors.volatility,
-        sentiment: factors.sentiment
-      };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-};
+  // Determine if the predicted change is positive, negative, or neutral
+  const isPredictionPositive = (data.predicted_change || 0) > 0;
+  const isPredictionNegative = (data.predicted_change || 0) < 0;
+  const isPredictionNeutral = (data.predicted_change || 0) === 0;
 
-// Default alternative models to use if none are provided
-const getDefaultAlternativeModels = (baseItem: HousingMarketData): AlternativeModelPrediction[] => {
-  return [
-    { 
-      model: "regional", 
-      value: baseItem.avg_price_usd * 1.05, 
-      confidence: 0.8 
-    },
-    { 
-      model: "national", 
-      value: baseItem.avg_price_usd * 0.95, 
-      confidence: 0.9 
-    }
-  ];
-};
-
-const HousingMarketPredictions: React.FC = () => {
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-  const [showAlternativeModels, setShowAlternativeModels] = useState<boolean>(false);
-  
-  const { data: housingData, isLoading } = useQuery({
-    queryKey: ["housingPredictionData"],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from("housing_market_data")
-          .select("*")
-          .order("timestamp", { ascending: false });
-          
-        if (error) {
-          toast({
-            title: "Error fetching data",
-            description: error.message,
-            variant: "destructive",
-          });
-          throw error;
-        }
-        
-        // Process the data to ensure it has the correct types
-        const processedData = data.map(item => {
-          // Create default alternative model predictions if not present
-          const alternativeModels = item.alternative_model_predictions || getDefaultAlternativeModels(item as HousingMarketData);
-
-          return {
-            ...item,
-            prediction_factors: processPredictionFactors(item.prediction_factors),
-            // Add empty alternative_model_predictions if not present
-            alternative_model_predictions: alternativeModels
-          };
-        }) as HousingMarketData[];
-        
-        return processedData;
-      } catch (error) {
-        console.error("Error fetching housing prediction data:", error);
-        return [];
-      }
-    },
-  });
-  
-  useEffect(() => {
-    if (housingData && housingData.length > 0) {
-      // Select first 3 regions by default
-      const uniqueRegions = [...new Set(housingData.map(item => item.region))];
-      setSelectedRegions(uniqueRegions.slice(0, 3));
-    }
-  }, [housingData]);
-
-  const filteredData = React.useMemo(() => {
-    if (!housingData) return [];
-    return housingData.filter(item => selectedRegions.includes(item.region));
-  }, [housingData, selectedRegions]);
-
-  const toggleRegion = (region: string) => {
-    setSelectedRegions(prev => 
-      prev.includes(region) 
-        ? prev.filter(r => r !== region) 
-        : [...prev, region]
-    );
+  // Get the color based on the prediction direction
+  const getPredictionColor = () => {
+    if (isPredictionPositive) return "text-green-600";
+    if (isPredictionNegative) return "text-red-600";
+    return "text-yellow-600";
   };
 
-  const uniqueRegions = React.useMemo(() => {
-    if (!housingData) return [];
-    return [...new Set(housingData.map(item => item.region))];
-  }, [housingData]);
+  // Get the appropriate icon based on the prediction direction
+  const getPredictionIcon = () => {
+    if (isPredictionPositive) return <ArrowUpIcon className="h-4 w-4 text-green-600" />;
+    if (isPredictionNegative) return <ArrowDownIcon className="h-4 w-4 text-red-600" />;
+    return null;
+  };
 
-  if (isLoading) {
+  // Get the badge color based on confidence level
+  const getConfidenceBadgeColor = () => {
+    if (confidencePercentage >= 80) return "bg-green-100 text-green-800";
+    if (confidencePercentage >= 60) return "bg-yellow-100 text-yellow-800";
+    return "bg-red-100 text-red-800";
+  };
+
+  // Format the prediction timestamp
+  const formatPredictionDate = () => {
+    if (!data.prediction_timestamp) return "N/A";
+    return new Date(data.prediction_timestamp).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // Get the prediction factors if available
+  const getPredictionFactors = () => {
+    if (!data.prediction_factors) return null;
+    
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-80 w-full" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Skeleton className="h-60 w-full" />
-          <Skeleton className="h-60 w-full" />
+      <div className="mt-4 space-y-2">
+        <h4 className="text-sm font-medium">Prediction Factors:</h4>
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="bg-blue-50 p-2 rounded">
+            <span className="block font-medium">Market Trend</span>
+            <span>{data.prediction_factors.market_trend.toFixed(2)}</span>
+          </div>
+          <div className="bg-purple-50 p-2 rounded">
+            <span className="block font-medium">Volatility</span>
+            <span>{data.prediction_factors.volatility.toFixed(2)}</span>
+          </div>
+          <div className="bg-amber-50 p-2 rounded">
+            <span className="block font-medium">Sentiment</span>
+            <span>{data.prediction_factors.sentiment.toFixed(2)}</span>
+          </div>
         </div>
       </div>
     );
-  }
+  };
+
+  // Get alternative model predictions if available
+  const getAlternativeModels = () => {
+    const displayedModels = data.alternative_model_predictions || [];
+    
+    if (displayedModels.length === 0) return null;
+    
+    return (
+      <div className="mt-6">
+        <h4 className="text-sm font-medium mb-2">Alternative Model Predictions:</h4>
+        <div className="space-y-2">
+          {displayedModels.map((model, index) => (
+            <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded text-sm">
+              <span className="font-medium capitalize">{model.model} Model</span>
+              <div className="flex items-center space-x-2">
+                <span className={model.value > 0 ? "text-green-600" : "text-red-600"}>
+                  {model.value > 0 ? "+" : ""}{model.value.toFixed(1)}%
+                </span>
+                <Badge variant="outline" className="text-xs">
+                  {Math.round(model.confidence * 100)}% conf.
+                </Badge>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap gap-2">
-        {uniqueRegions.map((region) => (
-          <Button
-            key={region}
-            variant={selectedRegions.includes(region) ? "default" : "outline"}
-            onClick={() => toggleRegion(region)}
-            className="text-xs"
-          >
-            {region}
-          </Button>
-        ))}
-        <Button
-          variant="outline"
-          onClick={() => setShowAlternativeModels(!showAlternativeModels)}
-          className="ml-auto text-xs"
-        >
-          {showAlternativeModels ? "Hide Alternative Models" : "Show Alternative Models"}
-        </Button>
-      </div>
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl flex items-center justify-between">
+          <span>Market Prediction</span>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <InfoIcon className="h-4 w-4 text-gray-400 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">
+                  AI-powered prediction for housing price changes in {data.region} 
+                  over the next quarter, based on historical data and market factors.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">Predicted Change (Next Quarter)</p>
+              <div className="flex items-center mt-1">
+                {getPredictionIcon()}
+                <span className={`text-2xl font-bold ${getPredictionColor()}`}>
+                  {data.predicted_change !== null ? (
+                    <>
+                      {data.predicted_change > 0 ? "+" : ""}
+                      {data.predicted_change.toFixed(1)}%
+                    </>
+                  ) : (
+                    "N/A"
+                  )}
+                </span>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500">Confidence Level</p>
+              <div className="mt-1">
+                <Badge className={getConfidenceBadgeColor()}>
+                  {confidencePercentage}% Confidence
+                </Badge>
+              </div>
+            </div>
+          </div>
 
-      <div className="grid grid-cols-1 gap-8">
-        <ChartContainer 
-          id="price-forecast"
-          title="Price Forecast (12 Month)" 
-          description="Predicted housing price trends based on current market data"
-        >
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={filteredData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="region" stroke="#9CA3AF" />
-              <YAxis 
-                stroke="#9CA3AF"
-                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-              />
-              <Tooltip 
-                formatter={(value: any) => [`$${value.toLocaleString()}`, "Price"]}
-                contentStyle={{ background: "#1F2937", border: "none" }}
-              />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="avg_price_usd" 
-                name="Current Price" 
-                stroke="#3B82F6" 
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey={(data) => data.avg_price_usd * (1 + (data.predicted_change || 0) / 100)} 
-                name="Predicted Price" 
-                stroke="#10B981" 
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+          <div className="pt-2 border-t border-gray-100">
+            <p className="text-sm text-gray-500">Prediction Date</p>
+            <p className="font-medium">{formatPredictionDate()}</p>
+          </div>
 
-        <ChartContainer 
-          id="prediction-confidence"
-          title="Prediction Confidence" 
-          description="Confidence levels for housing market predictions"
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={filteredData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="region" stroke="#9CA3AF" />
-              <YAxis 
-                stroke="#9CA3AF"
-                domain={[0, 1]}
-                tickFormatter={(value) => `${(value * 100).toFixed(0)}%`}
-              />
-              <Tooltip 
-                formatter={(value: any) => [`${(value * 100).toFixed(1)}%`, "Confidence"]}
-                contentStyle={{ background: "#1F2937", border: "none" }}
-              />
-              <Legend />
-              <Bar 
-                dataKey="prediction_confidence" 
-                name="Model Confidence" 
-                fill="#8B5CF6"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+          {data.prediction_explanation && (
+            <div className="pt-2 border-t border-gray-100">
+              <p className="text-sm text-gray-500">Explanation</p>
+              <p className="text-sm mt-1">{data.prediction_explanation}</p>
+            </div>
+          )}
 
-        <ChartContainer 
-          id="model-comparison"
-          title="Model Comparison" 
-          description="Compare different prediction models"
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={filteredData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="region" stroke="#9CA3AF" />
-              <YAxis 
-                stroke="#9CA3AF"
-                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-              />
-              <Tooltip 
-                formatter={(value: any) => [`$${value.toLocaleString()}`, "Predicted Price"]}
-                contentStyle={{ background: "#1F2937", border: "none" }}
-              />
-              <Legend />
-              <Bar 
-                dataKey={(data) => data.avg_price_usd * (1 + (data.predicted_change || 0) / 100)}
-                name="Primary Model" 
-                fill="#3B82F6"
-              />
-              {showAlternativeModels && (
-                <>
-                  <Bar 
-                    dataKey={(data) => data.avg_price_usd * 1.05}
-                    name="Regional Model" 
-                    fill="#EC4899"
-                  />
-                  <Bar 
-                    dataKey={(data) => data.avg_price_usd * 0.95}
-                    name="National Model" 
-                    fill="#F59E0B"
-                  />
-                </>
-              )}
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </div>
-    </div>
+          {getPredictionFactors()}
+          {getAlternativeModels()}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
-
-export default HousingMarketPredictions;

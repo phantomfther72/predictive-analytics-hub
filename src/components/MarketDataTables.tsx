@@ -128,10 +128,10 @@ const MarketDataTables: React.FC = () => {
                 ...item,
                 value: item.value || Math.floor(Math.random() * 10000),
                 // Add predicted_change if it doesn't exist
-                predicted_change: item.predicted_change !== undefined ? 
+                predicted_change: typeof item.predicted_change !== 'undefined' ? 
                   item.predicted_change : 
                   parseFloat((Math.random() * 10 - 5).toFixed(1)),
-                prediction_confidence: item.prediction_confidence !== undefined ?
+                prediction_confidence: typeof item.prediction_confidence !== 'undefined' ?
                   item.prediction_confidence :
                   0.7 + Math.random() * 0.3
               })) as MarketMetric[];

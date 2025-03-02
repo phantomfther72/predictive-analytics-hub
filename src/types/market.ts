@@ -1,4 +1,3 @@
-
 export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen";
 
 export type PredictionFactors = {
@@ -67,6 +66,7 @@ export type HousingMarketData = {
   confidence?: number;
   date?: string;
   alternative_model_predictions?: AlternativeModelPrediction[];
+  created_at?: string;
 };
 
 export type RentalMarketData = {

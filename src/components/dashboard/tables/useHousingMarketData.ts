@@ -19,14 +19,20 @@ export const useHousingMarketData = () => {
         handleError("Failed to fetch housing market data", error);
       }
 
-      return (data as any[]).map(item => ({
-        ...item,
-        prediction_factors: parsePredictionFactors(item.prediction_factors),
-        alternative_model_predictions: item.alternative_model_predictions || processAlternativeModels(item, [
-          { id: "regional", multiplier: 1.3, confidenceModifier: 0.75 },
-          { id: "national", multiplier: 0.7, confidenceModifier: 0.95 }
-        ])
-      })) as HousingMarketData[];
+      return (data as any[]).map(item => {
+        // Ensure we have alternative_model_predictions or create them
+        const altModelPredictions = item.alternative_model_predictions || 
+          processAlternativeModels(item, [
+            { id: "regional", multiplier: 1.3, confidenceModifier: 0.75 },
+            { id: "national", multiplier: 0.7, confidenceModifier: 0.95 }
+          ]);
+          
+        return {
+          ...item,
+          prediction_factors: parsePredictionFactors(item.prediction_factors),
+          alternative_model_predictions: altModelPredictions
+        };
+      }) as HousingMarketData[];
     },
   });
 };

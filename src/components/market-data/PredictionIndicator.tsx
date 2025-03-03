@@ -2,7 +2,6 @@
 import React from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export interface PredictionIndicatorProps {
   predictedChange?: number | null;
@@ -95,11 +94,11 @@ const PredictionIndicator: React.FC<PredictionIndicatorProps> = ({
 
   // Default text variant
   return (
-    <div className={`mt-2 ${className}`}>
-      <p className={`${sizeClasses[size]} font-medium flex items-center gap-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+    <span className={`mt-2 ${className}`}>
+      <span className={`${sizeClasses[size]} font-medium flex items-center gap-1 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
         {getContent()}
-      </p>
-    </div>
+      </span>
+    </span>
   );
 };
 

@@ -25,15 +25,17 @@ const MetricItem: React.FC<MetricItemProps> = ({ metric }) => {
         Updated: {new Date(metric.timestamp).toLocaleDateString()}
       </p>
       {(metric.predicted_change !== undefined || metric.prediction_confidence !== undefined) && (
-        <PredictionIndicator 
-          predictedChange={metric.predicted_change} 
-          predictionConfidence={metric.prediction_confidence}
-          showIcon={true}
-          showLabel={true}
-          showConfidence={true}
-          variant="text"
-          size="sm"
-        />
+        <div className="mt-2">
+          <PredictionIndicator 
+            predictedChange={metric.predicted_change} 
+            predictionConfidence={metric.prediction_confidence}
+            showIcon={true}
+            showLabel={true}
+            showConfidence={true}
+            variant="text"
+            size="sm"
+          />
+        </div>
       )}
     </div>
   );

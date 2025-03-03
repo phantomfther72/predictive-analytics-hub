@@ -13,6 +13,7 @@ import AgricultureMarket from "@/pages/AgricultureMarket";
 import MiningMarket from "@/pages/MiningMarket";
 import GreenHydrogenMarket from "@/pages/GreenHydrogenMarket";
 import FinancialMarket from "@/pages/FinancialMarket";
+import { MarketType } from "@/types/market";
 
 export const DashboardContent = () => {
   const isMobile = useIsMobile();
@@ -47,7 +48,7 @@ export const DashboardContent = () => {
             <Route path="/industry/agriculture" element={<IndustryView industry="agriculture" />} />
             <Route path="/industry/mining" element={<IndustryView industry="mining" />} />
             <Route path="/industry/cryptocurrency" element={<IndustryView industry="cryptocurrency" />} />
-            <Route path="/industry/green-hydrogen" element={<IndustryView industry="green_hydrogen" />} />
+            <Route path="/industry/green-hydrogen" element={<IndustryView industry="green_hydrogen" as MarketType />} />
           </Routes>
         </motion.div>
       </AnimatePresence>

@@ -119,7 +119,7 @@ export const useMarketMetrics = () => {
             // Process data to ensure no N/A values and add missing properties
             if (data && data.length > 0) {
               return data.map(item => {
-                // Type the data properly
+                // Type the data properly with correct interface
                 const marketMetric: MarketMetric = {
                   id: item.id,
                   market_type: item.market_type,

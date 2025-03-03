@@ -255,6 +255,8 @@ export type Database = {
           id: string
           market_type: Database["public"]["Enums"]["market_type"]
           metric_name: string
+          predicted_change: number | null
+          prediction_confidence: number | null
           source: string
           timestamp: string | null
           value: number
@@ -264,6 +266,8 @@ export type Database = {
           id?: string
           market_type: Database["public"]["Enums"]["market_type"]
           metric_name: string
+          predicted_change?: number | null
+          prediction_confidence?: number | null
           source: string
           timestamp?: string | null
           value: number
@@ -273,6 +277,8 @@ export type Database = {
           id?: string
           market_type?: Database["public"]["Enums"]["market_type"]
           metric_name?: string
+          predicted_change?: number | null
+          prediction_confidence?: number | null
           source?: string
           timestamp?: string | null
           value?: number

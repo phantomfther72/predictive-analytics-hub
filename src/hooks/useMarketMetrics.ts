@@ -118,17 +118,24 @@ export const useMarketMetrics = () => {
 
             // Process data to ensure no N/A values and add missing properties
             if (data && data.length > 0) {
-              return data.map(item => ({
-                ...item,
-                value: item.value || Math.floor(Math.random() * 10000),
-                // Add predicted_change if it doesn't exist
-                predicted_change: item.predicted_change !== undefined ? 
-                  item.predicted_change : 
-                  parseFloat((Math.random() * 10 - 5).toFixed(1)),
-                prediction_confidence: item.prediction_confidence !== undefined ?
-                  item.prediction_confidence :
-                  0.7 + Math.random() * 0.3
-              })) as MarketMetric[];
+              return data.map(item => {
+                // Type the data properly
+                const marketMetric: MarketMetric = {
+                  id: item.id,
+                  market_type: item.market_type,
+                  metric_name: item.metric_name,
+                  value: item.value || Math.floor(Math.random() * 10000),
+                  source: item.source,
+                  timestamp: item.timestamp || new Date().toISOString(),
+                  predicted_change: item.predicted_change !== undefined ? 
+                    item.predicted_change : 
+                    parseFloat((Math.random() * 10 - 5).toFixed(1)),
+                  prediction_confidence: item.prediction_confidence !== undefined ?
+                    item.prediction_confidence :
+                    0.7 + Math.random() * 0.3
+                };
+                return marketMetric;
+              });
             }
             
             return mockMetrics;

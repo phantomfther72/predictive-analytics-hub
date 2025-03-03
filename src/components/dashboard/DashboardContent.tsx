@@ -48,7 +48,7 @@ export const DashboardContent = () => {
             <Route path="/industry/agriculture" element={<IndustryView industry="agriculture" />} />
             <Route path="/industry/mining" element={<IndustryView industry="mining" />} />
             <Route path="/industry/cryptocurrency" element={<IndustryView industry="cryptocurrency" />} />
-            <Route path="/industry/green-hydrogen" element={<IndustryView industry="green_hydrogen" as MarketType />} />
+            <Route path="/industry/green-hydrogen" element={<IndustryView industry="green_hydrogen" />} />
           </Routes>
         </motion.div>
       </AnimatePresence>

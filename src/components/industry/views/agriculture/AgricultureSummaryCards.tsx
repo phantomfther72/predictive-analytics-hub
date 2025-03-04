@@ -3,12 +3,30 @@ import React from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { AgricultureMarketData } from "@/types/market";
 import { PredictionCell } from "@/components/dashboard/tables/PredictionCell";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AgricultureSummaryCardsProps {
   latestData: AgricultureMarketData;
 }
 
 export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = ({ latestData }) => {
+  if (!latestData) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Loading...</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-10 w-full" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <Card>
@@ -17,7 +35,7 @@ export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = (
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${latestData.market_price_usd.toLocaleString()}
+            ${latestData.market_price_usd ? latestData.market_price_usd.toLocaleString() : "N/A"}
             <span className="text-xs text-muted-foreground ml-1">per ton</span>
           </div>
         </CardContent>
@@ -29,7 +47,7 @@ export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = (
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {latestData.yield_per_hectare.toLocaleString()}
+            {latestData.yield_per_hectare ? latestData.yield_per_hectare.toLocaleString() : "N/A"}
             <span className="text-xs text-muted-foreground ml-1">tons</span>
           </div>
         </CardContent>
@@ -41,7 +59,7 @@ export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = (
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {latestData.rainfall_mm.toLocaleString()}
+            {latestData.rainfall_mm ? latestData.rainfall_mm.toLocaleString() : "N/A"}
             <span className="text-xs text-muted-foreground ml-1">mm</span>
           </div>
         </CardContent>
@@ -53,12 +71,16 @@ export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = (
         </CardHeader>
         <CardContent>
           <div className="flex items-center">
-            <PredictionCell
-              value={latestData.predicted_change}
-              confidence={latestData.prediction_confidence}
-              explanation={latestData.prediction_explanation}
-              factors={latestData.prediction_factors}
-            />
+            {latestData.predicted_change !== undefined ? (
+              <PredictionCell
+                value={latestData.predicted_change}
+                confidence={latestData.prediction_confidence}
+                explanation={latestData.prediction_explanation}
+                factors={latestData.prediction_factors}
+              />
+            ) : (
+              <span>N/A</span>
+            )}
           </div>
         </CardContent>
       </Card>

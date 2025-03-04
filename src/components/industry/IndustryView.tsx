@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,14 +9,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MiningSectorInsight, MarketMetric, AgricultureMarketData } from "@/types/market";
+import { MiningSectorInsight, MarketMetric, AgricultureMarketData, MarketType } from "@/types/market";
 import { parsePredictionFactors } from "@/components/dashboard/tables/PredictionFactorsUtils";
 import { PredictionCell } from "@/components/dashboard/tables/PredictionCell";
 import { AgricultureChart } from "@/components/dashboard/charts/AgricultureChart";
 import { useChartState } from "@/components/dashboard/charts/use-chart-state";
 
 interface IndustryViewProps {
-  industry: "housing" | "agriculture" | "mining" | "cryptocurrency";
+  industry: MarketType;
 }
 
 export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {

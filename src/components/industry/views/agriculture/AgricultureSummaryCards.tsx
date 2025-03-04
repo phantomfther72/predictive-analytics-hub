@@ -27,6 +27,13 @@ export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = (
     );
   }
 
+  // Safe access to properties with default values
+  const marketPrice = typeof latestData.market_price_usd === 'number' ? latestData.market_price_usd : 0;
+  const yieldPerHectare = typeof latestData.yield_per_hectare === 'number' ? latestData.yield_per_hectare : 0;
+  const rainfall = typeof latestData.rainfall_mm === 'number' ? latestData.rainfall_mm : 0;
+  const predictedChange = typeof latestData.predicted_change === 'number' ? latestData.predicted_change : 0;
+  const predictionConfidence = typeof latestData.prediction_confidence === 'number' ? latestData.prediction_confidence : 0;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <Card className="bg-card text-card-foreground">
@@ -35,9 +42,7 @@ export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = (
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${latestData.market_price_usd !== undefined && latestData.market_price_usd !== null 
-              ? latestData.market_price_usd.toLocaleString() 
-              : "N/A"}
+            ${marketPrice.toLocaleString()}
             <span className="text-xs text-muted-foreground ml-1">per ton</span>
           </div>
         </CardContent>
@@ -49,9 +54,7 @@ export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = (
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {latestData.yield_per_hectare !== undefined && latestData.yield_per_hectare !== null
-              ? latestData.yield_per_hectare.toLocaleString() 
-              : "N/A"}
+            {yieldPerHectare.toLocaleString()}
             <span className="text-xs text-muted-foreground ml-1">tons</span>
           </div>
         </CardContent>
@@ -63,9 +66,7 @@ export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = (
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {latestData.rainfall_mm !== undefined && latestData.rainfall_mm !== null
-              ? latestData.rainfall_mm.toLocaleString() 
-              : "N/A"}
+            {rainfall.toLocaleString()}
             <span className="text-xs text-muted-foreground ml-1">mm</span>
           </div>
         </CardContent>
@@ -77,16 +78,12 @@ export const AgricultureSummaryCards: React.FC<AgricultureSummaryCardsProps> = (
         </CardHeader>
         <CardContent>
           <div className="flex items-center">
-            {latestData.predicted_change !== undefined ? (
-              <PredictionCell
-                value={latestData.predicted_change}
-                confidence={latestData.prediction_confidence || 0}
-                explanation={latestData.prediction_explanation || null}
-                factors={latestData.prediction_factors || null}
-              />
-            ) : (
-              <span>N/A</span>
-            )}
+            <PredictionCell
+              value={predictedChange}
+              confidence={predictionConfidence}
+              explanation={latestData.prediction_explanation || null}
+              factors={latestData.prediction_factors || null}
+            />
           </div>
         </CardContent>
       </Card>

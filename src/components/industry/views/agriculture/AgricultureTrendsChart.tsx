@@ -27,13 +27,14 @@ export const AgricultureTrendsChart: React.FC<AgricultureTrendsChartProps> = ({ 
     );
   }
   
-  // Ensure all required data properties exist
+  // Ensure all required data properties exist with safe defaults
   const validData = data.map(item => ({
     ...item,
-    market_price_usd: item.market_price_usd ?? 0,
-    yield_per_hectare: item.yield_per_hectare ?? 0,
-    rainfall_mm: item.rainfall_mm ?? 0,
-    timestamp: item.timestamp || new Date().toISOString()
+    market_price_usd: typeof item.market_price_usd === 'number' ? item.market_price_usd : 0,
+    yield_per_hectare: typeof item.yield_per_hectare === 'number' ? item.yield_per_hectare : 0,
+    rainfall_mm: typeof item.rainfall_mm === 'number' ? item.rainfall_mm : 0,
+    timestamp: item.timestamp || new Date().toISOString(),
+    predicted_change: item.predicted_change ?? 0
   }));
   
   return (

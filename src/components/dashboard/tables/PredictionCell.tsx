@@ -30,10 +30,13 @@ export const PredictionCell: React.FC<PredictionCellProps> = ({
   explanation,
   factors,
 }) => {
-  if (value === null || value === undefined) return <span className="text-gray-400">N/A</span>;
+  // If value is null, undefined, or NaN, show N/A
+  if (value === null || value === undefined || isNaN(value)) {
+    return <span className="text-gray-400">N/A</span>;
+  }
   
   // Ensure value is a number
-  const numericValue = typeof value === 'number' ? value : parseFloat(value as any) || 0;
+  const numericValue = typeof value === 'number' ? value : parseFloat(String(value)) || 0;
   const isPositive = numericValue >= 0;
 
   return (

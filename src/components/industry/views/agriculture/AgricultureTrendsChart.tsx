@@ -15,7 +15,7 @@ export const AgricultureTrendsChart: React.FC<AgricultureTrendsChartProps> = ({ 
   
   if (!data || data.length === 0) {
     return (
-      <Card>
+      <Card className="bg-card text-card-foreground">
         <CardHeader>
           <CardTitle>Agricultural Trends</CardTitle>
           <CardDescription>No data available</CardDescription>
@@ -27,17 +27,27 @@ export const AgricultureTrendsChart: React.FC<AgricultureTrendsChartProps> = ({ 
     );
   }
   
+  // Ensure all required data properties exist
+  const validData = data.map(item => ({
+    ...item,
+    market_price_usd: item.market_price_usd ?? 0,
+    yield_per_hectare: item.yield_per_hectare ?? 0,
+    rainfall_mm: item.rainfall_mm ?? 0,
+    timestamp: item.timestamp || new Date().toISOString()
+  }));
+  
   return (
-    <Card>
+    <Card className="bg-card text-card-foreground">
       <CardHeader>
         <CardTitle>Agricultural Trends</CardTitle>
         <CardDescription>Market prices, yields, and environmental factors</CardDescription>
       </CardHeader>
       <CardContent>
         <AgricultureChart
-          data={data}
+          data={validData}
           selectedMetrics={selectedMetrics}
           onLegendClick={handleLegendClick}
+          isLoading={false}
         />
       </CardContent>
     </Card>

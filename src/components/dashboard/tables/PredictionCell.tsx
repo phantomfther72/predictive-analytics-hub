@@ -30,8 +30,11 @@ export const PredictionCell: React.FC<PredictionCellProps> = ({
   explanation,
   factors,
 }) => {
-  if (value === null) return <span className="text-gray-400">N/A</span>;
-  const isPositive = value >= 0;
+  if (value === null || value === undefined) return <span className="text-gray-400">N/A</span>;
+  
+  // Ensure value is a number
+  const numericValue = typeof value === 'number' ? value : parseFloat(value as any) || 0;
+  const isPositive = numericValue >= 0;
 
   return (
     <Dialog>
@@ -44,7 +47,7 @@ export const PredictionCell: React.FC<PredictionCellProps> = ({
         >
           <span>
             {isPositive ? "+" : ""}
-            {value.toFixed(2)}%
+            {numericValue.toFixed(2)}%
           </span>
           <TooltipProvider>
             <Tooltip>
@@ -63,7 +66,7 @@ export const PredictionCell: React.FC<PredictionCellProps> = ({
           <DialogTitle>Prediction Details</DialogTitle>
         </DialogHeader>
         <PredictionDetails
-          confidence={confidence}
+          confidence={confidence || 0}
           explanation={explanation}
           factors={factors}
         />
@@ -71,4 +74,3 @@ export const PredictionCell: React.FC<PredictionCellProps> = ({
     </Dialog>
   );
 };
-

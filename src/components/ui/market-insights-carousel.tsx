@@ -11,7 +11,7 @@ import type { MarketType, MarketMetric } from "@/types/market";
 interface InsightMetric {
   label: string;
   value: number;
-  change: number;
+  change: number | null;
 }
 
 interface MarketInsight {
@@ -135,15 +135,18 @@ export function MarketInsightsCarousel({
       const formattedMetrics: InsightMetric[] = [];
       metrics.forEach(m => {
         if (m && m.metric_name) {
+          // Handle potential null or undefined values safely
+          const numericValue = typeof m.value === 'string' ? parseFloat(m.value) : (m.value || 0);
+          const numericChange = m.predicted_change !== undefined && m.predicted_change !== null ? 
+            typeof m.predicted_change === 'string' ? 
+              parseFloat(m.predicted_change) : 
+              m.predicted_change : 
+            null;
+            
           formattedMetrics.push({
             label: m.metric_name,
-            // Ensure value is always a number by converting string values if needed
-            value: typeof m.value === 'string' ? parseFloat(m.value) : m.value || 0,
-            change: m.predicted_change !== undefined ? 
-              typeof m.predicted_change === 'string' ? 
-                parseFloat(m.predicted_change) : 
-                m.predicted_change : 
-              parseFloat((Math.random() * 10 - 5).toFixed(1))
+            value: numericValue,
+            change: numericChange
           });
         }
       });
@@ -349,8 +352,14 @@ export function MarketInsightsCarousel({
                         : "text-gray-500"
                     }`}
                   >
-                    {metric.change > 0 ? "+" : ""}
-                    {metric.change.toFixed(1)}% predicted
+                    {metric.change !== null ? (
+                      <>
+                        {metric.change > 0 ? "+" : ""}
+                        {metric.change.toFixed(1)}% predicted
+                      </>
+                    ) : (
+                      <span className="text-gray-500">No change predicted</span>
+                    )}
                   </p>
                 </div>
               ))}

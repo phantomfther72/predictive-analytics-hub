@@ -1,41 +1,118 @@
 
+import { useState, useCallback } from "react";
 import { useChartCore } from "./hooks/use-chart-core";
 import { useSimulation } from "./hooks/use-simulation";
 import { useAnnotations } from "./hooks/use-annotations";
 import { useModelComparison } from "./hooks/use-model-comparison";
 import { useVoiceCommands } from "./hooks/use-voice-commands";
-import { SimulationParameter, ChartAnnotation, ModelSettings } from "./types/chart-state-types";
 
-// Re-export the types for external use
-export { SimulationParameter, ChartAnnotation, ModelSettings };
+// Re-export types with explicit 'export type' syntax for isolatedModules
+export type { SimulationParameter, ChartAnnotation, ModelSettings } from "./types/chart-state-types";
 
 export const useChartState = () => {
-  const core = useChartCore();
-  const simulation = useSimulation();
-  const annotations = useAnnotations();
-  const modelComparison = useModelComparison();
-  
-  // Voice commands need references to other hook functions
-  const voiceCommands = useVoiceCommands(
-    modelComparison.toggleModelEnabled,
-    simulation.toggleSimulationMode
-  );
+  // Core chart state
+  const {
+    selectedDataset,
+    setSelectedDataset,
+    selectedMetric,
+    setSelectedMetric,
+    timeRange,
+    setTimeRange,
+    chartData,
+    isLoading,
+  } = useChartCore();
 
-  // Combine all hook returns into one cohesive API
+  // Simulation mode state
+  const {
+    simulationMode,
+    simulationParams,
+    toggleSimulationMode,
+    updateSimulationParam,
+  } = useSimulation();
+
+  // Annotations state
+  const {
+    annotations,
+    selectedAnnotation,
+    setSelectedAnnotation,
+    addAnnotation,
+    updateAnnotation,
+    deleteAnnotation,
+    addReplyToAnnotation,
+  } = useAnnotations();
+
+  // Model comparison state
+  const {
+    modelSettings,
+    updateModelSetting,
+    toggleModelVisibility,
+    resetModelSettings,
+  } = useModelComparison();
+
+  // Voice command state
+  const {
+    isListening,
+    toggleVoiceListening,
+    lastVoiceCommand,
+    commandResult,
+  } = useVoiceCommands();
+
+  // Modal states
+  const [showAnnotationModal, setShowAnnotationModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const toggleAnnotationModal = useCallback(() => {
+    setShowAnnotationModal((prev) => !prev);
+  }, []);
+
+  const toggleShareModal = useCallback(() => {
+    setShowShareModal((prev) => !prev);
+  }, []);
+
   return {
     // Core chart state
-    ...core,
-    
-    // Simulation features
-    ...simulation,
-    
-    // Collaborative features
-    ...annotations,
-    
-    // Multi-model comparison
-    ...modelComparison,
-    
-    // Voice commands
-    ...voiceCommands
+    selectedDataset,
+    setSelectedDataset,
+    selectedMetric,
+    setSelectedMetric,
+    timeRange,
+    setTimeRange,
+    chartData,
+    isLoading,
+
+    // Simulation state
+    simulationMode,
+    simulationParams,
+    toggleSimulationMode,
+    updateSimulationParam,
+
+    // Annotations state
+    annotations,
+    selectedAnnotation,
+    setSelectedAnnotation,
+    addAnnotation,
+    updateAnnotation,
+    deleteAnnotation,
+    addReplyToAnnotation,
+
+    // Model comparison state
+    modelSettings,
+    updateModelSetting,
+    toggleModelVisibility,
+    resetModelSettings,
+
+    // Voice commands state
+    isListening,
+    toggleVoiceListening,
+    lastVoiceCommand,
+    commandResult,
+
+    // Modal states
+    showAnnotationModal,
+    setShowAnnotationModal,
+    toggleAnnotationModal,
+    showShareModal,
+    setShowShareModal,
+    toggleShareModal,
   };
 };

@@ -13,6 +13,7 @@ import AgricultureMarket from "@/pages/AgricultureMarket";
 import MiningMarket from "@/pages/MiningMarket";
 import GreenHydrogenMarket from "@/pages/GreenHydrogenMarket";
 import FinancialMarket from "@/pages/FinancialMarket";
+import NotFound from "@/pages/NotFound";
 import { MarketType } from "@/types/market";
 
 export const DashboardContent = () => {
@@ -43,12 +44,14 @@ export const DashboardContent = () => {
             <Route path="/financial-market/*" element={<FinancialMarket />} />
             
             {/* Industry routes */}
-            <Route path="/industry/housing-market" element={<HousingMarket />} />
             <Route path="/industry/housing" element={<IndustryView industry="housing" />} />
             <Route path="/industry/agriculture" element={<IndustryView industry="agriculture" />} />
             <Route path="/industry/mining" element={<IndustryView industry="mining" />} />
             <Route path="/industry/cryptocurrency" element={<IndustryView industry="cryptocurrency" />} />
-            <Route path="/industry/green-hydrogen" element={<IndustryView industry="green_hydrogen" />} />
+            <Route path="/industry/green_hydrogen" element={<IndustryView industry="green_hydrogen" />} />
+            
+            {/* Catch-all route for dashboard - must be last */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </motion.div>
       </AnimatePresence>

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,11 +12,36 @@ import Dashboard from "./pages/Dashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./components/ui/use-toast";
 
+// Create error boundary for suspense fallbacks
+const ErrorFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+    <div className="text-center">
+      <h2 className="text-2xl font-semibold mb-4">Something went wrong</h2>
+      <p className="mb-4">We're experiencing some technical difficulties.</p>
+      <a href="/" className="text-teal-400 hover:text-teal-300 underline">
+        Return to Home
+      </a>
+    </div>
+  </div>
+);
+
+// Loading state for lazy-loaded components
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-slate-900">
+    <div className="animate-pulse text-teal-400 text-xl">Loading...</div>
+  </div>
+);
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60, // 1 minute
       refetchInterval: 1000 * 30, // 30 seconds
+      retry: 2,
+      // Add error handling with our toast notification system
+      onError: (error) => {
+        console.error("Query error:", error);
+      },
     },
   },
 });
@@ -64,7 +89,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   }, [toast, navigate]);
 
   if (session === null) {
-    return null; // Loading state
+    return <LoadingFallback />; // Better loading state
   }
 
   return session ? <>{children}</> : <Navigate to="/auth" />;
@@ -77,19 +102,22 @@ const App: React.FC = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route
-              path="/dashboard/*"
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/dashboard/*"
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+              {/* Catch-all route - must be last */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

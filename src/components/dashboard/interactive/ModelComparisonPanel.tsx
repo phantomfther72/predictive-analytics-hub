@@ -5,7 +5,8 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { useChartState, ModelSettings } from "../charts/use-chart-state";
+import { useChartState } from "../charts/use-chart-state";
+import { ModelSettings } from "../charts/types/chart-state-types";
 
 export const ModelComparisonPanel: React.FC = () => {
   const { models, toggleModelEnabled, updateModelWeight } = useChartState();

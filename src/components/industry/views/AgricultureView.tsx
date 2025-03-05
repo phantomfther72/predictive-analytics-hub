@@ -70,9 +70,12 @@ export const AgricultureView: React.FC = () => {
         prediction_confidence: 0.78,
         prediction_explanation: "Increased rainfall combined with stable fertilizer costs",
         prediction_factors: {
-          weather: 0.6,
-          market_demand: 0.3, 
-          production_costs: 0.1
+          market_trend: 60,
+          volatility: 30, 
+          sentiment: 10,
+          weather: 60,
+          market_demand: 30,
+          production_costs: 10
         }
       },
       {
@@ -91,9 +94,12 @@ export const AgricultureView: React.FC = () => {
         prediction_confidence: 0.65,
         prediction_explanation: "Decreased international demand affecting exports",
         prediction_factors: {
-          weather: 0.2,
-          market_demand: 0.7, 
-          production_costs: 0.1
+          market_trend: 20,
+          volatility: 70, 
+          sentiment: 10,
+          weather: 20,
+          market_demand: 70,
+          production_costs: 10
         }
       },
       {
@@ -112,9 +118,12 @@ export const AgricultureView: React.FC = () => {
         prediction_confidence: 0.82,
         prediction_explanation: "Government subsidies boosting local production",
         prediction_factors: {
-          weather: 0.3,
-          market_demand: 0.2, 
-          production_costs: 0.5
+          market_trend: 30,
+          volatility: 20, 
+          sentiment: 50,
+          weather: 30,
+          market_demand: 20,
+          production_costs: 50
         }
       },
       {
@@ -133,9 +142,12 @@ export const AgricultureView: React.FC = () => {
         prediction_confidence: 0.75,
         prediction_explanation: "Stable growing conditions with adequate rainfall",
         prediction_factors: {
-          weather: 0.5,
-          market_demand: 0.3, 
-          production_costs: 0.2
+          market_trend: 50,
+          volatility: 30, 
+          sentiment: 20,
+          weather: 50,
+          market_demand: 30,
+          production_costs: 20
         }
       }
     ];

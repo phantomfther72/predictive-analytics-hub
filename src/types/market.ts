@@ -4,6 +4,9 @@ export type PredictionFactors = {
   market_trend: number;
   volatility: number;
   sentiment: number;
+  weather?: number;
+  market_demand?: number;
+  production_costs?: number;
 };
 
 export type MarketMetric = {
@@ -64,11 +67,10 @@ export type HousingMarketData = {
   prediction_factors?: PredictionFactors | null;
   alternative_model_predictions?: AlternativeModelPrediction[];
   created_at?: string;
-  // Additional Namibian housing metrics
   median_price_usd?: number;
   min_price_usd?: number;
   max_price_usd?: number;
-  mom_change?: number; // Month over month change
+  mom_change?: number;
   avg_days_on_market?: number;
   sales_volume?: number;
   new_listings?: number;
@@ -89,13 +91,12 @@ export type RentalMarketData = {
   timestamp: string;
   predicted_change?: number | null;
   prediction_confidence?: number;
-  // Additional rental metrics
   median_rental_price?: number;
   min_rental_price?: number;
   max_rental_price?: number;
   occupancy_rate?: number;
   avg_lease_duration?: number;
-  mom_change?: number; // Month over month change
+  mom_change?: number;
 };
 
 export type HousingIndicator = {

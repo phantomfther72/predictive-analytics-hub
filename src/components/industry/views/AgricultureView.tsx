@@ -31,7 +31,13 @@ export const AgricultureView: React.FC = () => {
         
         return (data as any[]).map(item => ({
           ...item,
-          prediction_factors: parsePredictionFactors(item.prediction_factors)
+          // Ensure prediction_factors is an object or null, never undefined
+          prediction_factors: parsePredictionFactors(item.prediction_factors),
+          // Ensure numeric fields have proper values
+          predicted_change: item.predicted_change || 0,
+          prediction_confidence: item.prediction_confidence || 0,
+          // Ensure required timestamp fields exist
+          prediction_timestamp: item.prediction_timestamp || item.timestamp || new Date().toISOString()
         })) as AgricultureMarketData[];
       } catch (err) {
         console.error("Error fetching agriculture data:", err);
@@ -186,6 +192,7 @@ export const AgricultureView: React.FC = () => {
     );
   }
 
+  // Ensure we never have null data
   const marketData = agricultureData || [];
   // Get the latest data point for summary cards (or the first one if sorted differently)
   const latestData = marketData.length > 0 ? marketData[marketData.length - 1] : null;
@@ -196,9 +203,9 @@ export const AgricultureView: React.FC = () => {
       
       {latestData && <AgricultureSummaryCards latestData={latestData} />}
       
-      <AgricultureTrendsChart data={marketData} />
+      {marketData.length > 0 && <AgricultureTrendsChart data={marketData} />}
       
-      <AgricultureDetailCards data={marketData} />
+      {marketData.length > 0 && <AgricultureDetailCards data={marketData} />}
     </div>
   );
 };

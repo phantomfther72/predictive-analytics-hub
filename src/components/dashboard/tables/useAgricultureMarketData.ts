@@ -29,6 +29,7 @@ export const useAgricultureMarketData = () => {
         return (data as any[]).map(item => ({
           ...item,
           // Ensure no null values in critical fields
+          irrigation_volume_m3: item.irrigation_volume_m3 || 25000,
           predicted_change: item.predicted_change || 0,
           prediction_confidence: item.prediction_confidence || 0.7,
           prediction_timestamp: item.prediction_timestamp || item.timestamp || new Date().toISOString(),

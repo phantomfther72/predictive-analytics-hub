@@ -12,7 +12,7 @@ export const useMarketMetrics = () => {
     queryFn: async () => {
       try {
         // Mock Namibian context data
-        const mockMetrics: MarketMetric[] = [
+        const mockData: MarketMetric[] = [
           {
             id: "1",
             market_type: "housing",
@@ -138,20 +138,20 @@ export const useMarketMetrics = () => {
               });
             }
             
-            return mockMetrics;
+            return mockData;
           } else {
             // Demo mode - use mock data for unauthenticated users
             console.log("No auth session, using mock data");
-            return mockMetrics;
+            return mockData;
           }
         } catch (authError) {
           console.warn("Auth error, falling back to mock data:", authError);
-          return mockMetrics;
+          return mockData;
         }
       } catch (error) {
         console.error("Error in query function:", error);
-        // Always return mockMetrics instead of throwing to avoid UI crashes
-        return mockMetrics;
+        // Always return mockData instead of throwing to avoid UI crashes
+        return mockData;
       }
     },
   });

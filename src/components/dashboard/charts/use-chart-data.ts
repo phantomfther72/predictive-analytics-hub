@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { parsePredictionFactors } from "../tables/PredictionFactorsUtils";
+import { TimeRange } from "@/types/market";
 
-export const useChartData = (timeRange: number) => {
+export const useChartData = (timeRange: TimeRange) => {
   const { toast } = useToast();
 
   const { data: financialData, isLoading: isLoadingFinancial } = useQuery({

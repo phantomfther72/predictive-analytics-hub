@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,7 +75,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
       case "green_hydrogen": return "Green Hydrogen";
       case "cryptocurrency": return "Cryptocurrency";
       case "financial": return "Financial Markets";
-      default: return type.replace(/_/g, ' ');
+      default: return type.toString().replace(/_/g, ' ');
     }
   };
 

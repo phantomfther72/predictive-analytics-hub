@@ -24,7 +24,7 @@ import {
   GREEN_HYDROGEN_METRICS,
   Metric,
 } from "./charts/chart-config";
-import { Layout } from "./charts/types/chart-types";
+import { Layout, TimeRange } from "./charts/types/chart-types";
 
 export const DashboardCharts = () => {
   const {
@@ -50,7 +50,7 @@ export const DashboardCharts = () => {
     isLoadingMining,
     isLoadingAgriculture,
     isLoadingHydrogen,
-  } = useChartData(timeRange);
+  } = useChartData(timeRange as TimeRange);
 
   // Create a wrapper function to convert Payload to Metric for legend click handling
   const handleLegendClickWrapper = (data: Payload) => {
@@ -96,6 +96,11 @@ export const DashboardCharts = () => {
     // If we want to use this in the future, we would parse the newLayout array
   };
 
+  // Helper function to handle time range changes with proper typing
+  const handleTimeRangeChange = (value: string) => {
+    setTimeRange(value as TimeRange);
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -111,7 +116,7 @@ export const DashboardCharts = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <TimeRangeSlider value={timeRange} onChange={setTimeRange} />
+          <TimeRangeSlider value={timeRange} onChange={handleTimeRangeChange} />
           <Button variant="outline" size="sm" className="flex items-center gap-1">
             <Plus className="h-4 w-4" />
             <span>Add Chart</span>

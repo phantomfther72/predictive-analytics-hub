@@ -1,6 +1,6 @@
-
 export interface MarketMetric {
   name: string;
+  label: string;  // Added this field
   value: number | string;
   change: number;
   isPositive: boolean;

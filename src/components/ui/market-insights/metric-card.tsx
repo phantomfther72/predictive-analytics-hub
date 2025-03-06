@@ -22,9 +22,9 @@ export const MetricCard: React.FC<MetricCardProps> = ({ metric }) => {
       </p>
       <p
         className={`text-sm font-medium mt-2 ${
-          metric.change > 0
+          metric.change && metric.change > 0
             ? "text-green-600"
-            : metric.change < 0
+            : metric.change && metric.change < 0
             ? "text-red-600"
             : "text-gray-500"
         }`}

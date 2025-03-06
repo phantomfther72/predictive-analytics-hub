@@ -1,5 +1,5 @@
 
-export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen";
+export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen" | "financial";
 
 export type PredictionFactors = {
   market_trend: number;

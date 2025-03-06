@@ -59,7 +59,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
       "agriculture": "/agriculture-market",
       "mining": "/mining-market",
       "green_hydrogen": "/green-hydrogen-market",
-      "financial": "/financial-market"
+      "cryptocurrency": "/financial-market"
     };
     
     if (routes[industry]) {
@@ -74,8 +74,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
       case "mining": return "Mining";
       case "green_hydrogen": return "Green Hydrogen";
       case "cryptocurrency": return "Cryptocurrency";
-      case "financial": return "Financial Markets";
-      default: return type.replace('_', ' ');
+      default: return type.split('_').join(' ');
     }
   };
 
@@ -118,7 +117,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
         <h2 className="text-3xl font-bold capitalize">{getIndustryTitle(industry)}</h2>
         
         {/* Full dashboard link if available */}
-        {["housing", "agriculture", "mining", "green_hydrogen", "financial"].includes(industry) && (
+        {["housing", "agriculture", "mining", "green_hydrogen", "cryptocurrency"].includes(industry) && (
           <Button 
             variant="outline"
             onClick={navigateToMarketPage}
@@ -145,7 +144,10 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
               <CardContent className="pt-6">
                 <div className="space-y-2">
                   <p className="text-2xl font-bold">
-                    {metric.value.toLocaleString()} {metric.metric_name.includes('Price') ? 'USD' : ''}
+                    {typeof metric.value === 'number' 
+                      ? metric.value.toLocaleString() 
+                      : metric.value} 
+                    {metric.metric_name.includes('Price') ? 'USD' : ''}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Last updated: {new Date(metric.timestamp).toLocaleDateString()}
@@ -158,7 +160,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Predicted Change</span>
                       <span className={`text-sm font-semibold ${Number(metric.predicted_change) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {Number(metric.predicted_change) >= 0 ? '+' : ''}{metric.predicted_change.toFixed(2)}%
+                        {Number(metric.predicted_change) >= 0 ? '+' : ''}{Number(metric.predicted_change).toFixed(2)}%
                       </span>
                     </div>
                     {metric.prediction_confidence && (

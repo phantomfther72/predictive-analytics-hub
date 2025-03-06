@@ -12,7 +12,14 @@ import Dashboard from "./pages/Dashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./components/ui/use-toast";
 
-// Create error boundary for suspense fallbacks
+// Lazy load market-specific pages
+const HousingMarket = lazy(() => import("./pages/HousingMarket"));
+const AgricultureMarket = lazy(() => import("./pages/AgricultureMarket"));
+const MiningMarket = lazy(() => import("./pages/MiningMarket"));
+const GreenHydrogenMarket = lazy(() => import("./pages/GreenHydrogenMarket"));
+const FinancialMarket = lazy(() => import("./pages/FinancialMarket"));
+
+// Error boundary for suspense fallbacks
 const ErrorFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
     <div className="text-center">

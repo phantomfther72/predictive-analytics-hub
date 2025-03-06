@@ -7,6 +7,13 @@ export interface MarketMetric {
   unit?: string;
 }
 
+export interface InsightMetric {
+  label: string;
+  value: number | string;
+  change: number | null;
+  unit?: string;
+}
+
 export interface MarketInsight {
   id: string;
   title: string;

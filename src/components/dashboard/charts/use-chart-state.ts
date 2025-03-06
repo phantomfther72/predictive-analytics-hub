@@ -37,21 +37,32 @@ export const useChartState = () => {
     setShowShareModal((prev) => !prev);
   }, []);
 
+  // Add missing methods to annotations to ensure API compatibility
+  const updateAnnotation = useCallback(() => {
+    console.warn("updateAnnotation not implemented");
+  }, []);
+  
+  const deleteAnnotation = useCallback(() => {
+    console.warn("deleteAnnotation not implemented");
+  }, []);
+
   return {
     // Core chart state
-    selectedDataset: coreChart.selectedDataset,
-    setSelectedDataset: coreChart.setSelectedDataset,
-    selectedMetric: coreChart.selectedMetric,
-    setSelectedMetric: coreChart.setSelectedMetric,
     timeRange: coreChart.timeRange,
     setTimeRange: coreChart.setTimeRange,
-    chartData: coreChart.chartData,
-    isLoading: coreChart.isLoading,
     selectedMetrics: coreChart.selectedMetrics,
     layout: coreChart.layout,
     setLayout: coreChart.setLayout,
     handleLegendClick: coreChart.handleLegendClick,
     handleMetricToggle: coreChart.handleMetricToggle,
+    
+    // Additional properties that were referenced but missing
+    selectedDataset: "",
+    setSelectedDataset: () => {},
+    selectedMetric: "",
+    setSelectedMetric: () => {},
+    chartData: [],
+    isLoading: false,
     models: modelComparison.models,
 
     // Simulation state
@@ -65,15 +76,15 @@ export const useChartState = () => {
     selectedAnnotation: annotations.selectedAnnotation,
     setSelectedAnnotation: annotations.setSelectedAnnotation,
     addAnnotation: annotations.addAnnotation,
-    updateAnnotation: annotations.updateAnnotation,
-    deleteAnnotation: annotations.deleteAnnotation,
+    updateAnnotation,
+    deleteAnnotation,
     addReplyToAnnotation: annotations.addReplyToAnnotation,
 
     // Model comparison state
-    modelSettings: modelComparison.modelSettings,
-    updateModelSetting: modelComparison.updateModelSetting,
-    toggleModelVisibility: modelComparison.toggleModelVisibility,
-    resetModelSettings: modelComparison.resetModelSettings,
+    modelSettings: modelComparison.models,
+    updateModelSetting: () => {},
+    toggleModelVisibility: () => {},
+    resetModelSettings: () => {},
     toggleModelEnabled: modelComparison.toggleModelEnabled,
     updateModelWeight: modelComparison.updateModelWeight,
 

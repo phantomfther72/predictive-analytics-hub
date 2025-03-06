@@ -22,6 +22,20 @@ export const useAnnotations = () => {
     return newAnnotation.id;
   }, []);
 
+  const updateAnnotation = useCallback((annotationId: string, content: string) => {
+    setAnnotations(prev => 
+      prev.map(annotation => 
+        annotation.id === annotationId
+          ? { ...annotation, content }
+          : annotation
+      )
+    );
+  }, []);
+
+  const deleteAnnotation = useCallback((annotationId: string) => {
+    setAnnotations(prev => prev.filter(annotation => annotation.id !== annotationId));
+  }, []);
+
   const addReplyToAnnotation = useCallback((annotationId: string, content: string, author: string) => {
     setAnnotations(prev => 
       prev.map(annotation => 
@@ -48,6 +62,8 @@ export const useAnnotations = () => {
     selectedAnnotation,
     setSelectedAnnotation,
     addAnnotation,
+    updateAnnotation,
+    deleteAnnotation,
     addReplyToAnnotation
   };
 };

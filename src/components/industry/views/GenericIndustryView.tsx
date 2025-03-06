@@ -59,6 +59,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
       "agriculture": "/agriculture-market",
       "mining": "/mining-market",
       "green_hydrogen": "/green-hydrogen-market",
+      "financial": "/financial-market",
       "cryptocurrency": "/financial-market"
     };
     
@@ -74,6 +75,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
       case "mining": return "Mining";
       case "green_hydrogen": return "Green Hydrogen";
       case "cryptocurrency": return "Cryptocurrency";
+      case "financial": return "Financial Markets";
       default: return type.split('_').join(' ');
     }
   };

@@ -28,3 +28,11 @@ export interface MarketInsightsCarouselProps {
   className?: string;
   onInsightClick?: (insight: MarketInsight) => void;
 }
+
+// Add conversion utility to transform between metric formats
+export const convertToInsightMetric = (metric: MarketMetric): InsightMetric => ({
+  label: metric.name,
+  value: metric.value,
+  change: metric.change,
+  unit: metric.unit
+});

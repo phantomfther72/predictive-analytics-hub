@@ -22,6 +22,7 @@ import {
   MINING_METRICS,
   AGRICULTURE_METRICS,
   GREEN_HYDROGEN_METRICS,
+  Metric,
 } from "./charts/chart-config";
 import { Layout } from "./charts/types/chart-types";
 
@@ -73,13 +74,26 @@ export const DashboardCharts = () => {
   // Convert selectedMetrics from Metric[] to string[] (just the keys)
   const selectedMetricKeys = selectedMetrics.map(metric => metric.key);
 
-  // Create a wrapper for setLayout to match expected types
-  const handleLayoutChange = (newLayout: string | string[]) => {
-    if (typeof newLayout === 'string') {
-      setLayout(newLayout as Layout);
-    } else if (Array.isArray(newLayout) && newLayout.length > 0) {
-      setLayout(newLayout[0] as Layout);
+  // Create a wrapper function to handle string metric toggling
+  const handleStringMetricToggle = (metricKey: string) => {
+    const allMetrics = [
+      ...FINANCIAL_METRICS,
+      ...HOUSING_METRICS,
+      ...MINING_METRICS,
+      ...AGRICULTURE_METRICS,
+      ...GREEN_HYDROGEN_METRICS
+    ];
+    
+    const metric = allMetrics.find(m => m.key === metricKey);
+    if (metric) {
+      handleMetricToggle(metric);
     }
+  };
+
+  // Create a wrapper for setLayout to match expected types
+  const handleLayoutChange = (newLayout: string[]) => {
+    // No-op since we're not actually using the drag results for now
+    // If we want to use this in the future, we would parse the newLayout array
   };
 
   return (
@@ -116,40 +130,40 @@ export const DashboardCharts = () => {
           <MetricSelector
             metrics={FINANCIAL_METRICS}
             selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleMetricToggle}
+            onMetricToggle={handleStringMetricToggle}
           />
         )}
         {housingData && (
           <MetricSelector
             metrics={HOUSING_METRICS}
             selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleMetricToggle}
+            onMetricToggle={handleStringMetricToggle}
           />
         )}
         {miningData && (
           <MetricSelector
             metrics={MINING_METRICS}
             selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleMetricToggle}
+            onMetricToggle={handleStringMetricToggle}
           />
         )}
         {agricultureData && (
           <MetricSelector
             metrics={AGRICULTURE_METRICS}
             selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleMetricToggle}
+            onMetricToggle={handleStringMetricToggle}
           />
         )}
         {hydrogenData && (
           <MetricSelector
             metrics={GREEN_HYDROGEN_METRICS}
             selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleMetricToggle}
+            onMetricToggle={handleStringMetricToggle}
           />
         )}
       </div>
 
-      <ChartLayout layout={layout} onLayoutChange={handleLayoutChange}>
+      <ChartLayout onLayoutChange={handleLayoutChange}>
         <ChartContainer
           id="financial"
           title="Cryptocurrency Trends"

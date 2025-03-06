@@ -1,4 +1,4 @@
-export type TimeRange = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
+export type TimeRange = "1D" | "7D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
 
 export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen" | "financial";
 
@@ -160,6 +160,7 @@ export type GreenHydrogenMetrics = {
   prediction_confidence: number;
   prediction_explanation: string | null;
   prediction_factors: PredictionFactors | null;
+  alternative_model_predictions?: AlternativeModelPrediction[];
 };
 
 export type ExtendedChartColors = {

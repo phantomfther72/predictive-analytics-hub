@@ -1,5 +1,5 @@
 
-import { MarketInsight, MarketMetric } from "./types";
+import { MarketInsight, MarketMetric, InsightMetric } from "./types";
 import { MarketType } from "@/types/market";
 
 // Convert database market metrics to insight format
@@ -26,12 +26,14 @@ export function processMarketMetrics(marketMetrics: any[]): MarketInsight[] {
       description: `Latest data and predictions for ${title}`,
       industry: title,
       industryType: marketType,
+      date: new Date().toISOString(),
       metrics: filteredMetrics.map(m => ({
         name: m.metric_name,
         value: m.value,
         change: m.predicted_change || 0,
         isPositive: (m.predicted_change || 0) > 0,
-        unit: getMetricUnit(m.metric_name)
+        unit: getMetricUnit(m.metric_name),
+        label: m.metric_name
       }))
     };
   });
@@ -46,26 +48,30 @@ export function generateDemoInsights(): MarketInsight[] {
       description: "Latest real estate data and trends",
       industry: "Housing Markets",
       industryType: "housing",
+      date: new Date().toISOString(),
       metrics: [
         {
           name: "Average Price",
           value: 425000,
           change: 3.2,
           isPositive: true,
-          unit: "USD"
+          unit: "USD",
+          label: "Average Price"
         },
         {
           name: "Active Listings",
           value: 5280,
           change: -2.1,
-          isPositive: false
+          isPositive: false,
+          label: "Active Listings"
         },
         {
           name: "Days on Market",
           value: 28,
           change: -5.3,
           isPositive: true,
-          unit: "days"
+          unit: "days",
+          label: "Days on Market"
         }
       ]
     },
@@ -75,27 +81,31 @@ export function generateDemoInsights(): MarketInsight[] {
       description: "Global crop and yield forecasts",
       industry: "Agriculture",
       industryType: "agriculture",
+      date: new Date().toISOString(),
       metrics: [
         {
           name: "Crop Yield",
           value: 4.8,
           change: 0.5,
           isPositive: true,
-          unit: "t/ha"
+          unit: "t/ha",
+          label: "Crop Yield"
         },
         {
           name: "Market Price",
           value: 320,
           change: 12.5,
           isPositive: true,
-          unit: "USD/t"
+          unit: "USD/t",
+          label: "Market Price"
         },
         {
           name: "Export Volume",
           value: 125000,
           change: 4.2,
           isPositive: true,
-          unit: "tons"
+          unit: "tons",
+          label: "Export Volume"
         }
       ]
     },
@@ -105,27 +115,31 @@ export function generateDemoInsights(): MarketInsight[] {
       description: "Resource extraction and commodity prices",
       industry: "Mining",
       industryType: "mining",
+      date: new Date().toISOString(),
       metrics: [
         {
           name: "Copper Price",
           value: 9320,
           change: 5.8,
           isPositive: true,
-          unit: "USD/ton"
+          unit: "USD/ton",
+          label: "Copper Price"
         },
         {
           name: "Production Volume",
           value: 85600,
           change: 0.9,
           isPositive: true,
-          unit: "MT"
+          unit: "MT",
+          label: "Production Volume"
         },
         {
           name: "Export Growth",
           value: 3.5,
           change: 0.2,
           isPositive: true,
-          unit: "%"
+          unit: "%",
+          label: "Export Growth"
         }
       ]
     },
@@ -135,27 +149,31 @@ export function generateDemoInsights(): MarketInsight[] {
       description: "Emerging clean energy market trends",
       industry: "Green Hydrogen",
       industryType: "green_hydrogen",
+      date: new Date().toISOString(),
       metrics: [
         {
           name: "Production Capacity",
           value: 250,
           change: 15.3,
           isPositive: true,
-          unit: "MW"
+          unit: "MW",
+          label: "Production Capacity"
         },
         {
           name: "Market Demand",
           value: 180000,
           change: 23.8,
           isPositive: true,
-          unit: "tons"
+          unit: "tons",
+          label: "Market Demand"
         },
         {
           name: "Efficiency",
           value: 68.5,
           change: 2.1,
           isPositive: true,
-          unit: "%"
+          unit: "%",
+          label: "Efficiency"
         }
       ]
     },
@@ -165,27 +183,31 @@ export function generateDemoInsights(): MarketInsight[] {
       description: "Stock, bond, and currency analysis",
       industry: "Financial Markets",
       industryType: "financial",
+      date: new Date().toISOString(),
       metrics: [
         {
           name: "Market Index",
           value: 4820,
           change: 1.2,
           isPositive: true,
-          unit: "points"
+          unit: "points",
+          label: "Market Index"
         },
         {
           name: "Volatility",
           value: 18.5,
           change: -2.3,
           isPositive: true,
-          unit: "%"
+          unit: "%",
+          label: "Volatility"
         },
         {
           name: "Trading Volume",
           value: 1250000,
           change: 3.8,
           isPositive: true,
-          unit: "shares"
+          unit: "shares",
+          label: "Trading Volume"
         }
       ]
     }

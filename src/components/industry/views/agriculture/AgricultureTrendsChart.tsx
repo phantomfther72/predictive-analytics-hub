@@ -14,7 +14,7 @@ interface AgricultureTrendsChartProps {
 
 export const AgricultureTrendsChart: React.FC<AgricultureTrendsChartProps> = ({ data }) => {
   const chartState = useChartState();
-  const selectedMetrics = chartState.selectedMetrics.map(metric => metric.key);
+  const selectedMetricKeys = chartState.selectedMetrics.map(metric => metric.key);
   
   if (!data || data.length === 0) {
     return (
@@ -57,7 +57,7 @@ export const AgricultureTrendsChart: React.FC<AgricultureTrendsChartProps> = ({ 
       <CardContent>
         <AgricultureChart
           data={validData}
-          selectedMetrics={selectedMetrics}
+          selectedMetrics={selectedMetricKeys}
           onLegendClick={handleLegendClickWrapped}
           isLoading={false}
         />

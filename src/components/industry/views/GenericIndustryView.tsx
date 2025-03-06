@@ -76,7 +76,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
       case "green_hydrogen": return "Green Hydrogen";
       case "cryptocurrency": return "Cryptocurrency";
       case "financial": return "Financial Markets";
-      default: return type.split('_').join(' ');
+      default: return type.replace(/_/g, ' ');
     }
   };
 
@@ -119,7 +119,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
         <h2 className="text-3xl font-bold capitalize">{getIndustryTitle(industry)}</h2>
         
         {/* Full dashboard link if available */}
-        {["housing", "agriculture", "mining", "green_hydrogen", "cryptocurrency"].includes(industry) && (
+        {["housing", "agriculture", "mining", "green_hydrogen", "cryptocurrency", "financial"].includes(industry) && (
           <Button 
             variant="outline"
             onClick={navigateToMarketPage}

@@ -15,9 +15,22 @@ import { parsePredictionFactors } from "@/components/dashboard/tables/Prediction
 import { PredictionCell } from "@/components/dashboard/tables/PredictionCell";
 import { GreenHydrogenChart } from "@/components/dashboard/charts/GreenHydrogenChart";
 import { useChartState } from "@/components/dashboard/charts/use-chart-state";
+import { Payload } from "recharts/types/component/DefaultLegendContent";
 
 export const GreenHydrogenView: React.FC = () => {
-  const { selectedMetrics, handleLegendClick } = useChartState();
+  const chartState = useChartState();
+  const selectedMetricKeys = chartState.selectedMetrics.map(metric => metric.key);
+
+  // Create a wrapper function for legend clicks
+  const handleLegendClickWrapper = (data: Payload) => {
+    if (data && typeof data.value === 'string') {
+      const metricName = data.value;
+      const metric = chartState.selectedMetrics.find(m => m.name === metricName);
+      if (metric) {
+        chartState.handleLegendClick(metric);
+      }
+    }
+  };
 
   const { data: hydrogenData, isLoading } = useQuery({
     queryKey: ["green-hydrogen-metrics"],
@@ -128,8 +141,8 @@ export const GreenHydrogenView: React.FC = () => {
         <CardContent>
           <GreenHydrogenChart
             data={hydrogenData}
-            selectedMetrics={selectedMetrics}
-            onLegendClick={handleLegendClick}
+            selectedMetrics={selectedMetricKeys}
+            onLegendClick={handleLegendClickWrapper}
           />
         </CardContent>
       </Card>

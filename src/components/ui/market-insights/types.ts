@@ -23,10 +23,13 @@ export interface MarketInsight {
   description: string;
   industryType: string;
   date: string;
+  industry?: string;
   metrics: InsightMetric[];
 }
 
 export interface MarketInsightsCarouselProps {
-  insights: MarketInsight[];
+  insights?: MarketInsight[];
   onInsightClick?: (insight: MarketInsight) => void;
+  autoplayInterval?: number;
+  className?: string;
 }

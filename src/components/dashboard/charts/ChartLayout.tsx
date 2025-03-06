@@ -2,9 +2,11 @@
 import React, { useState } from "react";
 import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
 import { arrayMove, SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import { Layout } from "./types/chart-types";
 
 interface ChartLayoutProps {
   children: React.ReactNode;
+  layout?: Layout;
   onLayoutChange?: (newLayout: string[]) => void;
 }
 

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,9 +26,9 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Query for industry-specific market metrics
+  // Query for industry-specific market metrics - use string instead of MarketType in the query key array
   const { data: marketMetrics, isLoading, error, refetch } = useQuery({
-    queryKey: ["market-metrics", industry],
+    queryKey: ["market-metrics", industry as string],
     queryFn: async () => {
       try {
         const { data, error } = await supabase
@@ -75,7 +76,11 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
       case "green_hydrogen": return "Green Hydrogen";
       case "cryptocurrency": return "Cryptocurrency";
       case "financial": return "Financial Markets";
-      default: return type.toString().replace(/_/g, ' ');
+      default: {
+        // Use a safe approach that doesn't rely on toString()
+        const typeAsString = String(type);
+        return typeAsString.replace(/_/g, ' ');
+      }
     }
   };
 

@@ -36,19 +36,8 @@ export const DashboardContent = () => {
             <Route path="/tables" element={<DashboardTables />} />
             <Route path="/profile" element={<DashboardProfile />} />
             
-            {/* Market-specific routes */}
-            <Route path="/housing-market/*" element={<HousingMarket />} />
-            <Route path="/agriculture-market/*" element={<AgricultureMarket />} />
-            <Route path="/mining-market/*" element={<MiningMarket />} />
-            <Route path="/green-hydrogen-market/*" element={<GreenHydrogenMarket />} />
-            <Route path="/financial-market/*" element={<FinancialMarket />} />
-            
-            {/* Industry routes */}
-            <Route path="/industry/housing" element={<IndustryView industry="housing" />} />
-            <Route path="/industry/agriculture" element={<IndustryView industry="agriculture" />} />
-            <Route path="/industry/mining" element={<IndustryView industry="mining" />} />
-            <Route path="/industry/cryptocurrency" element={<IndustryView industry="cryptocurrency" />} />
-            <Route path="/industry/green_hydrogen" element={<IndustryView industry="green_hydrogen" />} />
+            {/* Industry routes - consistent naming pattern */}
+            <Route path="/industry/:industryType" element={<IndustryViewWrapper />} />
             
             {/* Catch-all route for dashboard - must be last */}
             <Route path="*" element={<NotFound />} />
@@ -57,4 +46,12 @@ export const DashboardContent = () => {
       </AnimatePresence>
     </main>
   );
+};
+
+// Wrapper component to extract the industry parameter
+const IndustryViewWrapper = () => {
+  const location = useLocation();
+  const industryType = location.pathname.split('/').pop() as MarketType;
+  
+  return <IndustryView industry={industryType} />;
 };

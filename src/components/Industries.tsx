@@ -1,5 +1,5 @@
 
-import { Home, Leaf, Mountain, Bitcoin } from "lucide-react";
+import { Home, Leaf, Mountain, Bitcoin, Zap, LineChart } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -10,6 +10,7 @@ const industries = [
     description:
       "Track property trends, predict market shifts, and identify investment opportunities in real estate.",
     type: "housing" as const,
+    route: "/housing-market"
   },
   {
     icon: Leaf,
@@ -17,6 +18,7 @@ const industries = [
     description:
       "Monitor crop prices, weather impacts, and global agricultural market movements.",
     type: "agriculture" as const,
+    route: "/agriculture-market"
   },
   {
     icon: Mountain,
@@ -24,6 +26,7 @@ const industries = [
     description:
       "Analyze commodity prices, production costs, and global mining industry trends.",
     type: "mining" as const,
+    route: "/mining-market"
   },
   {
     icon: Bitcoin,
@@ -31,7 +34,24 @@ const industries = [
     description:
       "Stay ahead of crypto market movements with real-time tracking and predictive analysis.",
     type: "cryptocurrency" as const,
+    route: "/dashboard/industry/cryptocurrency"
   },
+  {
+    icon: Zap,
+    title: "Green Hydrogen",
+    description:
+      "Track emerging clean energy innovation, investment trends, and production capacity.",
+    type: "green_hydrogen" as const,
+    route: "/green-hydrogen-market"
+  },
+  {
+    icon: LineChart,
+    title: "Financial Markets",
+    description:
+      "Monitor global financial markets, stocks, bonds and analyze investment opportunities.",
+    type: "financial" as const,
+    route: "/financial-market"
+  }
 ];
 
 const Industries = () => {
@@ -51,13 +71,13 @@ const Industries = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {industries.map((industry, index) => (
             <motion.div
               key={index}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate(`/dashboard/industry/${industry.type}`)}
+              onClick={() => navigate(industry.route)}
               className={`group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer ${
                 currentIndustry === industry.type
                   ? "bg-slate-50 ring-2 ring-slate-900/10"

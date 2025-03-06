@@ -1,9 +1,10 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink } from "lucide-react";
 import { MetricCard } from "./metric-card";
 import type { MarketInsight } from "./types";
+import { useNavigate } from "react-router-dom";
 
 interface CarouselContentProps {
   activeInsight: MarketInsight;
@@ -11,6 +12,7 @@ interface CarouselContentProps {
   handleNext: () => void;
   activeIndex: number;
   totalInsights: number;
+  onInsightClick?: (insight: MarketInsight) => void;
 }
 
 export const CarouselContent: React.FC<CarouselContentProps> = ({ 
@@ -18,8 +20,20 @@ export const CarouselContent: React.FC<CarouselContentProps> = ({
   handlePrevious, 
   handleNext, 
   activeIndex, 
-  totalInsights 
+  totalInsights,
+  onInsightClick
 }) => {
+  const navigate = useNavigate();
+
+  const handleViewDetails = () => {
+    if (onInsightClick) {
+      onInsightClick(activeInsight);
+    } else {
+      // Default navigation based on industry type
+      navigate(`/dashboard/industry/${activeInsight.industryType}`);
+    }
+  };
+
   return (
     <div className="relative">
       <div className="p-6">
@@ -52,6 +66,17 @@ export const CarouselContent: React.FC<CarouselContentProps> = ({
           {activeInsight.metrics.map((metric, idx) => (
             <MetricCard key={idx} metric={metric} />
           ))}
+        </div>
+        
+        <div className="mt-6 flex justify-end">
+          <Button 
+            onClick={handleViewDetails}
+            variant="outline" 
+            className="flex items-center gap-2 text-teal-600 hover:text-teal-700 hover:bg-teal-50"
+          >
+            View Details
+            <ExternalLink className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 

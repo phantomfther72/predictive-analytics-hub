@@ -5,16 +5,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { CarouselContent } from "./carousel-content";
 import { processMarketMetrics, generateDemoInsights } from "./utils";
-import type { MarketInsightsCarouselProps, MarketInsight } from "./types";
+import type { MarketInsight, MarketInsightsCarouselProps } from "./types";
+import { useNavigate } from "react-router-dom";
 
 export function MarketInsightsCarousel({
   autoplayInterval = 5000,
   className = "",
+  onInsightClick,
 }: MarketInsightsCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [insights, setInsights] = useState<MarketInsight[]>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMarketData();
@@ -81,6 +84,15 @@ export function MarketInsightsCarousel({
     setIsPaused(false);
   };
 
+  const handleInsightClick = (insight: MarketInsight) => {
+    if (onInsightClick) {
+      onInsightClick(insight);
+    } else {
+      // Default navigation
+      navigate(`/dashboard/industry/${insight.industryType}`);
+    }
+  };
+
   if (!insights.length) {
     return (
       <Card className={`overflow-hidden ${className}`}>
@@ -108,6 +120,7 @@ export function MarketInsightsCarousel({
           handleNext={handleNext}
           activeIndex={activeIndex}
           totalInsights={insights.length}
+          onInsightClick={handleInsightClick}
         />
       </CardContent>
     </Card>

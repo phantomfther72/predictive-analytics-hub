@@ -39,8 +39,10 @@ const queryClient = new QueryClient({
       refetchInterval: 1000 * 30, // 30 seconds
       retry: 2,
       // Add error handling with our toast notification system
-      onError: (error) => {
-        console.error("Query error:", error);
+      meta: {
+        onError: (error: Error) => {
+          console.error("Query error:", error);
+        },
       },
     },
   },
@@ -114,6 +116,13 @@ const App: React.FC = () => {
                   </PrivateRoute>
                 }
               />
+              {/* Market-specific routes */}
+              <Route path="/housing-market/*" element={<PrivateRoute><HousingMarket /></PrivateRoute>} />
+              <Route path="/agriculture-market/*" element={<PrivateRoute><AgricultureMarket /></PrivateRoute>} />
+              <Route path="/mining-market/*" element={<PrivateRoute><MiningMarket /></PrivateRoute>} />
+              <Route path="/green-hydrogen-market/*" element={<PrivateRoute><GreenHydrogenMarket /></PrivateRoute>} />
+              <Route path="/financial-market/*" element={<PrivateRoute><FinancialMarket /></PrivateRoute>} />
+              
               {/* Catch-all route - must be last */}
               <Route path="*" element={<NotFound />} />
             </Routes>

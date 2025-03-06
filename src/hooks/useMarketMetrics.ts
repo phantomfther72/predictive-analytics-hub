@@ -1,6 +1,4 @@
 
-// This file is using the supabase client to fetch market metrics
-// The mock data reference needs to be removed
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MarketMetric } from "@/types/market";

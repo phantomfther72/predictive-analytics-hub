@@ -1,179 +1,214 @@
 
-import type { MarketMetric, MarketType } from "@/types/market";
-import type { InsightMetric, MarketInsight } from "./types";
+import { MarketInsight, MarketMetric } from "./types";
+import { MarketType } from "@/types/market";
 
-export const processMarketMetrics = (metrics: MarketMetric[]): MarketInsight[] => {
+// Convert database market metrics to insight format
+export function processMarketMetrics(marketMetrics: any[]): MarketInsight[] {
   // Group metrics by market type
-  const groupedMetrics: Record<MarketType, MarketMetric[]> = metrics.reduce(
-    (acc, metric) => {
-      if (!acc[metric.market_type]) {
-        acc[metric.market_type] = [];
-      }
-      acc[metric.market_type].push(metric);
-      return acc;
-    },
-    {} as Record<MarketType, MarketMetric[]>
-  );
-
-  // Create insights from grouped metrics
-  return Object.entries(groupedMetrics).map(([marketType, metrics]) => {
-    let title = "";
-    let description = "";
-
-    switch (marketType) {
-      case "housing":
-        title = "Namibian Housing Market";
-        description =
-          "Latest trends and predictions for residential property values in Namibia's urban centers.";
-        break;
-      case "agriculture":
-        title = "Agricultural Sector";
-        description =
-          "Current metrics and forecasts for Namibia's farming and agricultural production.";
-        break;
-      case "mining":
-        title = "Mining & Resources";
-        description =
-          "Performance indicators and projections for Namibia's vital mining industry.";
-        break;
-      case "cryptocurrency":
-        title = "Cryptocurrency Markets";
-        description =
-          "Digital currency trends and adoption rates in Namibia's financial sector.";
-        break;
-      case "green_hydrogen":
-        title = "Green Hydrogen Sector";
-        description =
-          "Emerging metrics and growth indicators for Namibia's green hydrogen initiatives.";
-        break;
-      default:
-        title = `${marketType.charAt(0).toUpperCase() + marketType.slice(1)} Market`;
-        description = "Latest data and predictions from our AI models.";
+  const groupedMetrics: Record<string, any[]> = {};
+  
+  marketMetrics.forEach(metric => {
+    const marketType = metric.market_type;
+    if (!groupedMetrics[marketType]) {
+      groupedMetrics[marketType] = [];
     }
-
-    // Format metrics for this market type
-    const formattedMetrics: InsightMetric[] = [];
-    metrics.forEach(m => {
-      if (m && m.metric_name) {
-        // Handle potential null or undefined values safely
-        const numericValue = typeof m.value === 'string' ? parseFloat(m.value) : (m.value || 0);
-        const numericChange = m.predicted_change !== undefined && m.predicted_change !== null ? 
-          typeof m.predicted_change === 'string' ? 
-            parseFloat(m.predicted_change) : 
-            m.predicted_change : 
-          null;
-          
-        formattedMetrics.push({
-          label: m.metric_name,
-          value: numericValue,
-          change: numericChange
-        });
-      }
-    });
-
+    groupedMetrics[marketType].push(metric);
+  });
+  
+  // Generate insights from grouped metrics
+  return Object.entries(groupedMetrics).map(([marketType, metrics], index) => {
+    const title = getMarketTitle(marketType as MarketType);
+    const filteredMetrics = metrics.slice(0, 3); // Take top 3 metrics
+    
     return {
+      id: `insight-${index}`,
       title,
-      description,
-      metrics: formattedMetrics,
-      type: marketType as MarketType,
+      description: `Latest data and predictions for ${title}`,
+      industry: title,
+      industryType: marketType,
+      metrics: filteredMetrics.map(m => ({
+        name: m.metric_name,
+        value: m.value,
+        change: m.predicted_change || 0,
+        isPositive: (m.predicted_change || 0) > 0,
+        unit: getMetricUnit(m.metric_name)
+      }))
     };
   });
-};
+}
 
-export const generateDemoInsights = (): MarketInsight[] => {
-  // Create demo insights for all market types
+// Generate demo insights when no data is available
+export function generateDemoInsights(): MarketInsight[] {
   return [
     {
-      title: "Namibian Housing Market",
-      description:
-        "Latest trends and predictions for residential property values in Namibia's urban centers.",
-      type: "housing",
+      id: "insight-housing",
+      title: "Housing Markets",
+      description: "Latest real estate data and trends",
+      industry: "Housing Markets",
+      industryType: "housing",
       metrics: [
         {
-          label: "Average Price (N$)",
-          value: 1250000,
+          name: "Average Price",
+          value: 425000,
           change: 3.2,
+          isPositive: true,
+          unit: "USD"
         },
         {
-          label: "Monthly Listings",
-          value: 428,
-          change: -2.5,
+          name: "Active Listings",
+          value: 5280,
+          change: -2.1,
+          isPositive: false
         },
         {
-          label: "Days on Market",
-          value: 45,
-          change: -8.3,
-        },
-      ],
+          name: "Days on Market",
+          value: 28,
+          change: -5.3,
+          isPositive: true,
+          unit: "days"
+        }
+      ]
     },
     {
-      title: "Agricultural Sector",
-      description:
-        "Current metrics and forecasts for Namibia's farming and agricultural production.",
-      type: "agriculture",
+      id: "insight-agriculture",
+      title: "Agriculture",
+      description: "Global crop and yield forecasts",
+      industry: "Agriculture",
+      industryType: "agriculture",
       metrics: [
         {
-          label: "Crop Yield (t/ha)",
+          name: "Crop Yield",
           value: 4.8,
-          change: 1.5,
+          change: 0.5,
+          isPositive: true,
+          unit: "t/ha"
         },
         {
-          label: "Livestock Price Index",
-          value: 112.3,
-          change: 2.8,
+          name: "Market Price",
+          value: 320,
+          change: 12.5,
+          isPositive: true,
+          unit: "USD/t"
         },
         {
-          label: "Water Reserves (%)",
-          value: 68,
-          change: -5.2,
-        },
-      ],
+          name: "Export Volume",
+          value: 125000,
+          change: 4.2,
+          isPositive: true,
+          unit: "tons"
+        }
+      ]
     },
     {
-      title: "Mining & Resources",
-      description:
-        "Performance indicators and projections for Namibia's vital mining industry.",
-      type: "mining",
+      id: "insight-mining",
+      title: "Mining",
+      description: "Resource extraction and commodity prices",
+      industry: "Mining",
+      industryType: "mining",
       metrics: [
         {
-          label: "Uranium Production (t)",
-          value: 5800,
-          change: 4.3,
+          name: "Copper Price",
+          value: 9320,
+          change: 5.8,
+          isPositive: true,
+          unit: "USD/ton"
         },
         {
-          label: "Diamond Extraction (carats)",
-          value: 1840000,
-          change: -1.2,
+          name: "Production Volume",
+          value: 85600,
+          change: 0.9,
+          isPositive: true,
+          unit: "MT"
         },
         {
-          label: "Export Value (M N$)",
-          value: 14500,
-          change: 6.8,
-        },
-      ],
+          name: "Export Growth",
+          value: 3.5,
+          change: 0.2,
+          isPositive: true,
+          unit: "%"
+        }
+      ]
     },
     {
-      title: "Green Hydrogen Sector",
-      description:
-        "Emerging metrics and growth indicators for Namibia's green hydrogen initiatives.",
-      type: "green_hydrogen",
+      id: "insight-green_hydrogen",
+      title: "Green Hydrogen",
+      description: "Emerging clean energy market trends",
+      industry: "Green Hydrogen",
+      industryType: "green_hydrogen",
       metrics: [
         {
-          label: "Investment (M N$)",
-          value: 850,
-          change: 15.2,
+          name: "Production Capacity",
+          value: 250,
+          change: 15.3,
+          isPositive: true,
+          unit: "MW"
         },
         {
-          label: "Production Capacity (MW)",
-          value: 65,
-          change: 25.0,
+          name: "Market Demand",
+          value: 180000,
+          change: 23.8,
+          isPositive: true,
+          unit: "tons"
         },
         {
-          label: "Jobs Created",
-          value: 380,
-          change: 18.7,
-        },
-      ],
+          name: "Efficiency",
+          value: 68.5,
+          change: 2.1,
+          isPositive: true,
+          unit: "%"
+        }
+      ]
     },
+    {
+      id: "insight-financial",
+      title: "Financial Markets",
+      description: "Stock, bond, and currency analysis",
+      industry: "Financial Markets",
+      industryType: "financial",
+      metrics: [
+        {
+          name: "Market Index",
+          value: 4820,
+          change: 1.2,
+          isPositive: true,
+          unit: "points"
+        },
+        {
+          name: "Volatility",
+          value: 18.5,
+          change: -2.3,
+          isPositive: true,
+          unit: "%"
+        },
+        {
+          name: "Trading Volume",
+          value: 1250000,
+          change: 3.8,
+          isPositive: true,
+          unit: "shares"
+        }
+      ]
+    }
   ];
-};
+}
+
+// Helper functions
+function getMarketTitle(marketType: MarketType): string {
+  const titles: Record<string, string> = {
+    housing: "Housing Markets",
+    agriculture: "Agriculture",
+    mining: "Mining",
+    green_hydrogen: "Green Hydrogen",
+    cryptocurrency: "Cryptocurrency",
+    financial: "Financial Markets"
+  };
+  
+  return titles[marketType] || "Market Data";
+}
+
+function getMetricUnit(metricName: string): string {
+  if (metricName.toLowerCase().includes('price')) return 'USD';
+  if (metricName.toLowerCase().includes('volume')) return 'units';
+  if (metricName.toLowerCase().includes('percentage') || metricName.toLowerCase().includes('rate')) return '%';
+  return '';
+}

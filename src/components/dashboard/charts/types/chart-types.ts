@@ -48,10 +48,16 @@ export interface ChartAnnotation {
 export interface ChartComponentProps {
   data?: any[];
   isLoading?: boolean;
-  selectedMetrics: Metric[];
+  selectedMetrics: string[];
   onLegendClick: (data: Payload) => void;
   enabledModels?: ModelSettings[];
   simulationMode?: boolean;
+}
+
+// Define the type for TimeRangeSlider props
+export interface TimeRangeSliderProps {
+  value: string;
+  onChange: (value: string) => void;
 }
 
 export type { TimeRange };

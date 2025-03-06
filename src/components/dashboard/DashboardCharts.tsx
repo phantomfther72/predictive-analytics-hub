@@ -1,3 +1,4 @@
+
 import React from "react";
 import { TimeRangeSlider } from "./charts/TimeRangeSlider";
 import { MetricSelector } from "./charts/MetricSelector";
@@ -14,7 +15,6 @@ import { InteractiveFeatures } from "./InteractiveFeatures";
 import { Button } from "@/components/ui/button";
 import { Plus, MessageCircle, SplitSquareVertical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Metric } from "./charts/chart-config";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
 import {
   FINANCIAL_METRICS,
@@ -23,6 +23,7 @@ import {
   AGRICULTURE_METRICS,
   GREEN_HYDROGEN_METRICS,
 } from "./charts/chart-config";
+import { Layout } from "./charts/types/chart-types";
 
 export const DashboardCharts = () => {
   const {
@@ -50,8 +51,35 @@ export const DashboardCharts = () => {
     isLoadingHydrogen,
   } = useChartData(timeRange);
 
-  const handleLegendClickWrapped = (data: Payload) => {
-    handleLegendClick(data as unknown as Metric);
+  // Create a wrapper function to convert Payload to Metric for legend click handling
+  const handleLegendClickWrapper = (data: Payload) => {
+    if (data && typeof data.value === 'string') {
+      const metricName = data.value;
+      const allMetrics = [
+        ...FINANCIAL_METRICS,
+        ...HOUSING_METRICS,
+        ...MINING_METRICS,
+        ...AGRICULTURE_METRICS,
+        ...GREEN_HYDROGEN_METRICS
+      ];
+      
+      const metric = allMetrics.find(m => m.name === metricName);
+      if (metric) {
+        handleLegendClick(metric);
+      }
+    }
+  };
+
+  // Convert selectedMetrics from Metric[] to string[] (just the keys)
+  const selectedMetricKeys = selectedMetrics.map(metric => metric.key);
+
+  // Create a wrapper for setLayout to match expected types
+  const handleLayoutChange = (newLayout: string | string[]) => {
+    if (typeof newLayout === 'string') {
+      setLayout(newLayout as Layout);
+    } else if (Array.isArray(newLayout) && newLayout.length > 0) {
+      setLayout(newLayout[0] as Layout);
+    }
   };
 
   return (
@@ -87,41 +115,41 @@ export const DashboardCharts = () => {
         {financialData && (
           <MetricSelector
             metrics={FINANCIAL_METRICS}
-            selectedMetrics={selectedMetrics}
+            selectedMetrics={selectedMetricKeys}
             onMetricToggle={handleMetricToggle}
           />
         )}
         {housingData && (
           <MetricSelector
             metrics={HOUSING_METRICS}
-            selectedMetrics={selectedMetrics}
+            selectedMetrics={selectedMetricKeys}
             onMetricToggle={handleMetricToggle}
           />
         )}
         {miningData && (
           <MetricSelector
             metrics={MINING_METRICS}
-            selectedMetrics={selectedMetrics}
+            selectedMetrics={selectedMetricKeys}
             onMetricToggle={handleMetricToggle}
           />
         )}
         {agricultureData && (
           <MetricSelector
             metrics={AGRICULTURE_METRICS}
-            selectedMetrics={selectedMetrics}
+            selectedMetrics={selectedMetricKeys}
             onMetricToggle={handleMetricToggle}
           />
         )}
         {hydrogenData && (
           <MetricSelector
             metrics={GREEN_HYDROGEN_METRICS}
-            selectedMetrics={selectedMetrics}
+            selectedMetrics={selectedMetricKeys}
             onMetricToggle={handleMetricToggle}
           />
         )}
       </div>
 
-      <ChartLayout layout={layout} onLayoutChange={setLayout}>
+      <ChartLayout layout={layout} onLayoutChange={handleLayoutChange}>
         <ChartContainer
           id="financial"
           title="Cryptocurrency Trends"
@@ -130,8 +158,8 @@ export const DashboardCharts = () => {
           <FinancialChart
             data={financialData}
             isLoading={isLoadingFinancial}
-            selectedMetrics={selectedMetrics}
-            onLegendClick={handleLegendClickWrapped}
+            selectedMetrics={selectedMetricKeys}
+            onLegendClick={handleLegendClickWrapper}
             enabledModels={models}
             simulationMode={simulationMode}
           />
@@ -145,8 +173,8 @@ export const DashboardCharts = () => {
           <HousingChart
             data={housingData}
             isLoading={isLoadingHousing}
-            selectedMetrics={selectedMetrics}
-            onLegendClick={handleLegendClick}
+            selectedMetrics={selectedMetricKeys}
+            onLegendClick={handleLegendClickWrapper}
             enabledModels={models}
             simulationMode={simulationMode}
           />
@@ -160,8 +188,8 @@ export const DashboardCharts = () => {
           <MiningChart
             data={miningData}
             isLoading={isLoadingMining}
-            selectedMetrics={selectedMetrics}
-            onLegendClick={handleLegendClick}
+            selectedMetrics={selectedMetricKeys}
+            onLegendClick={handleLegendClickWrapper}
             enabledModels={models}
             simulationMode={simulationMode}
           />
@@ -175,8 +203,8 @@ export const DashboardCharts = () => {
           <AgricultureChart
             data={agricultureData}
             isLoading={isLoadingAgriculture}
-            selectedMetrics={selectedMetrics}
-            onLegendClick={handleLegendClick}
+            selectedMetrics={selectedMetricKeys}
+            onLegendClick={handleLegendClickWrapper}
             enabledModels={models}
             simulationMode={simulationMode}
           />
@@ -190,8 +218,8 @@ export const DashboardCharts = () => {
           <GreenHydrogenChart
             data={hydrogenData}
             isLoading={isLoadingHydrogen}
-            selectedMetrics={selectedMetrics}
-            onLegendClick={handleLegendClick}
+            selectedMetrics={selectedMetricKeys}
+            onLegendClick={handleLegendClickWrapper}
             enabledModels={models}
             simulationMode={simulationMode}
           />

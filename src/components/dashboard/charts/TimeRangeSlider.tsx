@@ -2,13 +2,15 @@
 import React from "react";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
+import { TimeRange } from "@/types/market";
 
 interface TimeRangeSliderProps {
-  value: number;
-  onChange: (value: number) => void;
+  value: TimeRange;
+  onChange: (value: TimeRange) => void;
 }
 
-const TIME_RANGES = [1, 7, 30]; // Days
+// Map time ranges to slider positions
+const TIME_RANGES: TimeRange[] = ["1D", "7D", "1M", "3M", "6M", "1Y"];
 
 export function TimeRangeSlider({ value, onChange }: TimeRangeSliderProps) {
   const handleChange = (newValue: number[]) => {
@@ -19,10 +21,10 @@ export function TimeRangeSlider({ value, onChange }: TimeRangeSliderProps) {
 
   return (
     <div className="space-y-2">
-      <Label>Time Range: {value} days</Label>
+      <Label>Time Range: {value}</Label>
       <Slider
         min={0}
-        max={2}
+        max={TIME_RANGES.length - 1}
         step={1}
         value={[currentIndex]}
         onValueChange={handleChange}

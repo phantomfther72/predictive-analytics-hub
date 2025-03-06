@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AgricultureMarketData } from "@/types/market";
@@ -5,13 +6,15 @@ import { AgricultureChart } from "@/components/dashboard/charts/AgricultureChart
 import { useChartState } from "@/components/dashboard/charts/use-chart-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
+import { Metric } from "@/components/dashboard/charts/chart-config";
 
 interface AgricultureTrendsChartProps {
   data: AgricultureMarketData[];
 }
 
 export const AgricultureTrendsChart: React.FC<AgricultureTrendsChartProps> = ({ data }) => {
-  const { selectedMetrics, handleLegendClick } = useChartState();
+  const chartState = useChartState();
+  const selectedMetrics = chartState.selectedMetrics.map(metric => metric.key);
   
   if (!data || data.length === 0) {
     return (
@@ -28,7 +31,12 @@ export const AgricultureTrendsChart: React.FC<AgricultureTrendsChartProps> = ({ 
   }
   
   const handleLegendClickWrapped = (data: Payload) => {
-    handleLegendClick(data as unknown as Metric);
+    if (data && typeof data.value === 'string') {
+      const metric = chartState.selectedMetrics.find(m => m.name === data.value);
+      if (metric) {
+        chartState.handleLegendClick(metric);
+      }
+    }
   };
   
   const validData = data.map(item => ({

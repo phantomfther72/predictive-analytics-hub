@@ -1,12 +1,13 @@
 
 import { Metric } from "../chart-config";
 import { TimeRange } from "@/types/market";
+import { Payload } from "recharts/types/component/DefaultLegendContent";
 
 export type Dataset = "financial" | "housing" | "mining" | "agriculture" | "green_hydrogen";
 export type Layout = "line" | "bar" | "scatter";
 
 export interface ChartData {
-  [key: string]: number;
+  [key: string]: number | string;
   timestamp: string;
 }
 
@@ -43,3 +44,14 @@ export interface ChartAnnotation {
     timestamp: Date;
   }[];
 }
+
+export interface ChartComponentProps {
+  data?: any[];
+  isLoading?: boolean;
+  selectedMetrics: Metric[];
+  onLegendClick: (data: Payload) => void;
+  enabledModels?: ModelSettings[];
+  simulationMode?: boolean;
+}
+
+export type { TimeRange };

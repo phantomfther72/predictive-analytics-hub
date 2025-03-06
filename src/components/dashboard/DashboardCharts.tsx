@@ -1,4 +1,3 @@
-
 import React from "react";
 import { TimeRangeSlider } from "./charts/TimeRangeSlider";
 import { MetricSelector } from "./charts/MetricSelector";
@@ -15,6 +14,8 @@ import { InteractiveFeatures } from "./InteractiveFeatures";
 import { Button } from "@/components/ui/button";
 import { Plus, MessageCircle, SplitSquareVertical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Metric } from "./charts/chart-config";
+import { Payload } from "recharts/types/component/DefaultLegendContent";
 import {
   FINANCIAL_METRICS,
   HOUSING_METRICS,
@@ -49,6 +50,10 @@ export const DashboardCharts = () => {
     isLoadingHydrogen,
   } = useChartData(timeRange);
 
+  const handleLegendClickWrapped = (data: Payload) => {
+    handleLegendClick(data as unknown as Metric);
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -76,7 +81,6 @@ export const DashboardCharts = () => {
         </div>
       </div>
 
-      {/* Advanced Interactive Features */}
       <InteractiveFeatures />
 
       <div className="flex flex-wrap gap-4 mb-6">
@@ -117,7 +121,7 @@ export const DashboardCharts = () => {
         )}
       </div>
 
-      <ChartLayout onLayoutChange={setLayout}>
+      <ChartLayout layout={layout} onLayoutChange={setLayout}>
         <ChartContainer
           id="financial"
           title="Cryptocurrency Trends"
@@ -127,8 +131,8 @@ export const DashboardCharts = () => {
             data={financialData}
             isLoading={isLoadingFinancial}
             selectedMetrics={selectedMetrics}
-            onLegendClick={handleLegendClick}
-            enabledModels={models.filter(m => m.enabled)}
+            onLegendClick={handleLegendClickWrapped}
+            enabledModels={models}
             simulationMode={simulationMode}
           />
         </ChartContainer>
@@ -143,7 +147,7 @@ export const DashboardCharts = () => {
             isLoading={isLoadingHousing}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
-            enabledModels={models.filter(m => m.enabled)}
+            enabledModels={models}
             simulationMode={simulationMode}
           />
         </ChartContainer>
@@ -158,7 +162,7 @@ export const DashboardCharts = () => {
             isLoading={isLoadingMining}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
-            enabledModels={models.filter(m => m.enabled)}
+            enabledModels={models}
             simulationMode={simulationMode}
           />
         </ChartContainer>
@@ -173,7 +177,7 @@ export const DashboardCharts = () => {
             isLoading={isLoadingAgriculture}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
-            enabledModels={models.filter(m => m.enabled)}
+            enabledModels={models}
             simulationMode={simulationMode}
           />
         </ChartContainer>
@@ -188,7 +192,7 @@ export const DashboardCharts = () => {
             isLoading={isLoadingHydrogen}
             selectedMetrics={selectedMetrics}
             onLegendClick={handleLegendClick}
-            enabledModels={models.filter(m => m.enabled)}
+            enabledModels={models}
             simulationMode={simulationMode}
           />
         </ChartContainer>

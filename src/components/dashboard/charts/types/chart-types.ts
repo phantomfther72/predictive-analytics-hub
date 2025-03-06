@@ -1,7 +1,14 @@
 
-import { Payload } from "recharts/types/component/DefaultLegendContent";
 import { Metric } from "../chart-config";
 import { TimeRange } from "@/types/market";
+
+export type Dataset = "financial" | "housing" | "mining" | "agriculture" | "green_hydrogen";
+export type Layout = "line" | "bar" | "scatter";
+
+export interface ChartData {
+  [key: string]: number;
+  timestamp: string;
+}
 
 export interface ModelSettings {
   id: string;
@@ -9,11 +16,9 @@ export interface ModelSettings {
   weight: number;
   enabled: boolean;
   color: string;
-  setting1?: string;
-  setting2?: string;
 }
 
-export interface SimulationParam {
+export interface SimulationParameter {
   id: string;
   name: string;
   value: number;
@@ -23,36 +28,18 @@ export interface SimulationParam {
   unit: string;
 }
 
-export interface ChartState {
-  timeRange: TimeRange;
-  setTimeRange: (range: TimeRange) => void;
-  selectedMetrics: Metric[];
-  selectedDataset: string;
-  setSelectedDataset: (dataset: string) => void;
-  selectedMetric: string;
-  setSelectedMetric: (metric: string) => void;
-  layout: string[];
-  setLayout: (layout: string[]) => void;
-  chartData: any[];
-  isLoading: boolean;
-  handleLegendClick: (data: Payload) => void;
-  handleMetricToggle: (metric: Metric) => void;
-  simulationMode: boolean;
-  toggleSimulationMode: () => void;
-  simulationParams: SimulationParam[];
-  updateSimulationParam: (id: string, value: number) => void;
-  models: ModelSettings[];
-  toggleModelEnabled: (modelId: string) => void;
-  updateModelWeight: (modelId: string, weight: number) => void;
-  resetModelSettings: () => void;
-  annotations: any[];
-  selectedAnnotation: string | null;
-  setSelectedAnnotation: (id: string | null) => void;
-  addAnnotation: (content: string) => void;
-  addReplyToAnnotation: (annotationId: string, content: string) => void;
-  voiceEnabled: boolean;
-  toggleVoiceCommands: () => void;
-  voiceCommandHistory: string[];
-  lastRecognizedCommand: string | null;
-  processVoiceCommand: (command: string) => void;
+export interface ChartAnnotation {
+  id: string;
+  chartId: string;
+  x: number;
+  y: number;
+  content: string;
+  author: string;
+  timestamp: Date;
+  replies: {
+    id: string;
+    author: string;
+    content: string;
+    timestamp: Date;
+  }[];
 }

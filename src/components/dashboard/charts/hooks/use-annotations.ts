@@ -1,69 +1,53 @@
 
-import { useState, useCallback } from "react";
-import { ChartAnnotation } from "../types/chart-state-types";
+import { useState } from 'react';
+import { ChartAnnotation } from "../types/chart-types";
 
 export const useAnnotations = () => {
   const [annotations, setAnnotations] = useState<ChartAnnotation[]>([]);
   const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null);
 
-  const addAnnotation = useCallback((chartId: string, x: number, y: number, content: string, author: string) => {
+  const addAnnotation = (chartId: string, x: number, y: number, content: string, author: string) => {
     const newAnnotation: ChartAnnotation = {
-      id: Date.now().toString(),
+      id: `annotation${annotations.length + 1}`,
       chartId,
       x,
       y,
       content,
       author,
       timestamp: new Date(),
-      replies: []
+      replies: [],
     };
-    
     setAnnotations(prev => [...prev, newAnnotation]);
     return newAnnotation.id;
-  }, []);
+  };
 
-  const updateAnnotation = useCallback((annotationId: string, content: string) => {
-    setAnnotations(prev => 
-      prev.map(annotation => 
-        annotation.id === annotationId
-          ? { ...annotation, content }
-          : annotation
-      )
+  const addReplyToAnnotation = (annotationId: string, content: string, author: string) => {
+    setAnnotations(prev =>
+      prev.map(annotation => {
+        if (annotation.id === annotationId) {
+          return {
+            ...annotation,
+            replies: [
+              ...annotation.replies,
+              {
+                id: `reply${annotation.replies.length + 1}`,
+                author,
+                content,
+                timestamp: new Date(),
+              },
+            ],
+          };
+        }
+        return annotation;
+      })
     );
-  }, []);
-
-  const deleteAnnotation = useCallback((annotationId: string) => {
-    setAnnotations(prev => prev.filter(annotation => annotation.id !== annotationId));
-  }, []);
-
-  const addReplyToAnnotation = useCallback((annotationId: string, content: string, author: string) => {
-    setAnnotations(prev => 
-      prev.map(annotation => 
-        annotation.id === annotationId
-          ? {
-              ...annotation,
-              replies: [
-                ...annotation.replies,
-                {
-                  id: Date.now().toString(),
-                  author,
-                  content,
-                  timestamp: new Date()
-                }
-              ]
-            }
-          : annotation
-      )
-    );
-  }, []);
+  };
 
   return {
     annotations,
     selectedAnnotation,
     setSelectedAnnotation,
     addAnnotation,
-    updateAnnotation,
-    deleteAnnotation,
-    addReplyToAnnotation
+    addReplyToAnnotation,
   };
 };

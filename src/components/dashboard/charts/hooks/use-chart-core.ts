@@ -1,47 +1,55 @@
 
-import { useState, useCallback } from "react";
-import { useLocalStorage } from "@/hooks/use-local-storage";
-import type { Payload } from "recharts/types/component/DefaultLegendContent";
+import { useState, useEffect } from 'react';
+import { useSearchParams } from "react-router-dom";
+import { Metric } from "../chart-config";
+import { TimeRange, Dataset, ChartData } from "../types/chart-types";
 
-export const useChartCore = () => {
-  const [timeRange, setTimeRange] = useState(1);
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>([
-    "current_price",
-    "volume",
-    "avg_price_usd",
-    "listings_active",
-    "market_value_usd",
-    "production_mt"
-  ]);
-  
-  const [layout, setLayout] = useLocalStorage<string[]>("chart-layout", [
-    "financial",
-    "housing",
-    "mining",
-    "agriculture",
-    "green-hydrogen"
-  ]);
+export const useChartCore = (initialDataset: Dataset = "financial", initialMetric = "price") => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [timeRange, setTimeRange] = useState<TimeRange>((searchParams.get("timeRange") as TimeRange) || "1M");
+  const [selectedMetrics, setSelectedMetrics] = useState<Metric[]>([]);
+  const [selectedDataset, setSelectedDataset] = useState<Dataset>(
+    (searchParams.get("dataset") as Dataset) || initialDataset
+  );
+  const [selectedMetric, setSelectedMetric] = useState<string>(
+    searchParams.get("metric") || initialMetric
+  );
+  const [layout, setLayout] = useState<"line" | "bar" | "scatter">("line");
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleMetricToggle = useCallback((metric: string) => {
-    setSelectedMetrics(prev => 
-      prev.includes(metric) 
-        ? prev.filter(m => m !== metric)
+  const handleLegendClick = (metric: Metric) => {
+    setSelectedMetric(metric.key);
+  };
+
+  const handleMetricToggle = (metric: Metric) => {
+    setSelectedMetrics(prev =>
+      prev.find(m => m.key === metric.key)
+        ? prev.filter(m => m.key !== metric.key)
         : [...prev, metric]
     );
-  }, []);
+  };
 
-  const handleLegendClick = useCallback((data: Payload) => {
-    if (data.dataKey) {
-      handleMetricToggle(data.dataKey.toString());
-    }
-  }, [handleMetricToggle]);
+  // Update search params when time range or dataset changes
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    params.set("timeRange", timeRange);
+    params.set("dataset", selectedDataset);
+    setSearchParams(params);
+  }, [timeRange, selectedDataset, searchParams, setSearchParams]);
 
   return {
     timeRange,
     setTimeRange,
     selectedMetrics,
+    selectedDataset,
+    setSelectedDataset,
+    selectedMetric,
+    setSelectedMetric,
     layout,
     setLayout,
+    chartData,
+    isLoading,
     handleLegendClick,
     handleMetricToggle,
   };

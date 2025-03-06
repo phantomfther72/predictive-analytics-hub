@@ -1,72 +1,36 @@
 
-import { useState, useCallback } from "react";
-import { ModelSettings } from "../types/chart-state-types";
+import { useState } from 'react';
+import { ModelSettings } from "../types/chart-types";
+
+const initialModels: ModelSettings[] = [
+  { id: "model1", name: "Model 1", weight: 0.5, enabled: true, color: "#0EA5E9" },
+  { id: "model2", name: "Model 2", weight: 0.3, enabled: false, color: "#10B981" },
+  { id: "model3", name: "Model 3", weight: 0.2, enabled: true, color: "#6366F1" },
+];
 
 export const useModelComparison = () => {
-  const [models, setModels] = useState<ModelSettings[]>([
-    { id: "primary", name: "Primary Model", enabled: true, weight: 1.0, color: "#3b82f6" },
-    { id: "optimistic", name: "Optimistic Model", enabled: false, weight: 0.7, color: "#10b981" },
-    { id: "pessimistic", name: "Pessimistic Model", enabled: false, weight: 0.7, color: "#ef4444" },
-    { id: "seasonal", name: "Seasonal Model", enabled: false, weight: 0.5, color: "#8b5cf6" },
-    { id: "regional", name: "Regional Model", enabled: false, weight: 0.6, color: "#f59e0b" },
-  ]);
+  const [models, setModels] = useState<ModelSettings[]>(initialModels);
 
-  const toggleModelEnabled = useCallback((modelId: string) => {
-    setModels(prev => 
-      prev.map(model => 
-        model.id === modelId
-          ? { ...model, enabled: !model.enabled }
-          : model
-      )
+  const toggleModelEnabled = (modelId: string) => {
+    setModels(prev =>
+      prev.map(model => model.id === modelId ? { ...model, enabled: !model.enabled } : model)
     );
-  }, []);
+  };
 
-  const toggleModelVisibility = useCallback((modelId: string) => {
-    setModels(prev => 
-      prev.map(model => 
-        model.id === modelId
-          ? { ...model, enabled: !model.enabled }
-          : model
-      )
+  const updateModelWeight = (modelId: string, weight: number) => {
+    setModels(prev =>
+      prev.map(model => model.id === modelId ? { ...model, weight } : model)
     );
-  }, []);
+  };
 
-  const updateModelWeight = useCallback((modelId: string, weight: number) => {
-    setModels(prev => 
-      prev.map(model => 
-        model.id === modelId
-          ? { ...model, weight: Math.min(Math.max(weight, 0), 1) }
-          : model
-      )
-    );
-  }, []);
-  
-  const updateModelSetting = useCallback((modelId: string, settingKey: keyof ModelSettings, value: any) => {
-    setModels(prev => 
-      prev.map(model => 
-        model.id === modelId
-          ? { ...model, [settingKey]: value }
-          : model
-      )
-    );
-  }, []);
-  
-  const resetModelSettings = useCallback(() => {
-    setModels([
-      { id: "primary", name: "Primary Model", enabled: true, weight: 1.0, color: "#3b82f6" },
-      { id: "optimistic", name: "Optimistic Model", enabled: false, weight: 0.7, color: "#10b981" },
-      { id: "pessimistic", name: "Pessimistic Model", enabled: false, weight: 0.7, color: "#ef4444" },
-      { id: "seasonal", name: "Seasonal Model", enabled: false, weight: 0.5, color: "#8b5cf6" },
-      { id: "regional", name: "Regional Model", enabled: false, weight: 0.6, color: "#f59e0b" },
-    ]);
-  }, []);
+  const resetModelSettings = () => {
+    setModels(initialModels);
+  };
 
   return {
     models,
     toggleModelEnabled,
-    toggleModelVisibility,
     updateModelWeight,
-    updateModelSetting,
-    resetModelSettings
+    resetModelSettings,
   };
 };

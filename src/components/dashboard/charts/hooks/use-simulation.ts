@@ -1,34 +1,29 @@
 
-import { useState, useCallback } from "react";
-import { SimulationParameter } from "../types/chart-state-types";
+import { useState } from 'react';
+import { SimulationParameter } from "../types/chart-types";
+
+const initialSimulationParams: SimulationParameter[] = [
+  { id: "market_trend", name: "Market Trend", value: 50, min: 0, max: 100, step: 1, unit: "%" },
+  { id: "volatility", name: "Volatility", value: 25, min: 0, max: 100, step: 1, unit: "%" },
+  { id: "sentiment", name: "Sentiment", value: 75, min: 0, max: 100, step: 1, unit: "%" },
+];
 
 export const useSimulation = () => {
   const [simulationMode, setSimulationMode] = useState(false);
-  const [simulationParams, setSimulationParams] = useState<SimulationParameter[]>([
-    { id: "volume", name: "Trading Volume", value: 100, min: 0, max: 200, step: 5, unit: "%" },
-    { id: "sentiment", name: "Market Sentiment", value: 50, min: 0, max: 100, step: 1, unit: "%" },
-    { id: "volatility", name: "Volatility", value: 30, min: 0, max: 100, step: 1, unit: "%" },
-    { id: "interest_rate", name: "Interest Rate", value: 3.5, min: 0, max: 10, step: 0.25, unit: "%" },
-  ]);
+  const [simulationParams, setSimulationParams] = useState(initialSimulationParams);
 
-  const toggleSimulationMode = useCallback(() => {
-    setSimulationMode(prev => !prev);
-  }, []);
+  const toggleSimulationMode = () => setSimulationMode(prev => !prev);
 
-  const updateSimulationParam = useCallback((id: string, value: number) => {
-    setSimulationParams(prev => 
-      prev.map(param => 
-        param.id === id 
-          ? { ...param, value } 
-          : param
-      )
+  const updateSimulationParam = (id: string, value: number) => {
+    setSimulationParams(prev =>
+      prev.map(param => param.id === id ? { ...param, value } : param)
     );
-  }, []);
+  };
 
   return {
     simulationMode,
-    simulationParams,
     toggleSimulationMode,
-    updateSimulationParam
+    simulationParams,
+    updateSimulationParam,
   };
 };

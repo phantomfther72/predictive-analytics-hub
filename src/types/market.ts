@@ -133,14 +133,14 @@ export type AgricultureMarketData = {
   yield_per_hectare: number;
   cultivated_acreage: number;
   rainfall_mm: number;
-  irrigation_volume_m3: number; // Required field
+  irrigation_volume_m3: number;
   market_price_usd: number;
   fertilizer_usage_kg_ha: number;
   export_volume_tons: number;
   import_volume_tons: number;
   timestamp: string;
   predicted_change: number | null;
-  prediction_timestamp: string; // Required field
+  prediction_timestamp: string;
   prediction_confidence: number;
   prediction_explanation: string | null;
   prediction_factors: PredictionFactors | null;

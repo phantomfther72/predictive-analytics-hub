@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,7 +26,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Query for industry-specific market metrics - convert industry to string to ensure type compatibility
+  // Query for industry-specific market metrics - explicitly convert to string for type safety
   const { data: marketMetrics, isLoading, error, refetch } = useQuery({
     queryKey: ["market-metrics", String(industry)],
     queryFn: async () => {
@@ -33,7 +34,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
         const { data, error } = await supabase
           .from("market_metrics")
           .select("*")
-          .eq("market_type", industry)
+          .eq("market_type", String(industry))
           .order("timestamp", { ascending: false });
         
         if (error) throw error;
@@ -62,13 +63,15 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
       "cryptocurrency": "/financial-market"
     };
     
-    if (routes[String(industry)]) {
-      navigate(routes[String(industry)]);
+    const industryStr = String(industry);
+    if (routes[industryStr]) {
+      navigate(routes[industryStr]);
     }
   };
 
   const getIndustryTitle = (type: MarketType): string => {
-    switch(type) {
+    const typeStr = String(type);
+    switch(typeStr) {
       case "housing": return "Housing Markets";
       case "agriculture": return "Agriculture";
       case "mining": return "Mining";
@@ -76,8 +79,8 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
       case "cryptocurrency": return "Cryptocurrency";
       case "financial": return "Financial Markets";
       default: {
-        // Use a safe approach that doesn't rely on toString()
-        return String(type).replace(/_/g, ' ');
+        // Use a safe string conversion approach
+        return typeStr.replace(/_/g, ' ');
       }
     }
   };
@@ -121,7 +124,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
         <h2 className="text-3xl font-bold capitalize">{getIndustryTitle(industry)}</h2>
         
         {/* Full dashboard link if available */}
-        {["housing", "agriculture", "mining", "green_hydrogen", "cryptocurrency", "financial"].includes(industry) && (
+        {["housing", "agriculture", "mining", "green_hydrogen", "cryptocurrency", "financial"].includes(String(industry)) && (
           <Button 
             variant="outline"
             onClick={navigateToMarketPage}

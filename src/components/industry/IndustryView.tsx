@@ -27,8 +27,9 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
       "financial": "/financial-market"
     };
     
-    if (routes[String(industry)]) {
-      navigate(routes[String(industry)]);
+    const industryStr = String(industry);
+    if (routes[industryStr]) {
+      navigate(routes[industryStr]);
     }
   };
   
@@ -59,7 +60,7 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
       
       {/* Render appropriate view based on industry type */}
       {(() => {
-        switch (industry) {
+        switch (String(industry)) {
           case "agriculture":
             return <AgricultureView />;
           case "mining":

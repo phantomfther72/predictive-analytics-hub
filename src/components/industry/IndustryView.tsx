@@ -27,8 +27,8 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
       "financial": "/financial-market"
     };
     
-    if (routes[industry as string]) {
-      navigate(routes[industry as string]);
+    if (routes[String(industry)]) {
+      navigate(routes[String(industry)]);
     }
   };
   
@@ -45,7 +45,7 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
         </Button>
         
         {/* Show button to full market page if available */}
-        {["housing", "agriculture", "mining", "green_hydrogen", "financial"].includes(industry) && (
+        {["housing", "agriculture", "mining", "green_hydrogen", "financial"].includes(String(industry)) && (
           <Button 
             variant="outline" 
             size="sm"

@@ -26,7 +26,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Query for industry-specific market metrics - convert to string to avoid type issues
+  // Query for industry-specific market metrics - converted to string to avoid type issues
   const { data: marketMetrics, isLoading, error, refetch } = useQuery({
     queryKey: ["market-metrics", industry as string],
     queryFn: async () => {

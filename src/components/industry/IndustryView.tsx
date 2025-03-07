@@ -27,8 +27,8 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
       "financial": "/financial-market"
     };
     
-    if (routes[industry]) {
-      navigate(routes[industry]);
+    if (routes[industry as string]) {
+      navigate(routes[industry as string]);
     }
   };
   

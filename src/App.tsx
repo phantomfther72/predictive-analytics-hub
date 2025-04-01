@@ -1,3 +1,4 @@
+
 import React, { Suspense, lazy } from 'react';
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
@@ -13,6 +14,7 @@ import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
 import MarketDataTables from './components/MarketDataTables';
+import { Toaster } from './components/ui/toaster';
 
 // Lazy load market pages to improve performance
 const HousingMarket = lazy(() => import('./pages/HousingMarket'));
@@ -42,6 +44,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
+      <Toaster />
     </>
   );
 }

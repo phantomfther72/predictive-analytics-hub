@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -12,14 +13,19 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: "1rem",
+        sm: "2rem",
+        lg: "4rem",
+      },
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Poppins", "Inter", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -33,6 +39,12 @@ export default {
         },
         teal: {
           500: "#14b8a6",
+          600: "#0d9488",
+        },
+        blue: {
+          700: "#1d4ed8",
+          800: "#1e40af",
+          900: "#1e3a8a",
         },
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -63,6 +75,11 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
       },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
       keyframes: {
         "fade-up": {
           "0%": {
@@ -82,10 +99,23 @@ export default {
             opacity: "1",
           },
         },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.5s ease-out",
         "fade-in": "fade-in 0.3s ease-out",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      screens: {
+        xs: "480px",
       },
     },
   },

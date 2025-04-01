@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   DropdownMenu,
@@ -74,13 +75,13 @@ export const DashboardHeader = () => {
               size="icon" 
               onClick={() => setOpenMobile(true)}
               aria-label="Toggle mobile menu"
-              className="touch-target"
+              className="touch-target mobile-interactive"
             >
               <Menu className="h-5 w-5" />
             </Button>
           )}
           <span className={cn(
-            "font-semibold text-slate-900 truncate transition-all",
+            "font-display font-semibold text-slate-900 dark:text-white truncate transition-all",
             isMobile ? "text-base" : "text-lg sm:text-xl"
           )}>
             <span className="bg-gradient-to-r from-blue-700 to-teal-500 bg-clip-text text-transparent">
@@ -88,9 +89,10 @@ export const DashboardHeader = () => {
             </span>
           </span>
         </div>
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
           <Button variant="ghost" size={isSmall ? "icon" : "sm"} asChild className={cn(
-            isSmall ? "" : "mr-2"
+            isSmall ? "" : "mr-1 sm:mr-2",
+            "touch-feedback"
           )}>
             <Link to="/" className="flex items-center gap-1">
               <Home className="h-4 w-4" />
@@ -99,7 +101,7 @@ export const DashboardHeader = () => {
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="touch-target">
+              <Button variant="ghost" size="icon" className="touch-target mobile-interactive">
                 <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>

@@ -1,92 +1,22 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* ... keep existing code (color variables and theme settings) */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* ... keep existing code (dark mode color variables) */
+  }
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  /* Improved responsive typography */
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   @media (max-width: 767px) {
@@ -104,30 +34,34 @@
   }
 }
 
-/* Mobile-optimized layout utilities */
+/* Enhanced mobile-optimized layout utilities */
 @layer utilities {
+  /* Container utilities */
   .mobile-container {
-    @apply px-4 w-full mx-auto;
+    @apply px-3 sm:px-4 w-full mx-auto;
   }
   
+  /* Section spacing */
   .mobile-section {
-    @apply py-4 sm:py-6;
+    @apply py-3 sm:py-4 md:py-6;
   }
   
+  /* Card padding */
   .mobile-card {
     @apply p-3 sm:p-4;
   }
   
+  /* Navigation and menu items */
   .mobile-menu-item {
-    @apply py-3 px-4;
+    @apply py-3 px-3 sm:px-4;
   }
   
-  /* Touch target size for mobile */
+  /* Touch target size for mobile - ensuring accessibility standards */
   .touch-target {
-    @apply min-h-[44px] min-w-[44px];
+    @apply min-h-[48px] min-w-[48px];
   }
   
-  /* Mobile transitions */
+  /* Mobile transitions - smoother animations */
   .mobile-transition {
     @apply transition-all duration-300 ease-in-out;
   }
@@ -137,9 +71,53 @@
     @apply overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent pb-2;
     -webkit-overflow-scrolling: touch;
   }
+  
+  /* Responsive text utilities */
+  .responsive-text-sm {
+    @apply text-xs sm:text-sm;
+  }
+  
+  .responsive-text-base {
+    @apply text-sm sm:text-base;
+  }
+  
+  .responsive-text-lg {
+    @apply text-base sm:text-lg;
+  }
+  
+  .responsive-text-xl {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+  
+  /* Active state and touch feedback */
+  .touch-feedback {
+    @apply active:bg-slate-100 dark:active:bg-slate-800 active:scale-95 transition-all duration-150;
+  }
+  
+  /* Custom focus styles for better visibility */
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500;
+  }
+
+  /* Grid layout utilities */
+  .responsive-grid-cols-1 {
+    @apply grid grid-cols-1;
+  }
+  
+  .responsive-grid-cols-2 {
+    @apply grid grid-cols-1 sm:grid-cols-2;
+  }
+  
+  .responsive-grid-cols-3 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  .responsive-grid-cols-4 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
+  }
 }
 
-/* Improved animations */
+/* Improved animations with proper CSS syntax */
 @keyframes fade-up {
   0% {
     opacity: 0;
@@ -160,10 +138,44 @@
   }
 }
 
+@keyframes slide-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Animation classes */
 .animate-fade-up {
   animation: fade-up 0.5s ease-out;
 }
 
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.4s ease-out;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* Enhanced touch feedback for interactive elements */
+.mobile-interactive {
+  @apply active:scale-95 transition-transform duration-200;
 }

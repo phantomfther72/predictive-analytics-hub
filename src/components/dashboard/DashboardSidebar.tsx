@@ -63,8 +63,8 @@ const SidebarContentComponent = () => {
   return (
     <div className="flex h-full flex-col">
       {isMobile && (
-        <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-white border-b">
-          <div className="font-semibold text-slate-900">
+        <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-white dark:bg-slate-900 border-b">
+          <div className="font-display font-semibold text-slate-900 dark:text-white">
             <span className="bg-gradient-to-r from-blue-700 to-teal-500 bg-clip-text text-transparent">
               Predictive Pulse
             </span>
@@ -74,7 +74,7 @@ const SidebarContentComponent = () => {
             size="icon"
             onClick={() => setOpenMobile(false)}
             aria-label="Close mobile menu"
-            className="touch-target"
+            className="touch-target mobile-interactive"
           >
             <X className="h-5 w-5" />
           </Button>
@@ -89,7 +89,10 @@ const SidebarContentComponent = () => {
                 asChild
                 onClick={handleNavigate}
               >
-                <Link to="/" className="flex items-center gap-2 mobile-menu-item">
+                <Link to="/" className={cn(
+                  "flex items-center gap-2 mobile-menu-item", 
+                  "touch-feedback focus-visible-ring"
+                )}>
                   <Home className="h-4 w-4" />
                   <span>Home</span>
                   {isMobile && <ChevronRight className="h-4 w-4 ml-auto" />}
@@ -105,6 +108,7 @@ const SidebarContentComponent = () => {
                 >
                   <Link to={item.path} className={cn(
                     "flex items-center gap-2 mobile-menu-item",
+                    "touch-feedback focus-visible-ring",
                     isMobile && "justify-between"
                   )}>
                     <div className="flex items-center gap-2">

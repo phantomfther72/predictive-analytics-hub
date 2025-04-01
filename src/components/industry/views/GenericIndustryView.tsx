@@ -31,14 +31,18 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
     queryKey: ["market-metrics", String(industry)],
     queryFn: async () => {
       try {
+        // Always use String() for consistent string conversion
+        const industryString = String(industry);
+        console.log(`Fetching market metrics for industry: ${industryString}`);
+        
         const { data, error } = await supabase
           .from("market_metrics")
           .select("*")
-          .eq("market_type", String(industry))
+          .eq("market_type", industryString)
           .order("timestamp", { ascending: false });
         
         if (error) throw error;
-        console.log(`Fetched ${data?.length} metrics for ${industry}`);
+        console.log(`Fetched ${data?.length} metrics for ${industryString}`);
         return data as MarketMetric[];
       } catch (err) {
         console.error(`Error fetching data for ${industry}:`, err);

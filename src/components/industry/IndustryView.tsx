@@ -33,6 +33,8 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
     }
   };
   
+  console.log("IndustryView rendering with industry:", industry);
+  
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -60,6 +62,7 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
       
       {/* Render appropriate view based on industry type */}
       {(() => {
+        console.log("Determining view for industry:", String(industry));
         switch (String(industry)) {
           case "agriculture":
             return <AgricultureView />;
@@ -68,6 +71,7 @@ export const IndustryView: React.FC<IndustryViewProps> = ({ industry }) => {
           case "green_hydrogen":
             return <GreenHydrogenView />;
           default:
+            console.log("Rendering GenericIndustryView for", String(industry));
             return <GenericIndustryView industry={industry} />;
         }
       })()}

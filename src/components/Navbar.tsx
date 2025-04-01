@@ -2,12 +2,15 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,8 +20,14 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const handleHomeClick = () => {
     navigate('/');
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -26,7 +35,7 @@ const Navbar = () => {
       className={cn(
         "fixed w-full z-50 transition-all duration-300",
         isScrolled
-          ? "bg-white/80 backdrop-blur-md shadow-sm"
+          ? "bg-white/90 backdrop-blur-md shadow-sm"
           : "bg-transparent",
         isMobileMenuOpen && "bg-white/95 backdrop-blur-md"
       )}
@@ -34,8 +43,14 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0 flex items-center">
-            <Link to="/" className="text-lg sm:text-xl font-semibold text-slate-900">
-              Predictive Pulse
+            <Link 
+              to="/" 
+              className="text-lg sm:text-xl font-semibold text-slate-900 flex items-center"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <span className="bg-gradient-to-r from-blue-700 to-teal-500 bg-clip-text text-transparent">
+                Predictive Pulse
+              </span>
             </Link>
           </div>
           
@@ -67,7 +82,7 @@ const Navbar = () => {
             </a>
             <button 
               onClick={() => navigate('/dashboard')}
-              className="bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors"
+              className="bg-gradient-to-r from-blue-700 to-teal-600 text-white px-6 py-2 rounded-lg hover:opacity-90 transition-all shadow-sm"
             >
               Get Started
             </button>
@@ -76,8 +91,9 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-slate-900 p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="text-slate-900 p-2 rounded-lg hover:bg-slate-100 transition-colors touch-target"
               aria-label="Toggle menu"
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -85,51 +101,55 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu with improved animation and styling */}
       <div
         className={cn(
           "md:hidden transition-all duration-300 ease-in-out",
-          isMobileMenuOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+          isMobileMenuOpen 
+            ? "max-h-[80vh] opacity-100 border-t border-slate-100 shadow-lg" 
+            : "max-h-0 opacity-0 overflow-hidden"
         )}
       >
-        <div className="px-4 py-3 space-y-2 border-t border-slate-100">
+        <div className="px-4 py-3 space-y-2 bg-white">
           <button
             onClick={handleHomeClick}
-            className="flex items-center w-full px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
+            className="flex items-center w-full px-4 py-3 text-slate-700 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors touch-target"
           >
-            <Home className="h-4 w-4 mr-1" />
-            <span>Home</span>
+            <Home className="h-5 w-5 mr-3" />
+            <span className="font-medium">Home</span>
           </button>
           <a
             href="#features"
-            className="block px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
+            className="block px-4 py-3 text-slate-700 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors touch-target"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            Features
+            <span className="font-medium">Features</span>
           </a>
           <a
             href="#industries"
-            className="block px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
+            className="block px-4 py-3 text-slate-700 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors touch-target"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            Industries
+            <span className="font-medium">Industries</span>
           </a>
           <a
             href="#testimonials"
-            className="block px-3 py-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors"
+            className="block px-4 py-3 text-slate-700 hover:text-slate-900 rounded-lg hover:bg-slate-50 transition-colors touch-target"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            Testimonials
+            <span className="font-medium">Testimonials</span>
           </a>
-          <button 
-            onClick={() => {
-              navigate('/dashboard');
-              setIsMobileMenuOpen(false);
-            }}
-            className="w-full text-left px-3 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            Get Started
-          </button>
+          <div className="pt-2 pb-3">
+            <button 
+              onClick={() => {
+                navigate('/dashboard');
+                setIsMobileMenuOpen(false);
+              }}
+              className="w-full text-center py-3 px-4 bg-gradient-to-r from-blue-700 to-teal-600 text-white rounded-lg hover:opacity-90 transition-all shadow-sm font-medium touch-target"
+            >
+              Get Started
+            </button>
+          </div>
         </div>
       </div>
     </nav>

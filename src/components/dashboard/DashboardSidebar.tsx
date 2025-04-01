@@ -12,10 +12,19 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, LineChart, Table, User, X, Home } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  LineChart, 
+  Table, 
+  User, 
+  X, 
+  Home, 
+  ChevronRight
+} from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 const menuItems = [
   {
@@ -54,12 +63,18 @@ const SidebarContentComponent = () => {
   return (
     <div className="flex h-full flex-col">
       {isMobile && (
-        <div className="flex items-center justify-end p-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-white border-b">
+          <div className="font-semibold text-slate-900">
+            <span className="bg-gradient-to-r from-blue-700 to-teal-500 bg-clip-text text-transparent">
+              Predictive Pulse
+            </span>
+          </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setOpenMobile(false)}
             aria-label="Close mobile menu"
+            className="touch-target"
           >
             <X className="h-5 w-5" />
           </Button>
@@ -74,9 +89,10 @@ const SidebarContentComponent = () => {
                 asChild
                 onClick={handleNavigate}
               >
-                <Link to="/" className="flex items-center gap-2">
+                <Link to="/" className="flex items-center gap-2 mobile-menu-item">
                   <Home className="h-4 w-4" />
                   <span>Home</span>
+                  {isMobile && <ChevronRight className="h-4 w-4 ml-auto" />}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -87,9 +103,15 @@ const SidebarContentComponent = () => {
                   isActive={location.pathname === item.path}
                   onClick={handleNavigate}
                 >
-                  <Link to={item.path} className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.title}</span>
+                  <Link to={item.path} className={cn(
+                    "flex items-center gap-2 mobile-menu-item",
+                    isMobile && "justify-between"
+                  )}>
+                    <div className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </div>
+                    {isMobile && <ChevronRight className="h-4 w-4" />}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -108,7 +130,7 @@ export const DashboardSidebar = () => {
   if (isMobile) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile}>
-        <SheetContent side="left" className="w-[240px] p-0">
+        <SheetContent side="left" className="w-[280px] p-0 border-r shadow-lg">
           <SidebarContentComponent />
         </SheetContent>
       </Sheet>
@@ -116,7 +138,7 @@ export const DashboardSidebar = () => {
   }
 
   return (
-    <Sidebar>
+    <Sidebar className="hidden md:flex border-r shadow-sm">
       <SidebarContentWrapper>
         <SidebarContentComponent />
       </SidebarContentWrapper>

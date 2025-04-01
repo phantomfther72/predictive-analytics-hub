@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { AlertTriangle, ExternalLink, RefreshCw } from "lucide-react";
 import { MarketMetric, MarketType } from "@/types/market";
 import { useToast } from "@/components/ui/use-toast";
+import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface GenericIndustryViewProps {
   industry: MarketType;
@@ -25,6 +27,8 @@ interface GenericIndustryViewProps {
 export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ industry }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const isSmall = useBreakpoint('sm');
   
   // Query for industry-specific market metrics
   const { data: marketMetrics, isLoading, error, refetch } = useQuery({
@@ -92,7 +96,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 animate-pulse">
         <Skeleton className="h-8 w-1/3" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
@@ -106,7 +110,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold capitalize">{getIndustryTitle(industry)}</h2>
+        <h2 className="text-2xl md:text-3xl font-bold capitalize">{getIndustryTitle(industry)}</h2>
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
@@ -125,53 +129,66 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold capitalize">{getIndustryTitle(industry)}</h2>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <h2 className="text-2xl md:text-3xl font-bold capitalize">
+          {getIndustryTitle(industry)}
+        </h2>
         
         {/* Full dashboard link if available */}
         {["housing", "agriculture", "mining", "green_hydrogen", "cryptocurrency", "financial"].includes(String(industry)) && (
           <Button 
             variant="outline"
             onClick={navigateToMarketPage}
-            className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 border-teal-200"
+            className="text-teal-600 hover:text-teal-700 hover:bg-teal-50 border-teal-200 w-full sm:w-auto justify-center"
+            size={isSmall ? "sm" : "default"}
           >
-            <span>View Full Dashboard</span>
+            <span>{isSmall ? "View Dashboard" : "View Full Dashboard"}</span>
             <ExternalLink className="ml-2 h-4 w-4" />
           </Button>
         )}
       </div>
       
       {(!marketMetrics || marketMetrics.length === 0) ? (
-        <div className="text-center py-8">
+        <div className="text-center py-8 bg-slate-50 rounded-lg border">
           <p className="text-slate-600">No data available for this industry yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className={cn(
+          "grid gap-4",
+          isSmall ? "grid-cols-1" : (
+            isMobile ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          )
+        )}>
           {marketMetrics.map((metric) => (
-            <Card key={metric.id} className="overflow-hidden hover:shadow-md transition-shadow">
-              <CardHeader className="bg-slate-50 border-b">
-                <CardTitle>{metric.metric_name}</CardTitle>
-                <CardDescription>Source: {metric.source}</CardDescription>
+            <Card key={metric.id} className="overflow-hidden hover:shadow-md transition-shadow h-full">
+              <CardHeader className="bg-slate-50 border-b p-4">
+                <CardTitle className={cn(
+                  isSmall ? "text-base" : "text-lg"
+                )}>{metric.metric_name}</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">Source: {metric.source}</CardDescription>
               </CardHeader>
-              <CardContent className="pt-6">
+              <CardContent className="pt-5 p-4">
                 <div className="space-y-2">
-                  <p className="text-2xl font-bold">
+                  <p className={cn(
+                    "font-bold",
+                    isSmall ? "text-xl" : "text-2xl"
+                  )}>
                     {typeof metric.value === 'number' 
                       ? metric.value.toLocaleString() 
                       : metric.value} 
-                    {metric.metric_name.includes('Price') ? 'USD' : ''}
+                    {metric.metric_name.includes('Price') ? ' USD' : ''}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Last updated: {new Date(metric.timestamp).toLocaleDateString()}
                   </p>
                 </div>
               </CardContent>
               {metric.predicted_change !== null && (
-                <CardFooter className="bg-slate-50 border-t">
+                <CardFooter className="bg-slate-50 border-t p-3 sm:p-4">
                   <div className="w-full">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Predicted Change</span>
-                      <span className={`text-sm font-semibold ${Number(metric.predicted_change) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="text-xs sm:text-sm font-medium">Predicted Change</span>
+                      <span className={`text-xs sm:text-sm font-semibold ${Number(metric.predicted_change) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {Number(metric.predicted_change) >= 0 ? '+' : ''}{Number(metric.predicted_change).toFixed(2)}%
                       </span>
                     </div>

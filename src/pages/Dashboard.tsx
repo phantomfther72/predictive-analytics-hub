@@ -12,16 +12,18 @@ const Dashboard = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-slate-50">
-        <DashboardSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <DashboardHeader />
-          <div className={cn(
-            "flex-1 py-6",
-            isMobile ? "px-4" : "container"
-          )}>
-            <DashboardContent />
-          </div>
+      <div className="min-h-screen flex flex-col w-full bg-slate-50">
+        <DashboardHeader />
+        <div className="flex flex-1 flex-col md:flex-row min-w-0">
+          <DashboardSidebar />
+          <main className="flex-1 flex flex-col min-w-0">
+            <div className={cn(
+              "flex-1 py-4 sm:py-6 mobile-transition",
+              isMobile ? "px-4" : "container"
+            )}>
+              <DashboardContent />
+            </div>
+          </main>
         </div>
       </div>
     </SidebarProvider>

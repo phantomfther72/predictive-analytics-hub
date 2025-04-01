@@ -88,14 +88,82 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
-}
 
-@layer base {
+  @media (max-width: 767px) {
+    html {
+      font-size: 93.75%; /* Slightly smaller base font size for mobile */
+    }
+  }
+  
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
   }
+}
+
+/* Mobile-optimized layout utilities */
+@layer utilities {
+  .mobile-container {
+    @apply px-4 w-full mx-auto;
+  }
+  
+  .mobile-section {
+    @apply py-4 sm:py-6;
+  }
+  
+  .mobile-card {
+    @apply p-3 sm:p-4;
+  }
+  
+  .mobile-menu-item {
+    @apply py-3 px-4;
+  }
+  
+  /* Touch target size for mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Mobile transitions */
+  .mobile-transition {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  /* Mobile-friendly scroll areas */
+  .mobile-scroll {
+    @apply overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent pb-2;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Improved animations */
+@keyframes fade-up {
+  "0%": {
+    opacity: "0",
+    transform: "translateY(10px)",
+  },
+  "100%": {
+    opacity: "1",
+    transform: "translateY(0)",
+  },
+}
+
+@keyframes fade-in {
+  "0%": {
+    opacity: "0",
+  },
+  "100%": {
+    opacity: "1",
+  },
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
 }

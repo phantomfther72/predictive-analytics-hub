@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,21 +25,19 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Query for industry-specific market metrics - passing the industry enum directly
+  // Query for industry-specific market metrics
   const { data: marketMetrics, isLoading, error, refetch } = useQuery({
     queryKey: ["market-metrics", String(industry)],
     queryFn: async () => {
       try {
-        // Convert to string only for logging purposes
         const industryString = String(industry);
         console.log(`Fetching market metrics for industry: ${industryString}`);
         
-        // Pass the industry enum directly to the query
+        // Convert MarketType to string for the query to ensure database compatibility
         const { data, error } = await supabase
           .from("market_metrics")
           .select("*")
-          // Convert MarketType to string only at the point of the query
-          .eq("market_type", industry)
+          .eq("market_type", industryString)
           .order("timestamp", { ascending: false });
         
         if (error) throw error;

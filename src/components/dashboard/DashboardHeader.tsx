@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   DropdownMenu,
@@ -15,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { useSidebar } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 export const DashboardHeader = () => {
   const navigate = useNavigate();

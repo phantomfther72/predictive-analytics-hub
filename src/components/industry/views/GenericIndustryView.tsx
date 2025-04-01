@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,7 +34,7 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
         const industryString = String(industry);
         console.log(`Fetching market metrics for industry: ${industryString}`);
         
-        // Convert MarketType to string for the query to ensure database compatibility
+        // Use the string representation for the database query
         const { data, error } = await supabase
           .from("market_metrics")
           .select("*")

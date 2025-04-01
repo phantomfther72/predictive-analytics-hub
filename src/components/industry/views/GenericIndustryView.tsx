@@ -34,12 +34,12 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
         const industryString = String(industry);
         console.log(`Fetching market metrics for industry: ${industryString}`);
         
-        // We need to do a type check to ensure we have a valid market type
-        // Handle the market_type filter in a type-safe way by using a generic eq filter
+        // Fix the TypeScript error by using the original industry prop
+        // which is already of type MarketType, instead of the converted string
         const { data, error } = await supabase
           .from("market_metrics")
           .select("*")
-          .eq("market_type", industryString)
+          .eq("market_type", industry) // Use the original MarketType prop directly
           .order("timestamp", { ascending: false });
         
         if (error) throw error;

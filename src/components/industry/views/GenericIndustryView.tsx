@@ -34,7 +34,8 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
         const industryString = String(industry);
         console.log(`Fetching market metrics for industry: ${industryString}`);
         
-        // Use industryString for the database query to ensure type compatibility
+        // We need to do a type check to ensure we have a valid market type
+        // Handle the market_type filter in a type-safe way by using a generic eq filter
         const { data, error } = await supabase
           .from("market_metrics")
           .select("*")

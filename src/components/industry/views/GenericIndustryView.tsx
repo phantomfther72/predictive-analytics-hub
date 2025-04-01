@@ -26,19 +26,21 @@ export const GenericIndustryView: React.FC<GenericIndustryViewProps> = ({ indust
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // Query for industry-specific market metrics - explicitly convert to string for type safety
+  // Query for industry-specific market metrics - passing the industry enum directly
   const { data: marketMetrics, isLoading, error, refetch } = useQuery({
     queryKey: ["market-metrics", String(industry)],
     queryFn: async () => {
       try {
-        // Always use String() for consistent string conversion
+        // Convert to string only for logging purposes
         const industryString = String(industry);
         console.log(`Fetching market metrics for industry: ${industryString}`);
         
+        // Pass the industry enum directly to the query
         const { data, error } = await supabase
           .from("market_metrics")
           .select("*")
-          .eq("market_type", industryString)
+          // Convert MarketType to string only at the point of the query
+          .eq("market_type", industry)
           .order("timestamp", { ascending: false });
         
         if (error) throw error;

@@ -1,7 +1,10 @@
+
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Responsive, WidthProvider } from "react-grid-layout";
-import { Layout } from "../charts/types/chart-types";
+import { Responsive, WidthProvider, Layout as RGLLayout } from "react-grid-layout";
+import { GridLayout } from "../charts/types/chart-types";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 
 const ReactGridLayout = WidthProvider(Responsive);
 
@@ -44,7 +47,7 @@ export const ChartLayout: React.FC<ChartLayoutProps> = ({ children, className, o
     ],
   };
 
-  const handleLayoutsChange = (newLayouts: { [key: string]: Layout[] }) => {
+  const handleLayoutsChange = (newLayouts: {[key: string]: RGLLayout[]}) => {
     // Extract the layout for the current breakpoint (e.g., 'lg', 'md', etc.)
     const currentLayout = newLayouts['lg'] || newLayouts['md'] || newLayouts['sm'] || newLayouts['xs'];
   

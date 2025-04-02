@@ -1,126 +1,172 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from "@/integrations/supabase/client";
-import { ModelSettings } from '../types/chart-state-types';
-import { useToast } from "@/components/ui/use-toast";
+import { supabase } from '@/integrations/supabase/client';
+import { CHART_COLORS } from '../chart-constants';
+import { v4 as uuidv4 } from 'uuid';
 
-export const useModelComparison = () => {
-  const [models, setModels] = useState<ModelSettings[]>([
-    { id: "1", name: "ARIMA Model", weight: 0.33, enabled: true, color: "#4285F4" },
-    { id: "2", name: "Neural Network", weight: 0.33, enabled: true, color: "#EA4335" },
-    { id: "3", name: "Random Forest", weight: 0.34, enabled: true, color: "#34A853" },
-  ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+// Define model type
+export interface Model {
+  id: string;
+  name: string;
+  type: string;
+  description: string;
+  color: string;
+  enabled: boolean;
+  weight: number;
+}
+
+// Define hook return type
+export interface UseModelComparisonReturn {
+  models: Model[];
+  isLoadingModels: boolean;
+  toggleModelEnabled: (modelId: string) => void;
+  updateModelWeight: (modelId: string, weight: number) => void;
+  modelWeights: Record<string, number>;
+}
+
+export const useModelComparison = (): UseModelComparisonReturn => {
+  const [models, setModels] = useState<Model[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState<boolean>(true);
+  const [modelWeights, setModelWeights] = useState<Record<string, number>>({});
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Get the current user
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        setUserId(data.user.id);
+      } else {
+        // For demo, use a mock user ID
+        setUserId('mock-user-id');
+      }
+    };
+    
+    fetchUserId();
+  }, []);
 
   // Fetch models from Supabase
-  const fetchModels = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // Use hardcoded models for now since we don't have the proper tables set up in Supabase yet
-      // This will be updated once we've added the models and model_weights tables to Supabase
-      
-      // Simulate a short delay to mimic fetching from the database
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      setModels([
-        { id: "1", name: "ARIMA Model", weight: 0.33, enabled: true, color: "#4285F4" },
-        { id: "2", name: "Neural Network", weight: 0.33, enabled: true, color: "#EA4335" },
-        { id: "3", name: "Random Forest", weight: 0.34, enabled: true, color: "#34A853" },
-      ]);
-    } catch (error) {
-      console.error('Error fetching models:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load models. Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        setIsLoadingModels(true);
+        
+        // Instead of actual Supabase fetch, use mock data for models
+        const mockModels: Model[] = [
+          {
+            id: 'model-1',
+            name: 'Deep Learning',
+            type: 'neural-network',
+            description: 'Recurrent neural network optimized for time series forecasting',
+            color: CHART_COLORS.primary,
+            enabled: true,
+            weight: 0.5
+          },
+          {
+            id: 'model-2',
+            name: 'ARIMA',
+            type: 'statistical',
+            description: 'Autoregressive Integrated Moving Average model',
+            color: CHART_COLORS.secondary,
+            enabled: true,
+            weight: 0.3
+          },
+          {
+            id: 'model-3',
+            name: 'Ensemble',
+            type: 'hybrid',
+            description: 'Hybrid model combining multiple techniques',
+            color: CHART_COLORS.tertiary,
+            enabled: true,
+            weight: 0.2
+          }
+        ];
+        
+        const weights = mockModels.reduce((acc, model) => {
+          acc[model.id] = model.weight;
+          return acc;
+        }, {} as Record<string, number>);
+        
+        setModels(mockModels);
+        setModelWeights(weights);
+        setIsLoadingModels(false);
+      } catch (error) {
+        console.error("Error fetching models:", error);
+        setIsLoadingModels(false);
+      }
+    };
+    
+    if (userId) {
+      fetchModels();
     }
-  }, [toast]);
-
-  // Save model weight to local state for now
-  const saveModelWeight = useCallback(async (modelId: string, weight: number, enabled: boolean) => {
-    try {
-      // This is just updating the state and not actually saving to Supabase
-      // Will be updated once we have the proper tables set up
-      return true;
-    } catch (error) {
-      console.error('Error saving model weight:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save model settings.",
-        variant: "destructive",
-      });
-      return false;
-    }
-  }, [toast]);
+  }, [userId]);
 
   // Toggle model enabled state
   const toggleModelEnabled = useCallback(async (modelId: string) => {
-    setModels(prevModels => {
-      const updatedModels = prevModels.map(model => {
-        if (model.id === modelId) {
-          // Find the model to update
-          const newEnabled = !model.enabled;
-          return { ...model, enabled: newEnabled };
-        }
-        return model;
-      });
-      return updatedModels;
-    });
-  }, []);
+    try {
+      // Update local state immediately for responsive UI
+      setModels(currentModels => 
+        currentModels.map(model => 
+          model.id === modelId ? { ...model, enabled: !model.enabled } : model
+        )
+      );
+      
+      // If we have a user ID, we'd normally update in Supabase
+      if (userId) {
+        // Simulate API call with a delay
+        await new Promise(resolve => setTimeout(resolve, 100));
+        console.log(`Updated model ${modelId} enabled status in "database"`);
+      }
+    } catch (error) {
+      console.error("Error toggling model:", error);
+      // Revert state change if there was an error
+      setModels(currentModels => 
+        currentModels.map(model => 
+          model.id === modelId ? { ...model, enabled: !model.enabled } : model
+        )
+      );
+    }
+  }, [userId]);
 
   // Update model weight
   const updateModelWeight = useCallback(async (modelId: string, weight: number) => {
-    setModels(prevModels => {
-      // Get the total weight of all models except the one being updated
-      const otherModelsWeight = prevModels
-        .filter(m => m.id !== modelId && m.enabled)
-        .reduce((total, m) => total + m.weight, 0);
+    try {
+      // Update model weights immediately for responsive UI
+      setModelWeights(currentWeights => ({
+        ...currentWeights,
+        [modelId]: weight
+      }));
       
-      // Calculate how much we need to adjust the other models' weights
-      const currentModelOldWeight = prevModels.find(m => m.id === modelId)?.weight || 0;
-      const weightDifference = weight - currentModelOldWeight;
+      setModels(currentModels => 
+        currentModels.map(model => 
+          model.id === modelId ? { ...model, weight } : model
+        )
+      );
       
-      // Only proceed if the total weight won't exceed 1 (100%)
-      if (otherModelsWeight + weight > 1.001) {
-        toast({
-          title: "Weight Limit Reached",
-          description: "The total weight of all models cannot exceed 100%.",
-          variant: "destructive",
-        });
-        return prevModels;
+      // If we have a user ID, we'd normally update in Supabase
+      if (userId) {
+        // Simulate API call with a delay
+        await new Promise(resolve => setTimeout(resolve, 100));
+        console.log(`Updated model ${modelId} weight to ${weight} in "database"`);
       }
-      
-      // Update the models
-      const updatedModels = prevModels.map(model => {
-        if (model.id === modelId) {
-          return { ...model, weight };
-        }
-        // Adjust other enabled models proportionally
-        if (otherModelsWeight > 0 && model.enabled) {
-          const adjustedWeight = model.weight * (1 - weight) / otherModelsWeight;
-          return { ...model, weight: adjustedWeight };
-        }
-        return model;
+    } catch (error) {
+      console.error("Error updating model weight:", error);
+      // Revert state change if there was an error
+      setModelWeights(currentWeights => {
+        const oldWeight = models.find(m => m.id === modelId)?.weight || 0.33;
+        return {
+          ...currentWeights,
+          [modelId]: oldWeight
+        };
       });
-      
-      return updatedModels;
-    });
-  }, [toast]);
-
-  // Initial load
-  useEffect(() => {
-    fetchModels();
-  }, [fetchModels]);
+    }
+  }, [userId, models]);
 
   return {
     models,
-    isLoadingModels: isLoading,
+    isLoadingModels,
     toggleModelEnabled,
     updateModelWeight,
-    fetchModels,
+    modelWeights
   };
 };

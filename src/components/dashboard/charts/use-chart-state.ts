@@ -23,4 +23,4 @@ export const useChartState = (initialDataset: Dataset = "financial", initialMetr
   };
 };
 
-export type { ModelSettings } from './types/chart-types';
+export type { ModelSettings } from './types/chart-state-types';

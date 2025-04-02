@@ -1,107 +1,88 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { PlayCircle, Rewind, Save } from "lucide-react";
 import { useChartState } from "../charts/use-chart-state";
-import { useToast } from "@/components/ui/use-toast";
+import { ModelContributionsChart } from "../charts/ModelContributionsChart";
 
 export const SimulationPanel: React.FC = () => {
-  const { simulationMode, toggleSimulationMode, simulationParams, updateSimulationParam } = useChartState();
-  const { toast } = useToast();
-
-  const handleRunSimulation = () => {
-    toast({
-      title: "Simulation Started",
-      description: "Your market simulation is now running with the current parameters.",
+  const { 
+    simulationParameters, 
+    updateSimulationParameter,
+    simulationMode,
+    models
+  } = useChartState();
+  
+  // For demo purposes - simulated model predictions
+  const [modelPredictions] = useState<Record<string, number>>({
+    "1": 580.45, // ARIMA
+    "2": 595.20, // Neural Network
+    "3": 575.80, // Random Forest
+  });
+  
+  // Calculate combined prediction
+  const calculateCombinedPrediction = () => {
+    const enabledModels = models.filter(model => model.enabled);
+    let weightedSum = 0;
+    let totalWeight = 0;
+    
+    enabledModels.forEach(model => {
+      const prediction = modelPredictions[model.id];
+      if (prediction !== undefined) {
+        weightedSum += prediction * model.weight;
+        totalWeight += model.weight;
+      }
     });
+    
+    if (totalWeight === 0) return 0;
+    return weightedSum / totalWeight;
   };
-
-  const handleResetParameters = () => {
-    toast({
-      title: "Parameters Reset",
-      description: "All simulation parameters have been reset to their default values.",
-    });
-  };
-
-  const handleSaveScenario = () => {
-    toast({
-      title: "Scenario Saved",
-      description: "Your market simulation scenario has been saved for future reference.",
-    });
-  };
+  
+  const combinedPrediction = calculateCombinedPrediction();
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          Market Simulation
-          <Button 
-            variant={simulationMode ? "secondary" : "outline"} 
-            size="sm"
-            onClick={toggleSimulationMode}
-          >
-            {simulationMode ? "Exit Simulation" : "Enter Simulation Mode"}
-          </Button>
-        </CardTitle>
-        <CardDescription>
-          Adjust parameters to simulate different market conditions
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {simulationParams.map((param) => (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>What-If Analysis</CardTitle>
+          <CardDescription>
+            Adjust parameters to see how they affect predictions
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {simulationParameters.map((param) => (
             <div key={param.id} className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor={`param-${param.id}`}>{param.name}</Label>
-                <span className="text-sm font-medium">
-                  {param.value}{param.unit}
+                <span className="text-sm font-medium">{param.name}</span>
+                <span className="text-sm">
+                  {param.value.toFixed(1)} {param.unit}
                 </span>
               </div>
               <Slider
-                id={`param-${param.id}`}
+                value={[param.value]}
                 min={param.min}
                 max={param.max}
                 step={param.step}
-                value={[param.value]}
-                onValueChange={(values) => updateSimulationParam(param.id, values[0])}
+                onValueChange={(values) => {
+                  updateSimulationParameter(param.id, values[0]);
+                }}
               />
             </div>
           ))}
-
-          <div className="flex items-center justify-between mt-6 pt-4 border-t">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleResetParameters}
-              className="flex items-center gap-1"
-            >
-              <Rewind className="w-4 h-4" />
-              Reset
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleSaveScenario}
-              className="flex items-center gap-1"
-            >
-              <Save className="w-4 h-4" />
-              Save Scenario
-            </Button>
-            
-            <Button 
-              onClick={handleRunSimulation}
-              className="flex items-center gap-1"
-            >
-              <PlayCircle className="w-4 h-4" />
-              Run Simulation
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          
+          {!simulationMode && (
+            <div className="py-2 px-3 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 rounded-md text-sm">
+              Simulation mode is disabled. Enable it in the chart settings to see real-time predictions.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      <ModelContributionsChart 
+        models={models} 
+        combinedPrediction={combinedPrediction} 
+        modelPredictions={modelPredictions} 
+      />
+    </div>
   );
 };

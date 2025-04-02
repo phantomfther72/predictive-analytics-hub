@@ -68,7 +68,7 @@
   
   /* Mobile-friendly scroll areas */
   .mobile-scroll {
-    @apply overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent pb-2;
+    @apply overflow-x-auto pb-2;
     -webkit-overflow-scrolling: touch;
   }
   
@@ -115,6 +115,20 @@
   .responsive-grid-cols-4 {
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
   }
+}
+
+/* Animation for the scrolling ticker */
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
+  animation: ticker 30s linear infinite;
 }
 
 /* Improved animations with proper CSS syntax */

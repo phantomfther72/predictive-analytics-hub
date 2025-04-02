@@ -75,14 +75,14 @@ export const DashboardHeader = () => {
               size="icon" 
               onClick={() => setOpenMobile(true)}
               aria-label="Toggle mobile menu"
-              className="touch-target mobile-interactive"
+              className="touch-target mobile-interactive mr-1"
             >
               <Menu className="h-5 w-5" />
             </Button>
           )}
           <span className={cn(
             "font-display font-semibold text-slate-900 dark:text-white truncate transition-all",
-            isMobile ? "text-base" : "text-lg sm:text-xl"
+            isMobile ? "text-base max-w-[160px]" : "text-lg sm:text-xl"
           )}>
             <span className="bg-gradient-to-r from-blue-700 to-teal-500 bg-clip-text text-transparent">
               Predictive Pulse

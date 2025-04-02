@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { NewsFeed } from "./NewsFeed";
@@ -107,25 +106,25 @@ export const DashboardOverview = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header with refresh controls */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      {/* Header with refresh controls - improved layout for mobile */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Market Overview</h1>
-          <p className="text-slate-500 dark:text-slate-400">
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
             {isLoading 
               ? "Loading latest market insights..." 
               : `Last updated: ${lastUpdated.toLocaleTimeString()}`}
           </p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Button 
             variant="outline" 
             size="sm"
             onClick={handleRefresh}
             disabled={isRefreshing}
             className={cn(
-              "flex items-center gap-2 touch-target",
+              "flex-shrink-0 flex items-center gap-2 touch-target min-w-24 justify-center",
               isRefreshing && "animate-pulse"
             )}
           >
@@ -136,7 +135,7 @@ export const DashboardOverview = () => {
           <Button 
             variant="default" 
             size="sm"
-            className="touch-target flex items-center gap-2"
+            className="flex-shrink-0 touch-target flex items-center gap-2 min-w-24 justify-center"
             onClick={() => navigate("/dashboard/charts")}
           >
             <LineChart className="h-4 w-4" />
@@ -146,17 +145,21 @@ export const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Market filter tabs */}
-      <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className="mobile-scroll w-full justify-start md:justify-center p-1">
-          <TabsTrigger value="all" className="touch-target">All Markets</TabsTrigger>
-          <TabsTrigger value="financial" className="touch-target">Financial</TabsTrigger>
-          <TabsTrigger value="housing" className="touch-target">Housing</TabsTrigger>
-          <TabsTrigger value="mining" className="touch-target">Mining</TabsTrigger>
-          <TabsTrigger value="agriculture" className="touch-target">Agriculture</TabsTrigger>
-          <TabsTrigger value="hydrogen" className="touch-target">Green Hydrogen</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Improved mobile-friendly market filter tabs */}
+      <div className="overflow-hidden">
+        <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <div className="overflow-x-auto pb-2 -mb-2">
+            <TabsList className="w-max min-w-full flex md:justify-center p-1">
+              <TabsTrigger value="all" className="touch-target px-4 min-w-16">All Markets</TabsTrigger>
+              <TabsTrigger value="financial" className="touch-target px-4 min-w-16">Financial</TabsTrigger>
+              <TabsTrigger value="housing" className="touch-target px-4 min-w-16">Housing</TabsTrigger>
+              <TabsTrigger value="mining" className="touch-target px-4 min-w-16">Mining</TabsTrigger>
+              <TabsTrigger value="agriculture" className="touch-target px-4 min-w-16">Agriculture</TabsTrigger>
+              <TabsTrigger value="hydrogen" className="touch-target px-4 min-w-16">Green Hydrogen</TabsTrigger>
+            </TabsList>
+          </div>
+        </Tabs>
+      </div>
 
       {/* Live metrics ticker */}
       <LiveMetricTicker />

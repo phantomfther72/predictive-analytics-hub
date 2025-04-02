@@ -21,59 +21,35 @@ export const useModelPredictions = (dataset: Dataset, metricKey: string) => {
   const fetchPredictions = useCallback(async () => {
     setIsLoading(true);
     try {
-      // First get the latest timestamp for this dataset and metric
-      const { data: timestampData, error: timestampError } = await supabase
-        .from('model_predictions')
-        .select('timestamp')
-        .eq('dataset', dataset)
-        .eq('metric_key', metricKey)
-        .order('timestamp', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (timestampError) {
-        console.log('No predictions found for this dataset and metric');
-        setIsLoading(false);
-        return;
-      }
-
-      setTimestamp(timestampData.timestamp);
-
-      // Then fetch all predictions for this dataset, metric, and timestamp
-      const { data, error } = await supabase
-        .from('model_predictions')
-        .select(`
-          id,
-          prediction_value,
-          confidence,
-          models:model_id (
-            id,
-            name,
-            color
-          )
-        `)
-        .eq('dataset', dataset)
-        .eq('metric_key', metricKey)
-        .eq('timestamp', timestampData.timestamp);
-
-      if (error) throw error;
-
-      // Format the predictions for easy access
-      if (data) {
-        const predictionMap: Record<string, ModelPrediction> = {};
-        
-        data.forEach((prediction: any) => {
-          predictionMap[prediction.models.id] = {
-            modelId: prediction.models.id,
-            modelName: prediction.models.name,
-            modelColor: prediction.models.color,
-            value: prediction.prediction_value,
-            confidence: prediction.confidence || 0,
-          };
-        });
-        
-        setPredictions(predictionMap);
-      }
+      // For now, we'll generate mock predictions since we don't have the tables set up
+      // This will be replaced with actual Supabase queries once we've migrated the database
+      
+      const mockPredictions: Record<string, ModelPrediction> = {
+        "1": {
+          modelId: "1",
+          modelName: "ARIMA Model",
+          modelColor: "#4285F4",
+          value: 120 + Math.random() * 20,
+          confidence: 0.72 + Math.random() * 0.1,
+        },
+        "2": {
+          modelId: "2",
+          modelName: "Neural Network",
+          modelColor: "#EA4335",
+          value: 130 + Math.random() * 20,
+          confidence: 0.68 + Math.random() * 0.1,
+        },
+        "3": {
+          modelId: "3",
+          modelName: "Random Forest",
+          modelColor: "#34A853",
+          value: 125 + Math.random() * 20,
+          confidence: 0.75 + Math.random() * 0.1,
+        },
+      };
+      
+      setTimestamp(new Date().toISOString());
+      setPredictions(mockPredictions);
     } catch (error) {
       console.error('Error fetching model predictions:', error);
       toast({
@@ -91,25 +67,6 @@ export const useModelPredictions = (dataset: Dataset, metricKey: string) => {
     if (dataset && metricKey) {
       fetchPredictions();
     }
-  }, [dataset, metricKey, fetchPredictions]);
-
-  // Set up real-time subscription for prediction updates
-  useEffect(() => {
-    const channel = supabase
-      .channel('prediction-changes')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'model_predictions',
-        filter: `dataset=eq.${dataset},metric_key=eq.${metricKey}` 
-      }, () => {
-        fetchPredictions();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [dataset, metricKey, fetchPredictions]);
 
   return {

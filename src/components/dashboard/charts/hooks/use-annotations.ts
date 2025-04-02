@@ -1,12 +1,12 @@
-
-import { useState } from 'react';
-import { ChartAnnotation } from "../types/chart-types";
+import { useState, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { ChartAnnotation } from '../types/chart-types';
 
 export const useAnnotations = () => {
   const [annotations, setAnnotations] = useState<ChartAnnotation[]>([]);
   const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null);
 
-  const addAnnotation = (chartId: string, x: number, y: number, content: string, author: string) => {
+  const addAnnotation = useCallback((chartId: string, x: number, y: number, content: string, author: string) => {
     const newAnnotation: ChartAnnotation = {
       id: `annotation${annotations.length + 1}`,
       chartId,
@@ -19,9 +19,9 @@ export const useAnnotations = () => {
     };
     setAnnotations(prev => [...prev, newAnnotation]);
     return newAnnotation.id;
-  };
+  }, [annotations]);
 
-  const addReplyToAnnotation = (annotationId: string, content: string, author: string) => {
+  const addReplyToAnnotation = useCallback((annotationId: string, content: string, author: string) => {
     setAnnotations(prev =>
       prev.map(annotation => {
         if (annotation.id === annotationId) {
@@ -41,7 +41,7 @@ export const useAnnotations = () => {
         return annotation;
       })
     );
-  };
+  }, [annotations]);
 
   return {
     annotations,

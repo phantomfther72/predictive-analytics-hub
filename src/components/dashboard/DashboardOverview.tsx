@@ -101,6 +101,8 @@ export const DashboardOverview = () => {
     isLoadingAgriculture || 
     isLoadingHydrogen;
 
+  const marketMetrics: any[] = [];
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
@@ -156,7 +158,7 @@ export const DashboardOverview = () => {
         </Tabs>
       </div>
 
-      <LiveMetricTicker metrics={marketMetrics || []} />
+      <LiveMetricTicker metrics={[]} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <LiveDataCard 

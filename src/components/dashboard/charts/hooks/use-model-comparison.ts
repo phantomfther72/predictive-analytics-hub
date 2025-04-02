@@ -17,46 +17,17 @@ export const useModelComparison = () => {
   const fetchModels = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Get auth session to determine if user is logged in
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
+      // Use hardcoded models for now since we don't have the proper tables set up in Supabase yet
+      // This will be updated once we've added the models and model_weights tables to Supabase
       
-      // Fetch models from the database
-      const { data: modelsData, error: modelsError } = await supabase
-        .from('models')
-        .select('*')
-        .eq('status', 'active');
+      // Simulate a short delay to mimic fetching from the database
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      if (modelsError) throw modelsError;
-      
-      // If user is logged in, fetch their model weights
-      let modelWeights: any[] = [];
-      if (userId) {
-        const { data: weightsData, error: weightsError } = await supabase
-          .from('model_weights')
-          .select('*')
-          .eq('user_id', userId);
-        
-        if (!weightsError && weightsData) {
-          modelWeights = weightsData;
-        }
-      }
-      
-      // Combine models with weights or use defaults
-      if (modelsData) {
-        const formattedModels = modelsData.map(model => {
-          const userWeight = modelWeights.find(w => w.model_id === model.id);
-          return {
-            id: String(model.id),
-            name: model.name,
-            weight: userWeight ? userWeight.weight : 0.33,
-            enabled: userWeight ? userWeight.enabled : true,
-            color: model.color
-          };
-        });
-        
-        setModels(formattedModels);
-      }
+      setModels([
+        { id: "1", name: "ARIMA Model", weight: 0.33, enabled: true, color: "#4285F4" },
+        { id: "2", name: "Neural Network", weight: 0.33, enabled: true, color: "#EA4335" },
+        { id: "3", name: "Random Forest", weight: 0.34, enabled: true, color: "#34A853" },
+      ]);
     } catch (error) {
       console.error('Error fetching models:', error);
       toast({
@@ -69,55 +40,11 @@ export const useModelComparison = () => {
     }
   }, [toast]);
 
-  // Save model weight to Supabase
+  // Save model weight to local state for now
   const saveModelWeight = useCallback(async (modelId: string, weight: number, enabled: boolean) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user?.id;
-      
-      if (!userId) {
-        toast({
-          title: "Authentication Required",
-          description: "You need to be logged in to save model settings.",
-          variant: "destructive",
-        });
-        return false;
-      }
-      
-      // Check if weight record exists for this user and model
-      const { data: existingWeight } = await supabase
-        .from('model_weights')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('model_id', modelId)
-        .maybeSingle();
-      
-      if (existingWeight) {
-        // Update existing weight
-        const { error } = await supabase
-          .from('model_weights')
-          .update({ 
-            weight, 
-            enabled,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingWeight.id);
-        
-        if (error) throw error;
-      } else {
-        // Insert new weight
-        const { error } = await supabase
-          .from('model_weights')
-          .insert({ 
-            user_id: userId,
-            model_id: modelId,
-            weight,
-            enabled
-          });
-        
-        if (error) throw error;
-      }
-      
+      // This is just updating the state and not actually saving to Supabase
+      // Will be updated once we have the proper tables set up
       return true;
     } catch (error) {
       console.error('Error saving model weight:', error);
@@ -137,17 +64,13 @@ export const useModelComparison = () => {
         if (model.id === modelId) {
           // Find the model to update
           const newEnabled = !model.enabled;
-          
-          // Save the change to Supabase (don't wait for it to complete)
-          saveModelWeight(modelId, model.weight, newEnabled);
-          
           return { ...model, enabled: newEnabled };
         }
         return model;
       });
       return updatedModels;
     });
-  }, [saveModelWeight]);
+  }, []);
 
   // Update model weight
   const updateModelWeight = useCallback(async (modelId: string, weight: number) => {
@@ -174,9 +97,6 @@ export const useModelComparison = () => {
       // Update the models
       const updatedModels = prevModels.map(model => {
         if (model.id === modelId) {
-          // Save the change to Supabase (don't wait for it to complete)
-          saveModelWeight(modelId, weight, model.enabled);
-          
           return { ...model, weight };
         }
         // Adjust other enabled models proportionally
@@ -189,29 +109,11 @@ export const useModelComparison = () => {
       
       return updatedModels;
     });
-  }, [toast, saveModelWeight]);
+  }, [toast]);
 
   // Initial load
   useEffect(() => {
     fetchModels();
-  }, [fetchModels]);
-
-  // Set up real-time subscription for model updates
-  useEffect(() => {
-    const channel = supabase
-      .channel('model-changes')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'models' 
-      }, () => {
-        fetchModels();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [fetchModels]);
 
   return {

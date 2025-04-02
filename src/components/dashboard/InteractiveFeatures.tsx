@@ -6,8 +6,19 @@ import { SimulationPanel } from "./interactive/SimulationPanel";
 import { CollaborationPanel } from "./interactive/CollaborationPanel";
 import { VoiceCommandPanel } from "./interactive/VoiceCommandPanel";
 import { BarChart, LineChart, Users, Mic } from "lucide-react";
+import { useChartState } from "./charts/use-chart-state";
 
 export const InteractiveFeatures: React.FC = () => {
+  const { 
+    models, 
+    toggleModelEnabled, 
+    updateModelWeight,
+    simulationMode,
+    toggleSimulationMode,
+    simulationParameters,
+    updateSimulationParameter
+  } = useChartState();
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Interactive Analysis Tools</h2>
@@ -33,11 +44,20 @@ export const InteractiveFeatures: React.FC = () => {
         </TabsList>
         
         <TabsContent value="models">
-          <ModelComparisonPanel />
+          <ModelComparisonPanel 
+            models={models}
+            toggleModelEnabled={toggleModelEnabled}
+            updateModelWeight={updateModelWeight}
+          />
         </TabsContent>
         
         <TabsContent value="simulation">
-          <SimulationPanel />
+          <SimulationPanel 
+            simulationMode={simulationMode}
+            toggleSimulationMode={toggleSimulationMode}
+            simulationParameters={simulationParameters}
+            updateSimulationParameter={updateSimulationParameter}
+          />
         </TabsContent>
         
         <TabsContent value="collaboration">

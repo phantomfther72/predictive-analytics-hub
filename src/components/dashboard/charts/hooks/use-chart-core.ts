@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams } from "react-router-dom";
 import { Metric } from "../chart-config";
-import { TimeRange, Dataset, ChartData } from "../types/chart-types";
+import { Dataset, TimeRange, ChartData } from "../types/chart-types";
 
 export const useChartCore = (initialDataset: Dataset = "financial", initialMetric = "price") => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,7 +29,6 @@ export const useChartCore = (initialDataset: Dataset = "financial", initialMetri
     );
   };
 
-  // Update search params when time range or dataset changes
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     params.set("timeRange", timeRange);

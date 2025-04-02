@@ -1,4 +1,3 @@
-
 import React from "react";
 import { TimeRangeSlider } from "./charts/TimeRangeSlider";
 import { MetricSelector } from "./charts/MetricSelector";
@@ -24,7 +23,7 @@ import {
   GREEN_HYDROGEN_METRICS,
   Metric,
 } from "./charts/chart-config";
-import { Layout, TimeRange } from "./charts/types/chart-types";
+import { Dataset, TimeRange } from "./charts/types/chart-types";
 
 export const DashboardCharts = () => {
   const {
@@ -52,7 +51,6 @@ export const DashboardCharts = () => {
     isLoadingHydrogen,
   } = useChartData(timeRange as TimeRange);
 
-  // Create a wrapper function to convert Payload to Metric for legend click handling
   const handleLegendClickWrapper = (data: Payload) => {
     if (data && typeof data.value === 'string') {
       const metricName = data.value;
@@ -71,10 +69,8 @@ export const DashboardCharts = () => {
     }
   };
 
-  // Convert selectedMetrics from Metric[] to string[] (just the keys)
   const selectedMetricKeys = selectedMetrics.map(metric => metric.key);
 
-  // Create a wrapper function to handle string metric toggling
   const handleStringMetricToggle = (metricKey: string) => {
     const allMetrics = [
       ...FINANCIAL_METRICS,
@@ -90,13 +86,9 @@ export const DashboardCharts = () => {
     }
   };
 
-  // Create a wrapper for setLayout to match expected types
   const handleLayoutChange = (newLayout: string[]) => {
-    // No-op since we're not actually using the drag results for now
-    // If we want to use this in the future, we would parse the newLayout array
   };
 
-  // Helper function to handle time range changes with proper typing
   const handleTimeRangeChange = (value: string) => {
     setTimeRange(value as TimeRange);
   };

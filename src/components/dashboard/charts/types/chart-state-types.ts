@@ -1,6 +1,7 @@
 
 import { Metric } from "../chart-config";
-import { Dataset, TimeRange } from "@/types/market";
+import { Dataset } from "./chart-types";
+import { TimeRange } from "@/types/market";
 
 export interface ModelSettings {
   id: string;

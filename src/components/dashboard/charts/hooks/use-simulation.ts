@@ -1,29 +1,73 @@
 
-import { useState } from 'react';
-import { SimulationParameter } from "../types/chart-types";
+import { useState, useCallback } from 'react';
 
-const initialSimulationParams: SimulationParameter[] = [
-  { id: "market_trend", name: "Market Trend", value: 50, min: 0, max: 100, step: 1, unit: "%" },
-  { id: "volatility", name: "Volatility", value: 25, min: 0, max: 100, step: 1, unit: "%" },
-  { id: "sentiment", name: "Sentiment", value: 75, min: 0, max: 100, step: 1, unit: "%" },
-];
+export interface SimulationParameter {
+  id: string;
+  name: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  unit: string;
+}
 
 export const useSimulation = () => {
   const [simulationMode, setSimulationMode] = useState(false);
-  const [simulationParams, setSimulationParams] = useState(initialSimulationParams);
+  const [simulationParameters, setSimulationParameters] = useState<SimulationParameter[]>([
+    {
+      id: "interest_rate",
+      name: "Interest Rate",
+      value: 4.5,
+      min: 0,
+      max: 10,
+      step: 0.25,
+      unit: "%"
+    },
+    {
+      id: "inflation",
+      name: "Inflation Rate",
+      value: 2.5,
+      min: 0,
+      max: 15,
+      step: 0.5,
+      unit: "%"
+    },
+    {
+      id: "gdp_growth",
+      name: "GDP Growth",
+      value: 3.0,
+      min: -5,
+      max: 10,
+      step: 0.5,
+      unit: "%"
+    },
+    {
+      id: "unemployment",
+      name: "Unemployment Rate",
+      value: 5.0,
+      min: 0,
+      max: 20,
+      step: 0.5,
+      unit: "%"
+    }
+  ]);
 
-  const toggleSimulationMode = () => setSimulationMode(prev => !prev);
+  const toggleSimulationMode = useCallback(() => {
+    setSimulationMode(prev => !prev);
+  }, []);
 
-  const updateSimulationParam = (id: string, value: number) => {
-    setSimulationParams(prev =>
-      prev.map(param => param.id === id ? { ...param, value } : param)
+  const updateSimulationParameter = useCallback((parameterId: string, value: number) => {
+    setSimulationParameters(prevParams => 
+      prevParams.map(param => 
+        param.id === parameterId ? { ...param, value } : param
+      )
     );
-  };
+  }, []);
 
   return {
     simulationMode,
+    simulationParameters,
     toggleSimulationMode,
-    simulationParams,
-    updateSimulationParam,
+    updateSimulationParameter,
   };
 };

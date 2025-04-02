@@ -40,7 +40,6 @@ export const DashboardOverview = () => {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   
-  // Setup cards for the drag and drop functionality
   const { items, handleDragEnd, handleReorderCards } = useDraggableCards([
     "financial-overview",
     "housing-overview",
@@ -50,7 +49,6 @@ export const DashboardOverview = () => {
   ]);
 
   useEffect(() => {
-    // Subscribe to realtime updates
     const channel = supabase
       .channel('market-updates')
       .on('postgres_changes', 
@@ -74,7 +72,6 @@ export const DashboardOverview = () => {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      // Simulate refresh - in a real app this would trigger actual data refetching
       await new Promise(resolve => setTimeout(resolve, 1000));
       setLastUpdated(new Date());
       toast({
@@ -106,7 +103,6 @@ export const DashboardOverview = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Header with refresh controls - improved layout for mobile */}
       <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Market Overview</h1>
@@ -145,7 +141,6 @@ export const DashboardOverview = () => {
         </div>
       </div>
 
-      {/* Improved mobile-friendly market filter tabs */}
       <div className="overflow-hidden">
         <Tabs defaultValue="all" value={activeTab} onValueChange={handleTabChange} className="w-full">
           <div className="overflow-x-auto pb-2 -mb-2">
@@ -161,10 +156,8 @@ export const DashboardOverview = () => {
         </Tabs>
       </div>
 
-      {/* Live metrics ticker */}
-      <LiveMetricTicker />
+      <LiveMetricTicker metrics={marketMetrics || []} />
 
-      {/* Key market indicators */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <LiveDataCard 
           title="Market Activity"
@@ -200,10 +193,8 @@ export const DashboardOverview = () => {
         />
       </div>
 
-      {/* Market Dashboards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {items.map((id) => {
-          // Show only cards that match the active tab or when "all" is selected
           if (activeTab !== "all" && !id.includes(activeTab)) {
             return null;
           }
@@ -651,7 +642,6 @@ export const DashboardOverview = () => {
         })}
       </div>
       
-      {/* News Feed Section */}
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
           <LayoutDashboard className="h-5 w-5" />

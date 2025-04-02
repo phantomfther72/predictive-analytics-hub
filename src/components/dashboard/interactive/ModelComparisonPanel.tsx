@@ -1,171 +1,120 @@
 
-import React, { useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React from 'react';
+import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useChartState } from "../charts/use-chart-state";
 import { ModelSettings } from "../charts/types/chart-state-types";
-import { Sparkles, RefreshCw, Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { Separator } from "@/components/ui/separator";
 
-export const ModelComparisonPanel: React.FC = () => {
-  const { models, toggleModelEnabled, updateModelWeight, fetchModels } = useChartState();
-  const { toast } = useToast();
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
+interface ModelComparisonPanelProps {
+  models: ModelSettings[];
+  toggleModelEnabled: (modelId: string) => void;
+  updateModelWeight: (modelId: string, weight: number) => void;
+  isLoading?: boolean;
+}
 
-  // Check authentication status
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-    };
-    
-    checkAuth();
-    
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
-    });
-    
-    return () => {
-      if (authListener && authListener.subscription) {
-        authListener.subscription.unsubscribe();
-      }
-    };
-  }, []);
+export const ModelComparisonPanel: React.FC<ModelComparisonPanelProps> = ({
+  models,
+  toggleModelEnabled,
+  updateModelWeight,
+  isLoading = false,
+}) => {
+  // Calculate total weight to ensure it's 100%
+  const totalWeight = models
+    .filter(model => model.enabled)
+    .reduce((sum, model) => sum + model.weight, 0);
 
-  // Calculate total weight
-  const totalWeight = models.reduce((sum, model) => 
-    model.enabled ? sum + model.weight : sum, 0
-  );
-  
-  // Function to handle refresh
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await fetchModels();
-      toast({
-        title: "Models Refreshed",
-        description: "The latest model settings have been loaded.",
-      });
-    } catch (error) {
-      console.error("Error refreshing models:", error);
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
+  // Format weight as percentage
+  const formatWeight = (weight: number) => `${Math.round(weight * 100)}%`;
 
   return (
-    <Card className="w-full">
-      <CardHeader>
+    <Card className="shadow-md">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-blue-500" />
-            <CardTitle>Multi-Model Comparison</CardTitle>
-            <Badge variant="outline" className="ml-1">Beta</Badge>
+          <div>
+            <CardTitle className="text-lg font-semibold">Model Weights</CardTitle>
+            <CardDescription>Adjust model influence on predictions</CardDescription>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            className="h-8 w-8 p-0"
-          >
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span className="sr-only">Refresh models</span>
-          </Button>
-        </div>
-        <CardDescription className="flex items-center gap-1.5">
-          Compare and combine predictions from multiple statistical models
-          {!isAuthenticated && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="inline-flex items-center">
-                    <Info className="h-4 w-4 text-amber-500" />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p>Sign in to save your model weight preferences across sessions.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          {isLoading && (
+            <Badge variant="outline" className="bg-slate-100 text-slate-500">
+              Syncing...
+            </Badge>
           )}
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Model</span>
-          <span className="text-muted-foreground">Weight</span>
         </div>
-        
-        {models.map((model) => (
-          <div key={model.id} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {/* Progress bar showing distribution of weights */}
+          <div className="flex gap-0.5 h-2 mb-2 overflow-hidden rounded">
+            {models
+              .filter(model => model.enabled && model.weight > 0)
+              .map(model => (
                 <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: model.color }}
+                  key={`progress-${model.id}`}
+                  className="h-full transition-all duration-300 ease-in-out"
+                  style={{
+                    backgroundColor: model.color,
+                    width: `${(model.weight / Math.max(totalWeight, 0.01)) * 100}%`
+                  }}
+                  title={`${model.name}: ${formatWeight(model.weight)}`}
                 />
-                <Label htmlFor={`model-${model.id}`} className="font-medium">
-                  {model.name}
-                </Label>
-              </div>
-              <Switch
-                id={`model-${model.id}`}
-                checked={model.enabled}
-                onCheckedChange={() => toggleModelEnabled(model.id)}
-              />
-            </div>
-            {model.enabled && (
-              <div className="pl-6 space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor={`weight-${model.id}`} className="text-sm text-muted-foreground">
-                    Weighting
-                  </Label>
-                  <span className="text-sm font-medium">
-                    {Math.round(model.weight * 100)}%
-                  </span>
-                </div>
-                <Slider
-                  id={`weight-${model.id}`}
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={[model.weight]}
-                  onValueChange={(values) => updateModelWeight(model.id, values[0])}
-                  className="mb-1"
-                />
-              </div>
+              ))}
+          </div>
+
+          {/* Total weight indicator */}
+          <div className="text-xs text-right text-slate-500">
+            Total: {formatWeight(totalWeight)}
+            {Math.abs(totalWeight - 1) > 0.01 && (
+              <span className="ml-1 text-amber-600">
+                (not 100%)
+              </span>
             )}
           </div>
-        ))}
-        
-        {/* Total weight indicator */}
-        <div className="pt-2 border-t border-border">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-medium">Total Weight:</span>
-            <span 
-              className={`font-bold ${
-                Math.abs(totalWeight - 1) < 0.01 
-                  ? 'text-green-600 dark:text-green-500' 
-                  : 'text-amber-600 dark:text-amber-500'
-              }`}
-            >
-              {Math.round(totalWeight * 100)}%
-            </span>
+
+          <Separator className="my-3" />
+
+          {/* Model weight sliders */}
+          <div className="space-y-6">
+            {models.map(model => (
+              <div key={model.id} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: model.color }}
+                    ></div>
+                    <Label htmlFor={`model-${model.id}`} className="text-sm font-medium">
+                      {model.name}
+                    </Label>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium w-12 text-right">
+                      {formatWeight(model.weight)}
+                    </span>
+                    <Switch
+                      id={`model-toggle-${model.id}`}
+                      checked={model.enabled}
+                      onCheckedChange={() => toggleModelEnabled(model.id)}
+                      className="data-[state=checked]:bg-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <Slider
+                  id={`model-${model.id}`}
+                  disabled={!model.enabled}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={[model.weight]}
+                  onValueChange={([value]) => updateModelWeight(model.id, value)}
+                  className={model.enabled ? "" : "opacity-50"}
+                />
+              </div>
+            ))}
           </div>
-          {Math.abs(totalWeight - 1) >= 0.01 && (
-            <p className="mt-1 text-xs text-amber-600 dark:text-amber-500">
-              Note: For best results, weights should add up to exactly 100%.
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>

@@ -1,70 +1,78 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Dataset } from '../types/chart-state-types';
+import { Dataset } from '../types/chart-types';
 
-interface ModelPrediction {
+type ModelPrediction = {
   modelId: string;
+  modelName: string;
+  modelColor: string;
   value: number;
   confidence: number;
-}
+};
 
-export const useModelPredictions = (
-  dataset: Dataset = 'financial',
-  metricKey: string = 'price',
-  refreshInterval: number = 30000 // 30 seconds default refresh
-) => {
-  const [predictions, setPredictions] = useState<Record<string, number>>({});
-  const [confidences, setConfidences] = useState<Record<string, number>>({});
+export const useModelPredictions = (dataset: Dataset, metricKey: string) => {
+  const [predictions, setPredictions] = useState<Record<string, ModelPrediction>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [timestamp, setTimestamp] = useState<string>(new Date().toISOString());
   const { toast } = useToast();
 
-  const fetchPredictions = async () => {
+  const fetchPredictions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // First get the latest timestamp for this dataset and metric
+      const { data: timestampData, error: timestampError } = await supabase
         .from('model_predictions')
-        .select('model_id, prediction_value, confidence')
+        .select('timestamp')
         .eq('dataset', dataset)
         .eq('metric_key', metricKey)
         .order('timestamp', { ascending: false })
-        .limit(30);
-      
+        .limit(1)
+        .single();
+
+      if (timestampError) {
+        console.log('No predictions found for this dataset and metric');
+        setIsLoading(false);
+        return;
+      }
+
+      setTimestamp(timestampData.timestamp);
+
+      // Then fetch all predictions for this dataset, metric, and timestamp
+      const { data, error } = await supabase
+        .from('model_predictions')
+        .select(`
+          id,
+          prediction_value,
+          confidence,
+          models:model_id (
+            id,
+            name,
+            color
+          )
+        `)
+        .eq('dataset', dataset)
+        .eq('metric_key', metricKey)
+        .eq('timestamp', timestampData.timestamp);
+
       if (error) throw error;
-      
-      if (data && data.length > 0) {
-        // Group predictions by model_id, taking the most recent for each
-        const latestPredictions: Record<string, number> = {};
-        const latestConfidences: Record<string, number> = {};
+
+      // Format the predictions for easy access
+      if (data) {
+        const predictionMap: Record<string, ModelPrediction> = {};
         
-        // Group predictions by model_id
-        const predictionsByModel: Record<string, ModelPrediction[]> = {};
-        
-        data.forEach(item => {
-          if (!predictionsByModel[item.model_id]) {
-            predictionsByModel[item.model_id] = [];
-          }
-          predictionsByModel[item.model_id].push({
-            modelId: item.model_id,
-            value: item.prediction_value,
-            confidence: item.confidence || 0.5
-          });
+        data.forEach((prediction: any) => {
+          predictionMap[prediction.models.id] = {
+            modelId: prediction.models.id,
+            modelName: prediction.models.name,
+            modelColor: prediction.models.color,
+            value: prediction.prediction_value,
+            confidence: prediction.confidence || 0,
+          };
         });
         
-        // Get the first (most recent) prediction for each model
-        Object.keys(predictionsByModel).forEach(modelId => {
-          const modelPredictions = predictionsByModel[modelId];
-          if (modelPredictions.length > 0) {
-            latestPredictions[modelId] = modelPredictions[0].value;
-            latestConfidences[modelId] = modelPredictions[0].confidence;
-          }
-        });
-        
-        setPredictions(latestPredictions);
-        setConfidences(latestConfidences);
-        setLastUpdated(new Date());
+        setPredictions(predictionMap);
       }
     } catch (error) {
       console.error('Error fetching model predictions:', error);
@@ -76,46 +84,38 @@ export const useModelPredictions = (
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [dataset, metricKey, toast]);
 
-  // Initial fetch
+  // Fetch predictions when dataset or metric changes
   useEffect(() => {
-    fetchPredictions();
-  }, [dataset, metricKey]);
-  
-  // Set up regular refresh
-  useEffect(() => {
-    const interval = setInterval(() => {
+    if (dataset && metricKey) {
       fetchPredictions();
-    }, refreshInterval);
-    
-    return () => clearInterval(interval);
-  }, [dataset, metricKey, refreshInterval]);
-  
-  // Set up real-time subscription
+    }
+  }, [dataset, metricKey, fetchPredictions]);
+
+  // Set up real-time subscription for prediction updates
   useEffect(() => {
     const channel = supabase
-      .channel('model-prediction-changes')
+      .channel('prediction-changes')
       .on('postgres_changes', { 
-        event: 'INSERT', 
+        event: '*', 
         schema: 'public', 
         table: 'model_predictions',
-        filter: `dataset=eq.${dataset}` 
+        filter: `dataset=eq.${dataset},metric_key=eq.${metricKey}` 
       }, () => {
         fetchPredictions();
       })
       .subscribe();
-      
+
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [dataset]);
+  }, [dataset, metricKey, fetchPredictions]);
 
   return {
     predictions,
-    confidences,
     isLoading,
-    lastUpdated,
-    fetchPredictions,
+    timestamp,
+    refresh: fetchPredictions
   };
 };

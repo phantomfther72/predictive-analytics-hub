@@ -30,7 +30,7 @@ export const useModelComparison = () => {
       if (modelsError) throw modelsError;
       
       // If user is logged in, fetch their model weights
-      let modelWeights = [];
+      let modelWeights: any[] = [];
       if (userId) {
         const { data: weightsData, error: weightsError } = await supabase
           .from('model_weights')
@@ -47,7 +47,7 @@ export const useModelComparison = () => {
         const formattedModels = modelsData.map(model => {
           const userWeight = modelWeights.find(w => w.model_id === model.id);
           return {
-            id: model.id,
+            id: String(model.id),
             name: model.name,
             weight: userWeight ? userWeight.weight : 0.33,
             enabled: userWeight ? userWeight.enabled : true,
@@ -198,7 +198,7 @@ export const useModelComparison = () => {
 
   // Set up real-time subscription for model updates
   useEffect(() => {
-    const modelChangesSubscription = supabase
+    const channel = supabase
       .channel('model-changes')
       .on('postgres_changes', { 
         event: '*', 
@@ -210,7 +210,7 @@ export const useModelComparison = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(modelChangesSubscription);
+      supabase.removeChannel(channel);
     };
   }, [fetchModels]);
 

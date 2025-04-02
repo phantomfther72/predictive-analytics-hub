@@ -378,6 +378,121 @@ export type Database = {
         }
         Relationships: []
       }
+      model_predictions: {
+        Row: {
+          confidence: number | null
+          created_at: string | null
+          dataset: string
+          id: string
+          metric_key: string
+          model_id: string | null
+          prediction_value: number
+          timestamp: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string | null
+          dataset: string
+          id?: string
+          metric_key: string
+          model_id?: string | null
+          prediction_value: number
+          timestamp: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string | null
+          dataset?: string
+          id?: string
+          metric_key?: string
+          model_id?: string | null
+          prediction_value?: number
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_predictions_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      model_weights: {
+        Row: {
+          created_at: string | null
+          enabled: boolean
+          id: string
+          model_id: string | null
+          updated_at: string | null
+          user_id: string | null
+          weight: number
+        }
+        Insert: {
+          created_at?: string | null
+          enabled?: boolean
+          id?: string
+          model_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          weight?: number
+        }
+        Update: {
+          created_at?: string | null
+          enabled?: boolean
+          id?: string
+          model_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "model_weights_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "models"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      models: {
+        Row: {
+          color: string
+          configuration: Json | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          status: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          color: string
+          configuration?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          status?: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string
+          configuration?: Json | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          status?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       news_feed: {
         Row: {
           created_at: string | null
@@ -518,6 +633,18 @@ export type Database = {
           confidence: number
           explanation: string
           factors: Json
+        }[]
+      }
+      calculate_weighted_prediction: {
+        Args: {
+          _dataset: string
+          _metric_key: string
+          _timestamp: string
+          _user_id: string
+        }
+        Returns: {
+          weighted_prediction: number
+          model_details: Json
         }[]
       }
       update_predictions: {

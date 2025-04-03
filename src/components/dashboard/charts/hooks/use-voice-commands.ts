@@ -5,6 +5,9 @@ export const useVoiceCommands = () => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [supportsSpeechRecognition, setSupportsSpeechRecognition] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceCommandHistory, setVoiceCommandHistory] = useState<string[]>([]);
+  const [lastRecognizedCommand, setLastRecognizedCommand] = useState<string | null>(null);
 
   // Check if the browser supports speech recognition
   useEffect(() => {
@@ -14,6 +17,13 @@ export const useVoiceCommands = () => {
     
     setSupportsSpeechRecognition(hasApi);
   }, []);
+
+  const toggleVoiceCommands = useCallback(() => {
+    setVoiceEnabled(prev => !prev);
+    if (isListening) {
+      stopListening();
+    }
+  }, [isListening]);
 
   const startListening = useCallback(() => {
     if (!supportsSpeechRecognition) return;
@@ -51,12 +61,28 @@ export const useVoiceCommands = () => {
     return null;
   }, []);
 
+  const processVoiceCommand = useCallback((command: string) => {
+    // Process the voice command
+    setLastRecognizedCommand(command);
+    setVoiceCommandHistory(prev => [...prev, command]);
+    
+    // Use the existing processCommand to get action
+    const action = processCommand(command);
+    return action;
+  }, [processCommand]);
+
   return {
     isListening,
     startListening,
     stopListening,
     transcript,
     supportsSpeechRecognition,
-    processCommand
+    processCommand,
+    // Adding new properties
+    voiceEnabled,
+    toggleVoiceCommands,
+    voiceCommandHistory,
+    lastRecognizedCommand,
+    processVoiceCommand
   };
 };

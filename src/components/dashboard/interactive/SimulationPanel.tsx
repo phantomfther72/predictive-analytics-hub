@@ -4,12 +4,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { SimulationParameter } from "../charts/hooks/use-simulation";
+import { SimulationParams } from "../charts/hooks/use-simulation";
 
 interface SimulationPanelProps {
   simulationMode: boolean;
   toggleSimulationMode: () => void;
-  simulationParameters: SimulationParameter[];
+  simulationParameters: Array<{
+    id: string;
+    name: string;
+    value: number;
+    min: number;
+    max: number;
+    step: number;
+    unit: string;
+  }>;
   updateSimulationParameter: (parameterId: string, value: number) => void;
 }
 

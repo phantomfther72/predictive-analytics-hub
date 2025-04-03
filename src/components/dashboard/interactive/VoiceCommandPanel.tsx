@@ -9,40 +9,40 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const VoiceCommandPanel: React.FC = () => {
   const { 
-    voiceEnabled, 
-    toggleVoiceCommands, 
-    voiceCommandHistory,
-    lastRecognizedCommand,
-    processVoiceCommand
+    isListening, 
+    startListening: startListeningFromHook,
+    stopListening: stopListeningFromHook,
+    supportsSpeechRecognition,
+    processCommand
   } = useChartState();
   
+  // Local state for UI purposes
   const [listening, setListening] = useState(false);
-  const [recognitionSupported, setRecognitionSupported] = useState(true);
-
-  // Check for browser support
-  useEffect(() => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      setRecognitionSupported(false);
-    }
-  }, []);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [lastCommand, setLastCommand] = useState<string | null>(null);
 
   const startListening = () => {
-    if (!recognitionSupported) return;
+    if (!supportsSpeechRecognition) return;
     
     setListening(true);
-    toggleVoiceCommands();
+    startListeningFromHook();
     
-    // In a real implementation, this would use the Web Speech API
+    // For demo purposes, we'll simulate a recognized command
     setTimeout(() => {
-      // For demo purposes, we'll simulate a recognized command
       const demoCommand = "Show the optimistic model prediction";
-      processVoiceCommand(demoCommand);
+      handleProcessCommand(demoCommand);
     }, 2000);
   };
 
   const stopListening = () => {
     setListening(false);
-    toggleVoiceCommands();
+    stopListeningFromHook();
+  };
+
+  const handleProcessCommand = (command: string) => {
+    setLastCommand(command);
+    setCommandHistory(prev => [...prev, command]);
+    processCommand(command);
   };
 
   return (
@@ -57,7 +57,7 @@ export const VoiceCommandPanel: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {!recognitionSupported ? (
+        {!supportsSpeechRecognition ? (
           <div className="py-4 text-center text-muted-foreground">
             <p>Voice recognition is not supported in your browser.</p>
             <p className="text-sm mt-2">Try using Chrome or Edge for this feature.</p>
@@ -75,19 +75,19 @@ export const VoiceCommandPanel: React.FC = () => {
               </Button>
             </div>
             
-            {lastRecognizedCommand && (
+            {lastCommand && (
               <div className="mt-4 p-3 bg-muted rounded-md text-center">
                 <p className="text-sm text-muted-foreground mb-1">Last recognized command:</p>
-                <p className="font-medium">{lastRecognizedCommand}</p>
+                <p className="font-medium">{lastCommand}</p>
               </div>
             )}
             
-            {voiceCommandHistory.length > 0 && (
+            {commandHistory.length > 0 && (
               <div className="mt-4">
                 <h4 className="text-sm font-medium mb-2">Command History</h4>
                 <ScrollArea className="h-[120px]">
                   <ul className="space-y-2">
-                    {[...voiceCommandHistory].reverse().map((command, index) => (
+                    {[...commandHistory].reverse().map((command, index) => (
                       <li key={index} className="text-sm p-2 bg-muted/50 rounded">
                         {command}
                       </li>

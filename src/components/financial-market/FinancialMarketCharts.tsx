@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -69,7 +68,6 @@ export default function FinancialMarketCharts() {
           current_price: basePrice + (Math.random() - 0.5) * basePrice * 0.2,
           change_percentage_24h: (Math.random() * 10) - 5,
           volume: Math.random() * 1000000000,
-          market_cap: Math.random() * 10000000000,
           timestamp: timestamp.toISOString(),
           predicted_change: (Math.random() * 8) - 4,
           prediction_timestamp: new Date(timestamp).toISOString(),

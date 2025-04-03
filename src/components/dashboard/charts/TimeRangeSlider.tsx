@@ -1,35 +1,48 @@
 
 import React from "react";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { TimeRange } from "@/types/market";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils";
 
 interface TimeRangeSliderProps {
-  value: TimeRange;
-  onChange: (value: TimeRange) => void;
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
 }
 
-// Map time ranges to slider positions
-const TIME_RANGES: TimeRange[] = ["1D", "7D", "1M", "3M", "6M", "1Y"];
-
-export function TimeRangeSlider({ value, onChange }: TimeRangeSliderProps) {
-  const handleChange = (newValue: number[]) => {
-    onChange(TIME_RANGES[newValue[0]]);
-  };
-
-  const currentIndex = TIME_RANGES.indexOf(value);
+export function TimeRangeSlider({
+  value,
+  onChange,
+  className
+}: TimeRangeSliderProps) {
+  const timeRanges = [
+    { value: "1D", label: "1D" },
+    { value: "7D", label: "7D" },
+    { value: "1M", label: "1M" },
+    { value: "3M", label: "3M" },
+    { value: "6M", label: "6M" },
+    { value: "1Y", label: "1Y" },
+    { value: "ALL", label: "ALL" },
+  ];
 
   return (
-    <div className="space-y-2">
-      <Label>Time Range: {value}</Label>
-      <Slider
-        min={0}
-        max={TIME_RANGES.length - 1}
-        step={1}
-        value={[currentIndex]}
-        onValueChange={handleChange}
-        className="w-[200px]"
-      />
-    </div>
+    <ToggleGroup
+      type="single" 
+      value={value}
+      onValueChange={(val) => {
+        if (val) onChange(val);
+      }}
+      className={cn("flex items-center border rounded-md bg-muted/40", className)}
+    >
+      {timeRanges.map((range) => (
+        <ToggleGroupItem
+          key={range.value}
+          value={range.value}
+          aria-label={`Show ${range.label} data`}
+          className="px-3 py-1 text-xs data-[state=on]:bg-primary data-[state=on]:text-white"
+        >
+          {range.label}
+        </ToggleGroupItem>
+      ))}
+    </ToggleGroup>
   );
 }

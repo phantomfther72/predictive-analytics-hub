@@ -17,14 +17,15 @@ export const useAnnotations = () => {
       content,
       author,
       timestamp: new Date(),
-      replies: [],
+      replies: []
     };
+
     setAnnotations(prev => [...prev, newAnnotation]);
     return newAnnotation.id;
   }, []);
 
   const addReplyToAnnotation = useCallback((annotationId: string, content: string, author: string) => {
-    setAnnotations(prev =>
+    setAnnotations(prev => 
       prev.map(annotation => {
         if (annotation.id === annotationId) {
           return {
@@ -35,9 +36,9 @@ export const useAnnotations = () => {
                 id: uuidv4(),
                 author,
                 content,
-                timestamp: new Date(),
-              },
-            ],
+                timestamp: new Date()
+              }
+            ]
           };
         }
         return annotation;
@@ -50,6 +51,6 @@ export const useAnnotations = () => {
     selectedAnnotation,
     setSelectedAnnotation,
     addAnnotation,
-    addReplyToAnnotation,
+    addReplyToAnnotation
   };
 };

@@ -1,73 +1,63 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
-export interface SimulationParameter {
-  id: string;
-  name: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  unit: string;
+export interface SimulationParams {
+  volatility: number;
+  trend: number;
+  seasonality: number;
+  marketSentiment: number;
 }
 
 export const useSimulation = () => {
   const [simulationMode, setSimulationMode] = useState(false);
-  const [simulationParameters, setSimulationParameters] = useState<SimulationParameter[]>([
-    {
-      id: "interest_rate",
-      name: "Interest Rate",
-      value: 4.5,
-      min: 0,
-      max: 10,
-      step: 0.25,
-      unit: "%"
-    },
-    {
-      id: "inflation",
-      name: "Inflation Rate",
-      value: 2.5,
-      min: 0,
-      max: 15,
-      step: 0.5,
-      unit: "%"
-    },
-    {
-      id: "gdp_growth",
-      name: "GDP Growth",
-      value: 3.0,
-      min: -5,
-      max: 10,
-      step: 0.5,
-      unit: "%"
-    },
-    {
-      id: "unemployment",
-      name: "Unemployment Rate",
-      value: 5.0,
-      min: 0,
-      max: 20,
-      step: 0.5,
-      unit: "%"
-    }
+  const [simulationParams, setSimulationParams] = useState<SimulationParams>({
+    volatility: 0.5,
+    trend: 0.5,
+    seasonality: 0.5,
+    marketSentiment: 0.5
+  });
+  
+  const [models, setModels] = useState([
+    { id: "primary", name: "Base Model", color: "#0EA5E9", weight: 1, enabled: true },
+    { id: "optimistic", name: "Optimistic", color: "#10B981", weight: 0.75, enabled: true },
+    { id: "pessimistic", name: "Conservative", color: "#F43F5E", weight: 0.5, enabled: true },
+    { id: "seasonal", name: "Seasonal", color: "#8B5CF6", weight: 0.65, enabled: false }
   ]);
 
-  const toggleSimulationMode = useCallback(() => {
+  const toggleSimulationMode = () => {
     setSimulationMode(prev => !prev);
-  }, []);
+  };
 
-  const updateSimulationParameter = useCallback((parameterId: string, value: number) => {
-    setSimulationParameters(prevParams => 
-      prevParams.map(param => 
-        param.id === parameterId ? { ...param, value } : param
+  const updateSimulationParams = (params: Partial<SimulationParams>) => {
+    setSimulationParams(prev => ({
+      ...prev,
+      ...params
+    }));
+  };
+
+  const toggleModelEnabled = (modelId: string) => {
+    setModels(prev => 
+      prev.map(model => 
+        model.id === modelId ? { ...model, enabled: !model.enabled } : model
       )
     );
-  }, []);
+  };
+
+  const updateModelWeight = (modelId: string, weight: number) => {
+    setModels(prev => 
+      prev.map(model => 
+        model.id === modelId ? { ...model, weight } : model
+      )
+    );
+  };
 
   return {
     simulationMode,
-    simulationParameters,
     toggleSimulationMode,
-    updateSimulationParameter,
+    simulationParams,
+    updateSimulationParams,
+    models,
+    toggleModelEnabled,
+    updateModelWeight
   };
 };

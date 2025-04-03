@@ -1,42 +1,44 @@
 
 import React from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-
-export interface Metric {
-  key: string;
-  name: string;
-  color: string;
-}
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Metric } from "./chart-config";
+import { Check } from "lucide-react";
 
 interface MetricSelectorProps {
   metrics: Metric[];
   selectedMetrics: string[];
-  onMetricToggle: (metric: string) => void;
+  onMetricToggle: (metricKey: string) => void;
+  className?: string;
 }
 
-export function MetricSelector({ metrics, selectedMetrics, onMetricToggle }: MetricSelectorProps) {
+export function MetricSelector({ 
+  metrics, 
+  selectedMetrics, 
+  onMetricToggle,
+  className 
+}: MetricSelectorProps) {
   return (
-    <div className="space-y-4">
-      <Label className="text-sm font-medium">Select Metrics</Label>
-      <div className="grid grid-cols-2 gap-4">
-        {metrics.map((metric) => (
-          <div key={metric.key} className="flex items-center space-x-2">
-            <Checkbox
-              id={metric.key}
-              checked={selectedMetrics.includes(metric.key)}
-              onCheckedChange={() => onMetricToggle(metric.key)}
-            />
-            <Label
-              htmlFor={metric.key}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              style={{ color: metric.color }}
-            >
-              {metric.name}
-            </Label>
-          </div>
-        ))}
-      </div>
+    <div className={cn("inline-flex flex-wrap gap-2", className)}>
+      {metrics.map((metric) => {
+        const isSelected = selectedMetrics.includes(metric.key);
+        return (
+          <Button
+            key={metric.key}
+            variant={isSelected ? "default" : "outline"}
+            size="sm"
+            className={cn(
+              "flex items-center gap-1 text-xs",
+              isSelected && `bg-${metric.color}/90 hover:bg-${metric.color}`
+            )}
+            onClick={() => onMetricToggle(metric.key)}
+          >
+            {isSelected && <Check className="h-3 w-3" />}
+            {metric.name}
+            {metric.unit && metric.unit !== "%" && ` (${metric.unit})`}
+          </Button>
+        );
+      })}
     </div>
   );
 }

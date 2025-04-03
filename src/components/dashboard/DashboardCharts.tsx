@@ -1,20 +1,8 @@
 
 import React from "react";
-import { TimeRangeSlider } from "./charts/TimeRangeSlider";
-import { MetricSelector } from "./charts/MetricSelector";
-import { ChartContainer } from "./charts/ChartContainer";
-import { ChartLayout } from "./charts/ChartLayout";
-import { FinancialChart } from "./charts/FinancialChart";
-import { HousingChart } from "./charts/HousingChart";
-import { MiningChart } from "./charts/MiningChart";
-import { AgricultureChart } from "./charts/AgricultureChart";
-import { GreenHydrogenChart } from "./charts/GreenHydrogenChart";
 import { useChartState } from "./charts/use-chart-state";
 import { useChartData } from "./charts/use-chart-data";
 import { InteractiveFeatures } from "./InteractiveFeatures";
-import { Button } from "@/components/ui/button";
-import { Plus, MessageCircle, SplitSquareVertical } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
 import {
   FINANCIAL_METRICS,
@@ -24,7 +12,10 @@ import {
   GREEN_HYDROGEN_METRICS,
   Metric,
 } from "./charts/chart-config";
-import { Dataset, TimeRange } from "./charts/types/chart-types";
+import { TimeRange } from "./charts/types/chart-types";
+import { ChartHeader } from "./charts/ChartHeader";
+import { MetricSelectors } from "./charts/MetricSelectors";
+import { ChartGrid } from "./charts/ChartGrid";
 
 export const DashboardCharts = () => {
   const {
@@ -104,147 +95,40 @@ export const DashboardCharts = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold">Interactive Analytics</h1>
-            {simulationMode && (
-              <Badge variant="secondary" className="ml-2 bg-teal-100 text-teal-800">Simulation Mode</Badge>
-            )}
-          </div>
-          <p className="text-muted-foreground mt-1">
-            Compare models, run simulations, and collaborate with your team
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <TimeRangeSlider value={timeRange} onChange={handleTimeRangeChange} />
-          <Button variant="outline" size="sm" className="flex items-center gap-1">
-            <Plus className="h-4 w-4" />
-            <span>Add Chart</span>
-          </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-1">
-            <SplitSquareVertical className="h-4 w-4" />
-            <span>Layout</span>
-          </Button>
-        </div>
-      </div>
+      <ChartHeader 
+        simulationMode={simulationMode}
+        timeRange={timeRange}
+        onTimeRangeChange={handleTimeRangeChange}
+      />
 
       <InteractiveFeatures />
 
-      <div className="flex flex-wrap gap-4 mb-6">
-        {financialData && financialData.length > 0 && (
-          <MetricSelector
-            metrics={FINANCIAL_METRICS}
-            selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleStringMetricToggle}
-          />
-        )}
-        {housingData && housingData.length > 0 && (
-          <MetricSelector
-            metrics={HOUSING_METRICS}
-            selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleStringMetricToggle}
-          />
-        )}
-        {miningData && miningData.length > 0 && (
-          <MetricSelector
-            metrics={MINING_METRICS}
-            selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleStringMetricToggle}
-          />
-        )}
-        {agricultureData && agricultureData.length > 0 && (
-          <MetricSelector
-            metrics={AGRICULTURE_METRICS}
-            selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleStringMetricToggle}
-          />
-        )}
-        {hydrogenData && hydrogenData.length > 0 && (
-          <MetricSelector
-            metrics={GREEN_HYDROGEN_METRICS}
-            selectedMetrics={selectedMetricKeys}
-            onMetricToggle={handleStringMetricToggle}
-          />
-        )}
-      </div>
+      <MetricSelectors 
+        selectedMetricKeys={selectedMetricKeys}
+        onMetricToggle={handleStringMetricToggle}
+        financialData={financialData}
+        housingData={housingData}
+        miningData={miningData}
+        agricultureData={agricultureData}
+        hydrogenData={hydrogenData}
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <ChartContainer
-          id="financial"
-          title="Cryptocurrency Trends"
-          description="Price movements and predicted changes"
-        >
-          <FinancialChart
-            data={financialData}
-            isLoading={isLoadingFinancial}
-            selectedMetrics={selectedMetricKeys}
-            onLegendClick={handleLegendClickWrapper}
-            enabledModels={models}
-            simulationMode={simulationMode}
-          />
-        </ChartContainer>
-
-        <ChartContainer
-          id="housing"
-          title="Housing Market Overview"
-          description="Regional price trends and listings"
-        >
-          <HousingChart
-            data={housingData}
-            isLoading={isLoadingHousing}
-            selectedMetrics={selectedMetricKeys}
-            onLegendClick={handleLegendClickWrapper}
-            enabledModels={models}
-            simulationMode={simulationMode}
-          />
-        </ChartContainer>
-
-        <ChartContainer
-          id="mining"
-          title="Mining Sector Performance"
-          description="Production and market value trends"
-        >
-          <MiningChart
-            data={miningData}
-            isLoading={isLoadingMining}
-            selectedMetrics={selectedMetricKeys}
-            onLegendClick={handleLegendClickWrapper}
-            enabledModels={models}
-            simulationMode={simulationMode}
-          />
-        </ChartContainer>
-
-        <ChartContainer
-          id="agriculture"
-          title="Agriculture Market Insights"
-          description="Crop yields, prices, and environmental factors"
-        >
-          <AgricultureChart
-            data={agricultureData}
-            isLoading={isLoadingAgriculture}
-            selectedMetrics={selectedMetricKeys}
-            onLegendClick={handleLegendClickWrapper}
-            enabledModels={models}
-            simulationMode={simulationMode}
-          />
-        </ChartContainer>
-
-        <ChartContainer
-          id="green-hydrogen"
-          title="Green Hydrogen Metrics"
-          description="Production capacity and market dynamics"
-        >
-          <GreenHydrogenChart
-            data={hydrogenData}
-            isLoading={isLoadingHydrogen}
-            selectedMetrics={selectedMetricKeys}
-            onLegendClick={handleLegendClickWrapper}
-            enabledModels={models}
-            simulationMode={simulationMode}
-          />
-        </ChartContainer>
-      </div>
+      <ChartGrid 
+        financialData={financialData}
+        housingData={housingData}
+        miningData={miningData}
+        agricultureData={agricultureData}
+        hydrogenData={hydrogenData}
+        isLoadingFinancial={isLoadingFinancial}
+        isLoadingHousing={isLoadingHousing}
+        isLoadingMining={isLoadingMining}
+        isLoadingAgriculture={isLoadingAgriculture}
+        isLoadingHydrogen={isLoadingHydrogen}
+        selectedMetricKeys={selectedMetricKeys}
+        onLegendClick={handleLegendClickWrapper}
+        models={models}
+        simulationMode={simulationMode}
+      />
     </div>
   );
 };

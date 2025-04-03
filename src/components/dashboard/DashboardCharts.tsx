@@ -1,3 +1,4 @@
+
 import React from "react";
 import { TimeRangeSlider } from "./charts/TimeRangeSlider";
 import { MetricSelector } from "./charts/MetricSelector";
@@ -87,11 +88,19 @@ export const DashboardCharts = () => {
   };
 
   const handleLayoutChange = (newLayout: string[]) => {
+    // Layout change implementation would go here
   };
 
   const handleTimeRangeChange = (value: string) => {
     setTimeRange(value as TimeRange);
   };
+
+  // Ensure we have some default metrics selected if none are selected
+  React.useEffect(() => {
+    if (selectedMetrics.length === 0 && FINANCIAL_METRICS.length > 0) {
+      handleMetricToggle(FINANCIAL_METRICS[0]);
+    }
+  }, [selectedMetrics]);
 
   return (
     <div className="space-y-8">
@@ -100,7 +109,7 @@ export const DashboardCharts = () => {
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">Interactive Analytics</h1>
             {simulationMode && (
-              <Badge variant="secondary" className="ml-2">Simulation Mode</Badge>
+              <Badge variant="secondary" className="ml-2 bg-teal-100 text-teal-800">Simulation Mode</Badge>
             )}
           </div>
           <p className="text-muted-foreground mt-1">
@@ -123,35 +132,35 @@ export const DashboardCharts = () => {
       <InteractiveFeatures />
 
       <div className="flex flex-wrap gap-4 mb-6">
-        {financialData && (
+        {financialData && financialData.length > 0 && (
           <MetricSelector
             metrics={FINANCIAL_METRICS}
             selectedMetrics={selectedMetricKeys}
             onMetricToggle={handleStringMetricToggle}
           />
         )}
-        {housingData && (
+        {housingData && housingData.length > 0 && (
           <MetricSelector
             metrics={HOUSING_METRICS}
             selectedMetrics={selectedMetricKeys}
             onMetricToggle={handleStringMetricToggle}
           />
         )}
-        {miningData && (
+        {miningData && miningData.length > 0 && (
           <MetricSelector
             metrics={MINING_METRICS}
             selectedMetrics={selectedMetricKeys}
             onMetricToggle={handleStringMetricToggle}
           />
         )}
-        {agricultureData && (
+        {agricultureData && agricultureData.length > 0 && (
           <MetricSelector
             metrics={AGRICULTURE_METRICS}
             selectedMetrics={selectedMetricKeys}
             onMetricToggle={handleStringMetricToggle}
           />
         )}
-        {hydrogenData && (
+        {hydrogenData && hydrogenData.length > 0 && (
           <MetricSelector
             metrics={GREEN_HYDROGEN_METRICS}
             selectedMetrics={selectedMetricKeys}
@@ -160,7 +169,7 @@ export const DashboardCharts = () => {
         )}
       </div>
 
-      <ChartLayout onLayoutChange={handleLayoutChange}>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         <ChartContainer
           id="financial"
           title="Cryptocurrency Trends"
@@ -235,7 +244,7 @@ export const DashboardCharts = () => {
             simulationMode={simulationMode}
           />
         </ChartContainer>
-      </ChartLayout>
+      </div>
     </div>
   );
 };

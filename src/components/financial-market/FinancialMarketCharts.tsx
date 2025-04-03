@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -128,13 +129,16 @@ export default function FinancialMarketCharts() {
                     <XAxis 
                       dataKey="timestamp"
                       tickFormatter={(time) => new Date(time).toLocaleDateString()}
+                      stroke={CHART_COLORS.text}
                     />
                     <YAxis 
                       tickFormatter={(value) => `$${(value / 1000).toFixed(0)}K`} 
+                      stroke={CHART_COLORS.text}
                     />
                     <Tooltip 
                       formatter={(value: number) => [`$${value.toLocaleString()}`, 'Price']}
                       labelFormatter={(label) => `Date: ${new Date(label).toLocaleDateString()}`}
+                      contentStyle={{ backgroundColor: '#1a2234', border: '1px solid #2a3649', color: 'white' }}
                     />
                     <Legend />
                     {Object.keys(assetData).map((asset, index) => (
@@ -146,6 +150,7 @@ export default function FinancialMarketCharts() {
                         name={asset}
                         stroke={Object.values(CHART_COLORS)[index % Object.values(CHART_COLORS).length]}
                         dot={false}
+                        strokeWidth={2}
                       />
                     ))}
                   </LineChart>
@@ -167,11 +172,13 @@ export default function FinancialMarketCharts() {
                       <XAxis 
                         dataKey="timestamp"
                         tickFormatter={(time) => new Date(time).toLocaleDateString()}
+                        stroke={CHART_COLORS.text}
                       />
                       <YAxis 
                         tickFormatter={(value) => `$${(value / 1e9).toFixed(1)}B`} 
+                        stroke={CHART_COLORS.text}
                       />
-                      <Tooltip />
+                      <Tooltip contentStyle={{ backgroundColor: '#1a2234', border: '1px solid #2a3649', color: 'white' }} />
                       <Legend />
                       <Area 
                         type="monotone" 
@@ -180,6 +187,7 @@ export default function FinancialMarketCharts() {
                         stroke={CHART_COLORS.secondary}
                         fill={CHART_COLORS.secondary}
                         fillOpacity={0.3}
+                        strokeWidth={2}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
@@ -199,9 +207,10 @@ export default function FinancialMarketCharts() {
                       <XAxis 
                         dataKey="timestamp"
                         tickFormatter={(time) => new Date(time).toLocaleDateString()}
+                        stroke={CHART_COLORS.text}
                       />
-                      <YAxis />
-                      <Tooltip />
+                      <YAxis stroke={CHART_COLORS.text} />
+                      <Tooltip contentStyle={{ backgroundColor: '#1a2234', border: '1px solid #2a3649', color: 'white' }} />
                       <Legend />
                       <Line 
                         type="monotone" 
@@ -209,6 +218,7 @@ export default function FinancialMarketCharts() {
                         name="Price" 
                         stroke={CHART_COLORS.primary} 
                         dot={false}
+                        strokeWidth={2}
                       />
                       <Line 
                         type="monotone" 
@@ -217,6 +227,7 @@ export default function FinancialMarketCharts() {
                         stroke={CHART_COLORS.prediction}
                         strokeDasharray="5 5"
                         dot={false}
+                        strokeWidth={2}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -227,11 +238,43 @@ export default function FinancialMarketCharts() {
         </TabsContent>
         
         <TabsContent value="assets" className="space-y-4">
-          {/* Asset-specific charts would go here */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Asset Performance</CardTitle>
+            </CardHeader>
+            <CardContent className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart>
+                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                  <XAxis stroke={CHART_COLORS.text} />
+                  <YAxis stroke={CHART_COLORS.text} />
+                  <Legend />
+                  <Tooltip contentStyle={{ backgroundColor: '#1a2234', border: '1px solid #2a3649', color: 'white' }} />
+                  {/* Content will populate after user selects an asset */}
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </TabsContent>
         
         <TabsContent value="predictions" className="space-y-4">
-          {/* Prediction-focused charts would go here */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Model Predictions</CardTitle>
+            </CardHeader>
+            <CardContent className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart>
+                  <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+                  <XAxis stroke={CHART_COLORS.text} />
+                  <YAxis stroke={CHART_COLORS.text} />
+                  <Legend />
+                  <Tooltip contentStyle={{ backgroundColor: '#1a2234', border: '1px solid #2a3649', color: 'white' }} />
+                  {/* Content will populate after user selects prediction models */}
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

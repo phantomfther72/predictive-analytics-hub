@@ -28,7 +28,7 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
   updateSimulationParameter
 }) => {
   return (
-    <Card className="shadow-md">
+    <Card className="shadow-md bg-card text-card-foreground">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <div>
@@ -43,7 +43,7 @@ export const SimulationPanel: React.FC<SimulationPanelProps> = ({
               id="simulation-toggle"
               checked={simulationMode}
               onCheckedChange={toggleSimulationMode}
-              className="data-[state=checked]:bg-blue-500"
+              className="data-[state=checked]:bg-teal-500"
             />
           </div>
         </div>

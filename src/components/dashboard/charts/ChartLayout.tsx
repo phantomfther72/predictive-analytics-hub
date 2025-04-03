@@ -68,7 +68,7 @@ export const ChartLayout: React.FC<ChartLayoutProps> = ({
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
       cols={{ lg: 12, md: 8, sm: 2, xs: 1, xxs: 1 }}
       rowHeight={350}
-      onLayoutChange={handleLayoutChange} // Changed from onLayoutsChange to onLayoutChange
+      onLayoutChange={handleLayoutChange}
     >
       {children}
     </ReactGridLayout>

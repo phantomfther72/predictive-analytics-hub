@@ -1,20 +1,24 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { Responsive, WidthProvider, Layout as RGLLayout } from "react-grid-layout";
-import { GridLayout } from "../charts/types/chart-types";
+import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
+import { GridLayout } from "./types/chart-types";
 
 const ReactGridLayout = WidthProvider(Responsive);
 
 interface ChartLayoutProps {
   children: React.ReactNode;
   className?: string;
-  onLayoutChange: (layout: string[]) => void;
+  onLayoutChange?: (layout: string[]) => void;
 }
 
-export const ChartLayout: React.FC<ChartLayoutProps> = ({ children, className, onLayoutChange }) => {
+export const ChartLayout: React.FC<ChartLayoutProps> = ({
+  children,
+  className,
+  onLayoutChange
+}) => {
   // Define default layouts for different breakpoints
   const defaultLayouts = {
     lg: [
@@ -47,19 +51,13 @@ export const ChartLayout: React.FC<ChartLayoutProps> = ({ children, className, o
     ],
   };
 
-  const handleLayoutsChange = (newLayouts: {[key: string]: RGLLayout[]}) => {
-    // Extract the layout for the current breakpoint (e.g., 'lg', 'md', etc.)
-    const currentLayout = newLayouts['lg'] || newLayouts['md'] || newLayouts['sm'] || newLayouts['xs'];
-  
+  const handleLayoutChange = (currentLayout: GridLayout[]) => {
     // Check if currentLayout is defined and is an array
-    if (Array.isArray(currentLayout)) {
+    if (Array.isArray(currentLayout) && onLayoutChange) {
       // Extract the order of chart IDs from the layout
       const newLayoutOrder = currentLayout.map(item => item.i);
-      
       // Call the onLayoutChange prop with the new layout order
       onLayoutChange(newLayoutOrder);
-    } else {
-      console.warn("Current layout is not an array:", currentLayout);
     }
   };
 
@@ -70,7 +68,7 @@ export const ChartLayout: React.FC<ChartLayoutProps> = ({ children, className, o
       breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
       cols={{ lg: 12, md: 8, sm: 2, xs: 1, xxs: 1 }}
       rowHeight={350}
-      onLayoutsChange={handleLayoutsChange}
+      onLayoutChange={handleLayoutChange} // Changed from onLayoutsChange to onLayoutChange
     >
       {children}
     </ReactGridLayout>

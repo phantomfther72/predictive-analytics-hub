@@ -1,13 +1,23 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GreenHydrogenMetrics } from "@/types/market";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, LineChart, TrendingUp, Zap, BarChart3, Droplets, Factory } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronRight, LineChart, TrendingUp, Zap, BarChart3, Droplets, Factory, Calendar, Filter, Download, Scale, Leaf } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PredictionBadge from "@/components/market-data/PredictionBadge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ResponsiveContainer, AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { useToast } from "@/components/ui/use-toast";
 
 interface GreenHydrogenMarketDashboardProps {
   data?: GreenHydrogenMetrics[];
@@ -15,6 +25,10 @@ interface GreenHydrogenMarketDashboardProps {
 
 export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboardProps> = ({ data = [] }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [selectedTimeframe, setSelectedTimeframe] = useState<"1M" | "3M" | "6M" | "1Y" | "ALL">("6M");
+  const [selectedRegion, setSelectedRegion] = useState<string>("All Regions");
+  const [selectedMetric, setSelectedMetric] = useState<string>("production_capacity_mw");
   
   if (!data || data.length === 0) {
     return <p>No green hydrogen market data available.</p>;
@@ -23,10 +37,135 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
   // Get latest data
   const latestData = data[0];
   
+  // Filter data based on selected timeframe
+  const filteredData = React.useMemo(() => {
+    if (selectedTimeframe === "ALL") return data;
+    
+    const now = new Date();
+    let cutoffDate = new Date();
+    
+    switch (selectedTimeframe) {
+      case "1M":
+        cutoffDate.setMonth(now.getMonth() - 1);
+        break;
+      case "3M":
+        cutoffDate.setMonth(now.getMonth() - 3);
+        break;
+      case "6M":
+        cutoffDate.setMonth(now.getMonth() - 6);
+        break;
+      case "1Y":
+        cutoffDate.setFullYear(now.getFullYear() - 1);
+        break;
+    }
+    
+    return data.filter(item => new Date(item.timestamp) >= cutoffDate);
+  }, [data, selectedTimeframe]);
+  
+  // Process chart data for production capacity over time
+  const capacityChartData = React.useMemo(() => {
+    return filteredData.map(item => ({
+      timestamp: item.timestamp,
+      value: item.production_capacity_mw,
+      predicted: item.production_capacity_mw * (1 + (item.predicted_change || 0) / 100)
+    })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  }, [filteredData]);
+  
+  // Process chart data for operational efficiency over time
+  const efficiencyChartData = React.useMemo(() => {
+    return filteredData.map(item => ({
+      timestamp: item.timestamp,
+      value: item.operational_efficiency_pct,
+      target: 85 // Target efficiency percentage
+    })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  }, [filteredData]);
+  
+  // Process chart data for investment over time
+  const investmentChartData = React.useMemo(() => {
+    return filteredData.map(item => ({
+      timestamp: item.timestamp,
+      value: item.investment_amount_usd / 1000000, // Convert to millions
+      roi: (item.investment_amount_usd / 1000000) * (item.operational_efficiency_pct / 100) * 0.15 // Simplified ROI calculation
+    })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  }, [filteredData]);
+  
+  // Process chart data for market demand
+  const demandChartData = React.useMemo(() => {
+    return filteredData.map(item => ({
+      timestamp: item.timestamp,
+      value: item.market_demand_tons,
+      supply: item.production_capacity_mw * 20 // Simplified conversion from MW to tons
+    })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  }, [filteredData]);
+  
+  // Calculate environmental impact metrics
+  const environmentalImpact = React.useMemo(() => {
+    const totalCapacity = filteredData.reduce((sum, item) => sum + item.production_capacity_mw, 0);
+    return {
+      carbonReduction: Math.round(totalCapacity * 8.1), // Tons of CO2 offset per MW
+      energySavings: Math.round(totalCapacity * 3.4), // MWh saved
+      waterSavings: Math.round(totalCapacity * 2.6) // Thousand liters of water saved
+    };
+  }, [filteredData]);
+  
+  // Calculate trends and forecasts
+  const trends = React.useMemo(() => {
+    const capacityValues = filteredData.map(item => item.production_capacity_mw);
+    const efficiencyValues = filteredData.map(item => item.operational_efficiency_pct);
+    const investmentValues = filteredData.map(item => item.investment_amount_usd);
+    
+    const capacityGrowth = capacityValues.length > 1 
+      ? ((capacityValues[0] - capacityValues[capacityValues.length - 1]) / capacityValues[capacityValues.length - 1] * 100)
+      : 0;
+      
+    const efficiencyImprovement = efficiencyValues.length > 1
+      ? ((efficiencyValues[0] - efficiencyValues[efficiencyValues.length - 1]) / efficiencyValues[efficiencyValues.length - 1] * 100)
+      : 0;
+      
+    const investmentGrowth = investmentValues.length > 1
+      ? ((investmentValues[0] - investmentValues[investmentValues.length - 1]) / investmentValues[investmentValues.length - 1] * 100)
+      : 0;
+      
+    return {
+      capacityGrowth: capacityGrowth.toFixed(1),
+      efficiencyImprovement: efficiencyImprovement.toFixed(1),
+      investmentGrowth: investmentGrowth.toFixed(1),
+      projectedCapacity2025: Math.round(latestData.production_capacity_mw * 1.85),
+      projectedCapacity2030: Math.round(latestData.production_capacity_mw * 4.2),
+      projectedEfficiency2025: Math.min(95, Math.round(latestData.operational_efficiency_pct * 1.2))
+    };
+  }, [filteredData, latestData]);
+  
+  // Handle export data
+  const handleExportData = () => {
+    toast({
+      title: "Data Export Initiated",
+      description: "Your Green Hydrogen market data export is being prepared",
+    });
+    
+    // In a real app, this would trigger a download of data
+    setTimeout(() => {
+      toast({
+        title: "Data Export Complete",
+        description: "Your data has been exported successfully",
+        variant: "success",
+      });
+    }, 1500);
+  };
+  
+  // Format timestamps for display
+  const formatDate = (timestamp: string) => {
+    return new Date(timestamp).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+  
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Namibian Green Hydrogen Market</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Namibian Green Hydrogen Market</h2>
         <Button 
           variant="outline" 
           className="flex items-center gap-2"
@@ -38,9 +177,50 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
         </Button>
       </div>
 
+      {/* Filters Row */}
+      <div className="flex flex-col md:flex-row justify-between gap-4 bg-slate-50 dark:bg-slate-900/30 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <Calendar size={16} className="text-slate-500" />
+            <span className="text-sm font-medium">Timeframe:</span>
+            <Select value={selectedTimeframe} onValueChange={(value) => setSelectedTimeframe(value as any)}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Timeframe" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1M">1 Month</SelectItem>
+                <SelectItem value="3M">3 Months</SelectItem>
+                <SelectItem value="6M">6 Months</SelectItem>
+                <SelectItem value="1Y">1 Year</SelectItem>
+                <SelectItem value="ALL">All Time</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Filter size={16} className="text-slate-500" />
+            <span className="text-sm font-medium">Metric:</span>
+            <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select Metric" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="production_capacity_mw">Production Capacity</SelectItem>
+                <SelectItem value="market_demand_tons">Market Demand</SelectItem>
+                <SelectItem value="operational_efficiency_pct">Operational Efficiency</SelectItem>
+                <SelectItem value="investment_amount_usd">Investment</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <Button variant="outline" className="flex items-center gap-2" onClick={handleExportData}>
+          <Download size={16} />
+          <span>Export Data</span>
+        </Button>
+      </div>
+
       {/* Key Performance Indicators */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center">
               <Zap size={18} className="mr-2 text-amber-500" />
@@ -49,26 +229,26 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
             <CardDescription>Total production potential</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-slate-900">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">
               {latestData.production_capacity_mw.toLocaleString()} MW
             </div>
             <div className="mt-2">
               <PredictionBadge 
-                value={latestData.predicted_change} 
-                confidence={latestData.prediction_confidence}
+                value={latestData.predicted_change || 0} 
+                confidence={latestData.prediction_confidence || 0}
                 size="sm"
               />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Investment</CardTitle>
             <CardDescription>Total capital investment</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-slate-900">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">
               ${(latestData.investment_amount_usd / 1000000).toFixed(1)}M
             </div>
             <div className="flex items-center mt-2">
@@ -80,13 +260,13 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Market Demand</CardTitle>
             <CardDescription>Current market need</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-slate-900">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">
               {latestData.market_demand_tons.toLocaleString()} tons
             </div>
             <div className="flex items-center mt-2">
@@ -98,13 +278,13 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Efficiency</CardTitle>
             <CardDescription>Operational efficiency</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-slate-900">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">
               {latestData.operational_efficiency_pct}%
             </div>
             <div className="flex items-center mt-2">
@@ -117,292 +297,393 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
         </Card>
       </div>
 
-      {/* Namibian Green Hydrogen Initiative */}
-      <Card className="border-2 border-teal-100">
-        <CardHeader className="bg-teal-50">
+      {/* Interactive Charts Section */}
+      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 shadow-sm">
+        <CardHeader>
+          <CardTitle>Performance Analytics</CardTitle>
+          <CardDescription>Interactive charts showing key green hydrogen metrics</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="capacity" className="w-full">
+            <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-6">
+              <TabsTrigger value="capacity">Production Capacity</TabsTrigger>
+              <TabsTrigger value="efficiency">Operational Efficiency</TabsTrigger>
+              <TabsTrigger value="investment">Investment & ROI</TabsTrigger>
+              <TabsTrigger value="demand">Market Demand</TabsTrigger>
+            </TabsList>
+            <TabsContent value="capacity" className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={capacityChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="timestamp" 
+                    tickFormatter={(timestamp) => formatDate(timestamp)}
+                  />
+                  <YAxis 
+                    label={{ value: 'Megawatts (MW)', angle: -90, position: 'insideLeft' }}
+                    tickFormatter={(value) => value.toLocaleString()}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [`${value.toLocaleString()} MW`, 'Capacity']}
+                    labelFormatter={(label) => formatDate(label.toString())}
+                  />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="value" 
+                    name="Actual Capacity" 
+                    stroke="#0EA5E9" 
+                    fill="#0EA5E9"
+                    fillOpacity={0.3}
+                  />
+                  <Area 
+                    type="monotone"
+                    dataKey="predicted" 
+                    name="Predicted Capacity" 
+                    stroke="#8B5CF6" 
+                    fill="#8B5CF6" 
+                    fillOpacity={0.1}
+                    strokeDasharray="5 5"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </TabsContent>
+            <TabsContent value="efficiency" className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={efficiencyChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="timestamp" 
+                    tickFormatter={(timestamp) => formatDate(timestamp)}
+                  />
+                  <YAxis 
+                    label={{ value: 'Efficiency (%)', angle: -90, position: 'insideLeft' }}
+                    domain={[0, 100]}
+                  />
+                  <Tooltip 
+                    formatter={(value: number) => [`${value.toFixed(1)}%`, 'Efficiency']}
+                    labelFormatter={(label) => formatDate(label.toString())}
+                  />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="value" 
+                    name="Operational Efficiency" 
+                    stroke="#10B981" 
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="target" 
+                    name="Target Efficiency" 
+                    stroke="#6B7280"
+                    strokeDasharray="5 5"
+                    strokeWidth={1.5}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </TabsContent>
+            <TabsContent value="investment" className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={investmentChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="timestamp" 
+                    tickFormatter={(timestamp) => formatDate(timestamp)}
+                  />
+                  <YAxis 
+                    yAxisId="left"
+                    label={{ value: 'Investment ($ Millions)', angle: -90, position: 'insideLeft' }}
+                    tickFormatter={(value) => `$${value}M`}
+                  />
+                  <YAxis 
+                    yAxisId="right"
+                    orientation="right"
+                    label={{ value: 'ROI ($ Millions)', angle: 90, position: 'insideRight' }}
+                    tickFormatter={(value) => `$${value.toFixed(1)}M`}
+                  />
+                  <Tooltip 
+                    formatter={(value: number, name) => {
+                      return name === "ROI" 
+                        ? [`$${value.toFixed(2)}M`, 'Estimated ROI']
+                        : [`$${value.toFixed(1)}M`, 'Investment'];
+                    }}
+                    labelFormatter={(label) => formatDate(label.toString())}
+                  />
+                  <Legend />
+                  <Line 
+                    yAxisId="left"
+                    type="monotone" 
+                    dataKey="value" 
+                    name="Investment" 
+                    stroke="#F59E0B" 
+                    strokeWidth={2}
+                    dot={{ r: 4 }}
+                  />
+                  <Line 
+                    yAxisId="right"
+                    type="monotone" 
+                    dataKey="roi" 
+                    name="ROI" 
+                    stroke="#EC4899" 
+                    strokeWidth={2}
+                    dot={{ r: 3 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </TabsContent>
+            <TabsContent value="demand" className="h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={demandChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="timestamp" 
+                    tickFormatter={(timestamp) => formatDate(timestamp)}
+                  />
+                  <YAxis 
+                    label={{ value: 'Tons', angle: -90, position: 'insideLeft' }}
+                    tickFormatter={(value) => value.toLocaleString()}
+                  />
+                  <Tooltip 
+                    formatter={(value: number, name) => [value.toLocaleString() + " tons", name]}
+                    labelFormatter={(label) => formatDate(label.toString())}
+                  />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="value" 
+                    name="Market Demand" 
+                    stroke="#F43F5E" 
+                    fill="#F43F5E"
+                    fillOpacity={0.2}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="supply" 
+                    name="Production Supply" 
+                    stroke="#22D3EE" 
+                    fill="#22D3EE"
+                    fillOpacity={0.2}
+                    strokeDasharray="5 5"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Environmental Impact */}
+      <Card className="border-2 border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-slate-950/50">
+        <CardHeader className="bg-emerald-50 dark:bg-emerald-900/20">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Namibian Green Hydrogen Strategic Initiative</CardTitle>
-              <CardDescription>National development program metrics and projections</CardDescription>
+              <CardTitle>Environmental Impact Assessment</CardTitle>
+              <CardDescription>Carbon reduction and resource efficiency metrics</CardDescription>
             </div>
-            <Zap className="h-5 w-5 text-teal-600" />
+            <Leaf className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
           </div>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Development Status</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-slate-500">Project Stage</p>
-                  <Badge variant="outline" className="mt-1 bg-teal-50 text-teal-700 border-teal-200">
-                    Scale-up Phase
-                  </Badge>
+            <Card className="border-0 shadow-none bg-transparent">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-slate-600 dark:text-slate-400">Carbon Offset</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                  {environmentalImpact.carbonReduction.toLocaleString()} tons
                 </div>
-                <div>
-                  <p className="text-sm text-slate-500">Facility Locations</p>
-                  <div className="mt-2 space-y-1">
-                    <Badge variant="outline" className="mr-1 bg-slate-50">Walvis Bay</Badge>
-                    <Badge variant="outline" className="mr-1 bg-slate-50">Lüderitz</Badge>
-                    <Badge variant="outline" className="mr-1 bg-slate-50">Swakopmund</Badge>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Facility Uptime</p>
-                  <p className="text-2xl font-bold mt-1">{latestData.facility_uptime_pct}%</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Employment Created</p>
-                  <p className="text-2xl font-bold mt-1">870</p>
-                  <p className="text-xs text-slate-400">65% local workforce</p>
-                </div>
-              </div>
-            </div>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Equivalent to removing {Math.round(environmentalImpact.carbonReduction/4.6).toLocaleString()} cars for a year
+                </p>
+              </CardContent>
+            </Card>
             
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Production & Export</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-slate-500">Current Production</p>
-                  <p className="text-2xl font-bold mt-1">
-                    {Math.round(latestData.production_capacity_mw * latestData.operational_efficiency_pct / 100).toLocaleString()} MW
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {(latestData.operational_efficiency_pct / 100).toFixed(2)} efficiency ratio
-                  </p>
+            <Card className="border-0 shadow-none bg-transparent">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-slate-600 dark:text-slate-400">Energy Savings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                  {environmentalImpact.energySavings.toLocaleString()} MWh
                 </div>
-                <div>
-                  <p className="text-sm text-slate-500">Export Agreements</p>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-sm">European Union</span>
-                      <span className="text-sm font-medium">42,000 tons</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">South Africa</span>
-                      <span className="text-sm font-medium">16,500 tons</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Japan</span>
-                      <span className="text-sm font-medium">8,200 tons</span>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Carbon Offset</p>
-                  <p className="text-2xl font-bold mt-1 text-green-600">125,000 tons CO₂e</p>
-                </div>
-              </div>
-            </div>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Could power {Math.round(environmentalImpact.energySavings * 0.3).toLocaleString()} households annually
+                </p>
+              </CardContent>
+            </Card>
             
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Future Projections</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-slate-500">Capacity Growth (5-year)</p>
-                  <div className="mt-1">
-                    <PredictiveBadge value={215} label="Target Capacity" unit="MW" confidence={0.88} />
-                  </div>
+            <Card className="border-0 shadow-none bg-transparent">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-slate-600 dark:text-slate-400">Water Conservation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                  {environmentalImpact.waterSavings.toLocaleString()}k liters
                 </div>
-                <div>
-                  <p className="text-sm text-slate-500">Investment Growth</p>
-                  <div className="mt-1">
-                    <PredictiveBadge value={42} label="Projected Growth" unit="%" confidence={0.75} />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Market Demand Growth</p>
-                  <div className="mt-1">
-                    <PredictiveBadge value={38} label="Annual Increase" unit="%" confidence={0.82} />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Key Growth Factors</p>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Technology Improvement</span>
-                      <Badge variant="outline" className="bg-teal-50 text-teal-700">High</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Policy Support</span>
-                      <Badge variant="outline" className="bg-teal-50 text-teal-700">High</Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Infrastructure Development</span>
-                      <Badge variant="outline" className="bg-amber-50 text-amber-700">Medium</Badge>
-                    </div>
-                  </div>
-                </div>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Compared to traditional hydrogen production methods
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="mt-6 p-4 rounded-md bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-900/30">
+            <h4 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">Sustainability Metrics</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Efficiency Rating</p>
+                <p className="text-lg font-medium text-slate-900 dark:text-white">AA+</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Lifecycle Assessment</p>
+                <p className="text-lg font-medium text-slate-900 dark:text-white">85/100</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Renewable Input</p>
+                <p className="text-lg font-medium text-slate-900 dark:text-white">97.8%</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Water Usage Ratio</p>
+                <p className="text-lg font-medium text-slate-900 dark:text-white">0.32:1</p>
               </div>
             </div>
           </div>
         </CardContent>
-        <CardFooter className="bg-teal-50 border-t flex justify-between">
-          <div className="text-sm text-slate-500">
-            Source: Namibian Ministry of Mines & Energy, Green Hydrogen Council
-          </div>
-          <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => navigate("/dashboard/charts")}>
-            <LineChart size={14} className="text-teal-600" />
-            <span>View Growth Projections</span>
-          </Button>
-        </CardFooter>
       </Card>
 
-      {/* Technology & Infrastructure */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Technology Assessment</CardTitle>
-                <CardDescription>Current technology implementation status</CardDescription>
-              </div>
-              <Factory className="h-5 w-5 text-slate-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <p className="text-sm font-medium">Electrolyzer Technology</p>
-                  <Badge variant="outline" className="bg-green-50 text-green-700">PEM & Alkaline</Badge>
+      {/* Future Projections */}
+      <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 shadow-sm">
+        <CardHeader>
+          <CardTitle>Strategic Forecasts</CardTitle>
+          <CardDescription>Long-term projections based on current trends and predictive models</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Production Capacity Growth</h3>
+              <div className="space-y-6">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <p className="text-sm font-medium">Current Capacity</p>
+                    <p className="text-sm font-medium">{latestData.production_capacity_mw.toLocaleString()} MW</p>
+                  </div>
+                  <div className="bg-slate-100 dark:bg-slate-800 rounded-full h-3">
+                    <div className="bg-blue-600 dark:bg-blue-500 h-3 rounded-full" style={{ width: '15%' }}></div>
+                  </div>
                 </div>
-                <div className="bg-slate-100 rounded-full h-2.5">
-                  <div className="bg-green-600 h-2.5 rounded-full" style={{ width: '82%' }}></div>
+                
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <p className="text-sm font-medium">2025 Projection</p>
+                    <p className="text-sm font-medium">{trends.projectedCapacity2025.toLocaleString()} MW</p>
+                  </div>
+                  <div className="bg-slate-100 dark:bg-slate-800 rounded-full h-3">
+                    <div className="bg-blue-600 dark:bg-blue-500 h-3 rounded-full" style={{ width: '35%' }}></div>
+                  </div>
                 </div>
-                <div className="flex justify-between text-xs text-slate-500 mt-1">
-                  <span>Developing</span>
-                  <span>Advanced</span>
-                  <span>Cutting-edge</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <p className="text-sm font-medium">Renewable Energy Integration</p>
-                  <Badge variant="outline" className="bg-green-50 text-green-700">Solar & Wind</Badge>
-                </div>
-                <div className="bg-slate-100 rounded-full h-2.5">
-                  <div className="bg-green-600 h-2.5 rounded-full" style={{ width: '78%' }}></div>
-                </div>
-                <div className="flex justify-between text-xs text-slate-500 mt-1">
-                  <span>Limited</span>
-                  <span>Substantial</span>
-                  <span>Complete</span>
+                
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <p className="text-sm font-medium">2030 Projection</p>
+                    <p className="text-sm font-medium">{trends.projectedCapacity2030.toLocaleString()} MW</p>
+                  </div>
+                  <div className="bg-slate-100 dark:bg-slate-800 rounded-full h-3">
+                    <div className="bg-blue-600 dark:bg-blue-500 h-3 rounded-full" style={{ width: '80%' }}></div>
+                  </div>
                 </div>
               </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <p className="text-sm font-medium">Storage Solutions</p>
-                  <Badge variant="outline" className="bg-amber-50 text-amber-700">Developing</Badge>
-                </div>
-                <div className="bg-slate-100 rounded-full h-2.5">
-                  <div className="bg-amber-500 h-2.5 rounded-full" style={{ width: '45%' }}></div>
-                </div>
-                <div className="flex justify-between text-xs text-slate-500 mt-1">
-                  <span>Basic</span>
-                  <span>Intermediate</span>
-                  <span>Advanced</span>
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <p className="text-sm font-medium">Transport Infrastructure</p>
-                  <Badge variant="outline" className="bg-amber-50 text-amber-700">In Progress</Badge>
-                </div>
-                <div className="bg-slate-100 rounded-full h-2.5">
-                  <div className="bg-amber-500 h-2.5 rounded-full" style={{ width: '38%' }}></div>
-                </div>
-                <div className="flex justify-between text-xs text-slate-500 mt-1">
-                  <span>Beginning</span>
-                  <span>Developing</span>
-                  <span>Complete</span>
+              
+              <div className="mt-6">
+                <h4 className="text-md font-medium mb-2">Key Growth Drivers</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200">Policy</Badge>
+                    <span className="text-sm">Government incentives</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200">Technology</Badge>
+                    <span className="text-sm">Electrolyzer efficiency</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200">Market</Badge>
+                    <span className="text-sm">Export agreements</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200">Investment</Badge>
+                    <span className="text-sm">Foreign direct investment</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Alternative Model Projections</CardTitle>
-                <CardDescription>Comparative analysis of different forecasting models</CardDescription>
-              </div>
-              <BarChart3 className="h-5 w-5 text-slate-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {latestData.alternative_model_predictions && (
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Market & Financial Outlook</h3>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Model Type</TableHead>
-                    <TableHead className="text-right">Growth Projection</TableHead>
-                    <TableHead className="text-right">Confidence</TableHead>
-                    <TableHead className="text-right">Key Factors</TableHead>
+                    <TableHead>Metric</TableHead>
+                    <TableHead>1-Year Forecast</TableHead>
+                    <TableHead>5-Year Forecast</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {latestData.alternative_model_predictions.map((model, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell className="font-medium capitalize">{model.model} Model</TableCell>
-                      <TableCell className="text-right">
-                        <span className={model.value >= 0 ? "text-green-600" : "text-red-600"}>
-                          {model.value >= 0 ? "+" : ""}
-                          {model.value.toFixed(1)}%
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">{Math.round(model.confidence * 100)}%</TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="outline" className="text-xs">
-                          {model.model === 'tech-focused' ? 'Technology' : 
-                           model.model === 'policy-driven' ? 'Policy' : 
-                           'Market'}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  <TableRow className="bg-slate-50">
-                    <TableCell className="font-medium">PredictivePulse Model</TableCell>
-                    <TableCell className="text-right">
-                      <span className={latestData.predicted_change && latestData.predicted_change >= 0 ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>
-                        {latestData.predicted_change && latestData.predicted_change >= 0 ? "+" : ""}
-                        {latestData.predicted_change?.toFixed(1)}%
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right font-semibold">{Math.round((latestData.prediction_confidence || 0) * 100)}%</TableCell>
-                    <TableCell className="text-right">
-                      <Badge className="text-xs bg-blue-100 text-blue-800 hover:bg-blue-200">Composite</Badge>
-                    </TableCell>
+                  <TableRow>
+                    <TableCell className="font-medium">Production Cost</TableCell>
+                    <TableCell>$4.80/kg <Badge variant="outline" className="ml-1">-8%</Badge></TableCell>
+                    <TableCell>$2.30/kg <Badge variant="outline" className="ml-1">-52%</Badge></TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Market Demand</TableCell>
+                    <TableCell>+32% <Badge variant="default" className="ml-1 text-xs">High Confidence</Badge></TableCell>
+                    <TableCell>+215% <Badge variant="outline" className="ml-1 text-xs">Medium Confidence</Badge></TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Efficiency</TableCell>
+                    <TableCell>{latestData.operational_efficiency_pct + 5}%</TableCell>
+                    <TableCell>{trends.projectedEfficiency2025}%</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Investment ROI</TableCell>
+                    <TableCell>6.8%</TableCell>
+                    <TableCell>15.2%</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell className="font-medium">Export Market Size</TableCell>
+                    <TableCell>$420M</TableCell>
+                    <TableCell>$2.8B</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+              
+              <div className="mt-6 p-4 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/30">
+                <h4 className="font-medium mb-2">Strategic Recommendations</h4>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start gap-2">
+                    <Scale className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <span>Increase infrastructure investment by 40% within 18 months</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Scale className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <span>Focus on efficiency improvements to reach 85% operational efficiency</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Scale className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <span>Develop export partnerships with EU markets for premium pricing</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-// Helper component for custom prediction badges
-const PredictiveBadge = ({ value, label, unit, confidence }: { value: number, label: string, unit: string, confidence: number }) => {
-  return (
-    <div className="bg-slate-50 border border-slate-200 rounded-md p-2">
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-medium text-slate-700">{label}</span>
-        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-          {Math.round(confidence * 100)}% conf.
-        </Badge>
-      </div>
-      <div className="text-2xl font-bold mt-1 flex items-center gap-1">
-        {value}{unit}
-        <TrendingUp size={16} className="text-green-600 ml-1" />
-      </div>
-    </div>
-  );
-};
+// Helper component for custom prediction badges moved to separate component file
+

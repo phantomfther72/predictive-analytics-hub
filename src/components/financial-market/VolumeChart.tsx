@@ -16,6 +16,7 @@ export const VolumeChart: React.FC<VolumeChartProps> = ({ data, isLoading = fals
   const isMobile = useIsMobile();
   
   // Always process chart data regardless of loading state
+  // Move useMemo hook before any conditional returns to prevent React hook errors
   const chartData = React.useMemo(() => {
     if (!data) return [];
     return [...data]

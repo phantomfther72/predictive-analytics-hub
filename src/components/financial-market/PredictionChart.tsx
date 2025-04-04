@@ -16,6 +16,7 @@ export const PredictionChart: React.FC<PredictionChartProps> = ({ data, isLoadin
   const isMobile = useIsMobile();
   
   // Always process chart data regardless of loading state
+  // Move useMemo hook before any conditional returns to prevent React hook errors
   const chartData = React.useMemo(() => {
     if (!data) return [];
     return [...data]
@@ -28,10 +29,6 @@ export const PredictionChart: React.FC<PredictionChartProps> = ({ data, isLoadin
       }));
   }, [data]);
 
-  if (isLoading) {
-    return <Skeleton className="h-[300px] w-full rounded-lg" />;
-  }
-
   const formatPrice = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -40,6 +37,10 @@ export const PredictionChart: React.FC<PredictionChartProps> = ({ data, isLoadin
       maximumFractionDigits: 0
     }).format(value);
   };
+
+  if (isLoading) {
+    return <Skeleton className="h-[300px] w-full rounded-lg" />;
+  }
 
   return (
     <Card className="bg-slate-950/50 border-slate-800 shadow-lg animate-fade-in">

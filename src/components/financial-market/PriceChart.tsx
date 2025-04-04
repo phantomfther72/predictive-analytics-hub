@@ -26,12 +26,20 @@ export const PriceChart: React.FC<PriceChartProps> = ({
   assetData 
 }) => {
   const isMobile = useIsMobile();
-  const [visibleAssets, setVisibleAssets] = React.useState<string[]>(
-    Object.keys(assetData).length ? Object.keys(assetData) : []
-  );
+  const [visibleAssets, setVisibleAssets] = React.useState<string[]>([]);
+  
+  // Always call useMemo, but with the correct dependency
+  const allChartData = React.useMemo(() => {
+    if (!financialData) return [];
+    
+    return [...financialData].sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
+  }, [financialData]);
 
+  // Update visibleAssets when assetData changes
   React.useEffect(() => {
-    if (Object.keys(assetData).length) {
+    if (Object.keys(assetData).length > 0) {
       setVisibleAssets(Object.keys(assetData));
     }
   }, [assetData]);
@@ -47,15 +55,6 @@ export const PriceChart: React.FC<PriceChartProps> = ({
   if (isLoading) {
     return <Skeleton className="h-[400px] w-full rounded-lg" />;
   }
-
-  // Combine all data for the chart and sort by timestamp
-  const allChartData = React.useMemo(() => {
-    if (!financialData) return [];
-    
-    return [...financialData].sort(
-      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
-  }, [financialData]);
 
   const formatPrice = (value: number) => {
     return new Intl.NumberFormat('en-US', {

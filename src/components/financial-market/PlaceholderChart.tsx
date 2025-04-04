@@ -3,7 +3,6 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { CHART_COLORS } from "../dashboard/charts/chart-constants";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Info } from "lucide-react";
 
 interface PlaceholderChartProps {
@@ -17,18 +16,14 @@ export const PlaceholderChart: React.FC<PlaceholderChartProps> = ({
   description = "More data will be available soon", 
   comingSoon = true 
 }) => {
-  const isMobile = useIsMobile();
-  
   // Generate some placeholder data for visual appeal
-  const generatePlaceholderData = () => {
+  const placeholderData = React.useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => ({
       name: `Point ${i + 1}`,
       value: Math.floor(Math.random() * 100) + 20,
       forecast: Math.floor(Math.random() * 100) + 30
     }));
-  };
-
-  const placeholderData = React.useMemo(() => generatePlaceholderData(), []);
+  }, []);
 
   return (
     <Card className="bg-slate-950/50 border-slate-800 shadow-lg animate-fade-in">
@@ -46,7 +41,7 @@ export const PlaceholderChart: React.FC<PlaceholderChartProps> = ({
           )}
         </div>
       </CardHeader>
-      <CardContent className={`h-[${isMobile ? '300px' : '400px'}]`}>
+      <CardContent className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={placeholderData}>
             <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />

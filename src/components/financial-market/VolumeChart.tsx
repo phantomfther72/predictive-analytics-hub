@@ -15,11 +15,7 @@ interface VolumeChartProps {
 export const VolumeChart: React.FC<VolumeChartProps> = ({ data, isLoading = false }) => {
   const isMobile = useIsMobile();
   
-  if (isLoading) {
-    return <Skeleton className="h-[300px] w-full rounded-lg" />;
-  }
-
-  // Filter to show only BTC data and ensure it's sorted by date
+  // Always process chart data regardless of loading state
   const chartData = React.useMemo(() => {
     if (!data) return [];
     return [...data]
@@ -33,13 +29,17 @@ export const VolumeChart: React.FC<VolumeChartProps> = ({ data, isLoading = fals
     return `$${value.toLocaleString()}`;
   };
 
+  if (isLoading) {
+    return <Skeleton className="h-[300px] w-full rounded-lg" />;
+  }
+
   return (
     <Card className="bg-slate-950/50 border-slate-800 shadow-lg animate-fade-in">
       <CardHeader className="pb-2">
         <CardTitle className="text-white font-poppins tracking-tight">Trading Volume</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={`h-[${isMobile ? '250px' : '300px'}]`}>
+        <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />

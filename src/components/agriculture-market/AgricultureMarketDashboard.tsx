@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AgricultureMarketData } from "@/types/market";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronRight, LineChart, TrendingUp, Droplets, Leaf, Sun, Calendar, Filter, Download, ChevronDown, BarChart } from "lucide-react";
+import { ChevronRight, LineChart as ChartIcon, TrendingUp, Droplets, Leaf, Sun, Calendar, Filter, Download, ChevronDown, BarChart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PredictionBadge from "@/components/market-data/PredictionBadge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -198,7 +197,7 @@ export const AgricultureMarketDashboard: React.FC<AgricultureMarketDashboardProp
       toast({
         title: "Data Export Complete",
         description: "Your data has been exported successfully",
-        variant: "success",
+        variant: "default", // Changed from "success" to "default"
       });
     }, 1500);
   };
@@ -221,7 +220,7 @@ export const AgricultureMarketDashboard: React.FC<AgricultureMarketDashboardProp
           className="flex items-center gap-2"
           onClick={() => navigate("/dashboard/charts")}
         >
-          <LineChart size={16} />
+          <ChartIcon size={16} />
           <span>Interactive Charts</span>
           <ChevronRight size={16} />
         </Button>
@@ -569,7 +568,7 @@ export const AgricultureMarketDashboard: React.FC<AgricultureMarketDashboardProp
             Source: Namibian Ministry of Agriculture, Water and Land Reform
           </div>
           <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => navigate("/dashboard/charts")}>
-            <LineChart size={14} />
+            <ChartIcon size={14} />
             <span>View Crop Trends</span>
           </Button>
         </CardFooter>
@@ -716,116 +715,3 @@ export const AgricultureMarketDashboard: React.FC<AgricultureMarketDashboardProp
             <div>
               <h3 className="text-lg font-semibold mb-4">Fertilizer Usage</h3>
               <div className="space-y-4">
-                <div className="flex justify-between">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Average Usage</p>
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{latestData.fertilizer_usage_kg_ha} kg/ha</p>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Nitrogen Content</p>
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{Math.round(latestData.fertilizer_usage_kg_ha * 0.32)} kg/ha</p>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Phosphorus Content</p>
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{Math.round(latestData.fertilizer_usage_kg_ha * 0.26)} kg/ha</p>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Potassium Content</p>
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{Math.round(latestData.fertilizer_usage_kg_ha * 0.18)} kg/ha</p>
-                </div>
-                <div className="pt-2">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Fertilizer Efficiency</p>
-                  <div className="bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 mt-2">
-                    <div className="bg-emerald-600 dark:bg-emerald-500 h-2.5 rounded-full" style={{ width: '72%' }}></div>
-                  </div>
-                  <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    <span>Low</span>
-                    <span>Medium</span>
-                    <span>High</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Input Cost Analysis</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Input Type</TableHead>
-                    <TableHead className="text-right">Cost/ha</TableHead>
-                    <TableHead className="text-right">% of Total</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>Fertilizer</TableCell>
-                    <TableCell className="text-right">$180</TableCell>
-                    <TableCell className="text-right">42%</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Seeds</TableCell>
-                    <TableCell className="text-right">$85</TableCell>
-                    <TableCell className="text-right">20%</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Pesticides</TableCell>
-                    <TableCell className="text-right">$65</TableCell>
-                    <TableCell className="text-right">15%</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Irrigation</TableCell>
-                    <TableCell className="text-right">$55</TableCell>
-                    <TableCell className="text-right">13%</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>Labor</TableCell>
-                    <TableCell className="text-right">$45</TableCell>
-                    <TableCell className="text-right">10%</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Input-Yield Correlation</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Fertilizer Efficiency Ratio</p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{(latestData.yield_per_hectare / (latestData.fertilizer_usage_kg_ha / 100)).toFixed(2)}</p>
-                  <p className="text-xs text-slate-400">tons yield per 100kg fertilizer</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Optimal Application Rate</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">{Math.round(latestData.fertilizer_usage_kg_ha * 1.08)} kg/ha</Badge>
-                    <span className="text-sm text-slate-500">recommended</span>
-                  </div>
-                </div>
-                
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-md border border-slate-200 dark:border-slate-700 mt-2">
-                  <h4 className="text-sm font-medium mb-2">Optimization Recommendations</h4>
-                  <ul className="space-y-1 text-sm">
-                    <li className="flex items-start gap-2">
-                      <ChevronRight size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                      <span>Increase nitrogen application by 8%</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <ChevronRight size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                      <span>Time application with rainfall forecast</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <ChevronRight size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                      <span>Switch to precision application methods</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-

@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { GreenHydrogenMetrics } from "@/types/market";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronRight, LineChart, TrendingUp, Zap, BarChart3, Droplets, Factory, Calendar, Filter, Download, Scale, Leaf } from "lucide-react";
+import { ChevronRight, LineChart as ChartIcon, TrendingUp, Zap, BarChart3, Droplets, Factory, Calendar, Filter, Download, Scale, Leaf } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PredictionBadge from "@/components/market-data/PredictionBadge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -34,10 +33,8 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
     return <p>No green hydrogen market data available.</p>;
   }
 
-  // Get latest data
   const latestData = data[0];
   
-  // Filter data based on selected timeframe
   const filteredData = React.useMemo(() => {
     if (selectedTimeframe === "ALL") return data;
     
@@ -62,7 +59,6 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
     return data.filter(item => new Date(item.timestamp) >= cutoffDate);
   }, [data, selectedTimeframe]);
   
-  // Process chart data for production capacity over time
   const capacityChartData = React.useMemo(() => {
     return filteredData.map(item => ({
       timestamp: item.timestamp,
@@ -71,44 +67,39 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
     })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   }, [filteredData]);
   
-  // Process chart data for operational efficiency over time
   const efficiencyChartData = React.useMemo(() => {
     return filteredData.map(item => ({
       timestamp: item.timestamp,
       value: item.operational_efficiency_pct,
-      target: 85 // Target efficiency percentage
+      target: 85
     })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   }, [filteredData]);
   
-  // Process chart data for investment over time
   const investmentChartData = React.useMemo(() => {
     return filteredData.map(item => ({
       timestamp: item.timestamp,
-      value: item.investment_amount_usd / 1000000, // Convert to millions
-      roi: (item.investment_amount_usd / 1000000) * (item.operational_efficiency_pct / 100) * 0.15 // Simplified ROI calculation
+      value: item.investment_amount_usd / 1000000,
+      roi: (item.investment_amount_usd / 1000000) * (item.operational_efficiency_pct / 100) * 0.15
     })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   }, [filteredData]);
   
-  // Process chart data for market demand
   const demandChartData = React.useMemo(() => {
     return filteredData.map(item => ({
       timestamp: item.timestamp,
       value: item.market_demand_tons,
-      supply: item.production_capacity_mw * 20 // Simplified conversion from MW to tons
+      supply: item.production_capacity_mw * 20
     })).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
   }, [filteredData]);
   
-  // Calculate environmental impact metrics
   const environmentalImpact = React.useMemo(() => {
     const totalCapacity = filteredData.reduce((sum, item) => sum + item.production_capacity_mw, 0);
     return {
-      carbonReduction: Math.round(totalCapacity * 8.1), // Tons of CO2 offset per MW
-      energySavings: Math.round(totalCapacity * 3.4), // MWh saved
-      waterSavings: Math.round(totalCapacity * 2.6) // Thousand liters of water saved
+      carbonReduction: Math.round(totalCapacity * 8.1),
+      energySavings: Math.round(totalCapacity * 3.4),
+      waterSavings: Math.round(totalCapacity * 2.6)
     };
   }, [filteredData]);
   
-  // Calculate trends and forecasts
   const trends = React.useMemo(() => {
     const capacityValues = filteredData.map(item => item.production_capacity_mw);
     const efficiencyValues = filteredData.map(item => item.operational_efficiency_pct);
@@ -136,24 +127,21 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
     };
   }, [filteredData, latestData]);
   
-  // Handle export data
   const handleExportData = () => {
     toast({
       title: "Data Export Initiated",
       description: "Your Green Hydrogen market data export is being prepared",
     });
     
-    // In a real app, this would trigger a download of data
     setTimeout(() => {
       toast({
         title: "Data Export Complete",
         description: "Your data has been exported successfully",
-        variant: "success",
+        variant: "default",
       });
     }, 1500);
   };
   
-  // Format timestamps for display
   const formatDate = (timestamp: string) => {
     return new Date(timestamp).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -171,13 +159,12 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
           className="flex items-center gap-2"
           onClick={() => navigate("/dashboard/charts")}
         >
-          <LineChart size={16} />
+          <ChartIcon size={16} />
           <span>Interactive Charts</span>
           <ChevronRight size={16} />
         </Button>
       </div>
 
-      {/* Filters Row */}
       <div className="flex flex-col md:flex-row justify-between gap-4 bg-slate-50 dark:bg-slate-900/30 p-4 rounded-lg border border-slate-200 dark:border-slate-800">
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
@@ -218,7 +205,6 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
         </Button>
       </div>
 
-      {/* Key Performance Indicators */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 shadow-sm">
           <CardHeader className="pb-2">
@@ -297,7 +283,6 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
         </Card>
       </div>
 
-      {/* Interactive Charts Section */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 shadow-sm">
         <CardHeader>
           <CardTitle>Performance Analytics</CardTitle>
@@ -476,7 +461,6 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
         </CardContent>
       </Card>
 
-      {/* Environmental Impact */}
       <Card className="border-2 border-emerald-100 dark:border-emerald-900/30 bg-white dark:bg-slate-950/50">
         <CardHeader className="bg-emerald-50 dark:bg-emerald-900/20">
           <div className="flex items-center justify-between">
@@ -556,7 +540,6 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
         </CardContent>
       </Card>
 
-      {/* Future Projections */}
       <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/50 shadow-sm">
         <CardHeader>
           <CardTitle>Strategic Forecasts</CardTitle>
@@ -684,6 +667,3 @@ export const GreenHydrogenMarketDashboard: React.FC<GreenHydrogenMarketDashboard
     </div>
   );
 };
-
-// Helper component for custom prediction badges moved to separate component file
-

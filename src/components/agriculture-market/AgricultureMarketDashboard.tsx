@@ -1,10 +1,11 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AgricultureMarketData } from "@/types/market";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronRight, LineChart as ChartIcon, TrendingUp, Droplets, Leaf, Sun, Calendar, Filter, Download, ChevronDown, BarChart } from "lucide-react";
+import { ChevronRight, LineChart as ChartIconLine, TrendingUp, Droplets, Leaf, Sun, Calendar, Filter, Download, ChevronDown, BarChart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PredictionBadge from "@/components/market-data/PredictionBadge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -220,7 +221,7 @@ export const AgricultureMarketDashboard: React.FC<AgricultureMarketDashboardProp
           className="flex items-center gap-2"
           onClick={() => navigate("/dashboard/charts")}
         >
-          <ChartIcon size={16} />
+          <ChartIconLine size={16} />
           <span>Interactive Charts</span>
           <ChevronRight size={16} />
         </Button>
@@ -568,7 +569,7 @@ export const AgricultureMarketDashboard: React.FC<AgricultureMarketDashboardProp
             Source: Namibian Ministry of Agriculture, Water and Land Reform
           </div>
           <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => navigate("/dashboard/charts")}>
-            <ChartIcon size={14} />
+            <ChartIconLine size={14} />
             <span>View Crop Trends</span>
           </Button>
         </CardFooter>
@@ -715,3 +716,12 @@ export const AgricultureMarketDashboard: React.FC<AgricultureMarketDashboardProp
             <div>
               <h3 className="text-lg font-semibold mb-4">Fertilizer Usage</h3>
               <div className="space-y-4">
+                <p>Fertilizer and input analysis details would go here.</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};

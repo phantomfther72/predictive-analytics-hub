@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -12,6 +12,7 @@ import {
   Line,
   ComposedChart,
   Area,
+  AnimationTiming,
 } from "recharts";
 import { ChartTooltip } from "./ChartTooltip";
 import type { MiningSectorInsight } from "@/types/market";
@@ -19,8 +20,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { Payload } from "recharts/types/component/DefaultLegendContent";
 import { ModelSettings } from "../charts/use-chart-state";
 import { Button } from "@/components/ui/button";
-import { BarChart3, LineChart as LineChartIcon, Activity, TrendingUp } from "lucide-react";
+import { BarChart3, LineChart as LineChartIcon, Activity, TrendingUp, CircleChevronRight } from "lucide-react";
 import { formatCurrency, formatNumber, formatPercentage } from "@/components/mining-market/utils/formatter";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MiningChartProps {
   data?: MiningSectorInsight[];
@@ -44,13 +46,61 @@ export function MiningChart({
   description
 }: MiningChartProps) {
   const [chartType, setChartType] = useState<'bar' | 'line' | 'composed'>('bar');
+  const [animationDuration, setAnimationDuration] = useState<number>(900);
+  const [animationActive, setAnimationActive] = useState<boolean>(true);
+  const chartRef = useRef<HTMLDivElement>(null);
+  
+  // Animation timing effect for rendering
+  useEffect(() => {
+    // Temporarily disable animation to prevent flicker when switching chart types
+    setAnimationActive(false);
+    const timer = setTimeout(() => setAnimationActive(true), 50);
+    return () => clearTimeout(timer);
+  }, [chartType]);
+  
+  // Chart transition effect
+  const handleChartTypeChange = (type: 'bar' | 'line' | 'composed') => {
+    if (type === chartType) return;
+    
+    // Apply scale-down effect to current chart before changing
+    if (chartRef.current) {
+      chartRef.current.style.transition = 'opacity 300ms, transform 300ms';
+      chartRef.current.style.opacity = '0';
+      chartRef.current.style.transform = 'scale(0.98)';
+      
+      setTimeout(() => {
+        setChartType(type);
+        
+        // Apply scale-up effect to new chart
+        if (chartRef.current) {
+          setTimeout(() => {
+            chartRef.current.style.opacity = '1';
+            chartRef.current.style.transform = 'scale(1)';
+          }, 50);
+        }
+      }, 300);
+    } else {
+      setChartType(type);
+    }
+  };
   
   if (isLoading) {
-    return <Skeleton className="h-[400px] w-full" />;
+    return (
+      <div className="animate-pulse">
+        <Skeleton className="h-[400px] w-full rounded-lg" />
+      </div>
+    );
   }
 
   if (!data?.length) {
-    return <div>No mining data available</div>;
+    return (
+      <div className="flex items-center justify-center h-[400px] border border-dashed border-slate-200 rounded-lg bg-slate-50">
+        <div className="text-center text-slate-500">
+          <TrendingUp className="mx-auto h-10 w-10 mb-3 text-slate-300" />
+          <p>No mining data available</p>
+        </div>
+      </div>
+    );
   }
 
   const renderTooltipContent = (props: any) => {
@@ -59,7 +109,7 @@ export function MiningChart({
     if (!active || !payload || !payload.length) return null;
     
     return (
-      <div className="bg-white p-3 rounded shadow-lg border border-slate-200">
+      <div className="bg-white p-3 rounded shadow-lg border border-slate-200 animate-fade-in">
         <p className="font-medium text-slate-900 mb-2">{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={`item-${index}`} className="flex items-center gap-2 text-sm">
@@ -83,6 +133,18 @@ export function MiningChart({
     );
   };
 
+  // Animation configuration for charts
+  const animationConfig = {
+    isAnimationActive: animationActive,
+    animationDuration: animationDuration,
+    animationEasing: 'ease-in-out' as AnimationTiming
+  };
+  
+  // Animation for data elements depending on chart type
+  const getAnimationDelay = (index: number): number => {
+    return chartType === 'bar' ? index * 50 : 0;
+  };
+
   const renderChart = () => {
     switch(chartType) {
       case 'line':
@@ -93,12 +155,20 @@ export function MiningChart({
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="commodity" />
-              <YAxis yAxisId="left" orientation="left" />
+              <XAxis 
+                dataKey="commodity" 
+                {...animationConfig}
+              />
+              <YAxis 
+                yAxisId="left" 
+                orientation="left" 
+                {...animationConfig}
+              />
               <YAxis
                 yAxisId="right"
                 orientation="right"
                 tickFormatter={(value) => formatCurrency(value, 'compact')}
+                {...animationConfig}
               />
               <Tooltip content={renderTooltipContent} />
               <Legend onClick={onLegendClick} />
@@ -112,7 +182,8 @@ export function MiningChart({
                   yAxisId="left"
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
+                  activeDot={{ r: 6, fill: "#0EA5E9", stroke: "#fff", strokeWidth: 2 }}
+                  {...animationConfig}
                 />
               )}
               
@@ -125,7 +196,8 @@ export function MiningChart({
                   yAxisId="right"
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
+                  activeDot={{ r: 6, fill: "#10B981", stroke: "#fff", strokeWidth: 2 }}
+                  {...animationConfig}
                 />
               )}
               
@@ -138,7 +210,8 @@ export function MiningChart({
                   yAxisId="left"
                   strokeWidth={2}
                   dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
+                  activeDot={{ r: 6, fill: "#8B5CF6", stroke: "#fff", strokeWidth: 2 }}
+                  {...animationConfig}
                 />
               )}
               
@@ -155,6 +228,7 @@ export function MiningChart({
                       strokeWidth={1.5}
                       strokeDasharray="5 5"
                       dot={{ r: 3 }}
+                      {...animationConfig}
                     />
                   )
                 ))
@@ -171,12 +245,20 @@ export function MiningChart({
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="commodity" />
-              <YAxis yAxisId="left" orientation="left" />
+              <XAxis 
+                dataKey="commodity"
+                {...animationConfig}
+              />
+              <YAxis 
+                yAxisId="left" 
+                orientation="left"
+                {...animationConfig}
+              />
               <YAxis
                 yAxisId="right"
                 orientation="right"
                 tickFormatter={(value) => formatCurrency(value, 'compact')}
+                {...animationConfig}
               />
               <Tooltip content={renderTooltipContent} />
               <Legend onClick={onLegendClick} />
@@ -187,6 +269,9 @@ export function MiningChart({
                   name="Production (MT)"
                   fill="#0EA5E9"
                   yAxisId="left"
+                  {...animationConfig}
+                  animationBegin={getAnimationDelay(0)}
+                  radius={[4, 4, 0, 0]}
                 />
               )}
               
@@ -199,6 +284,9 @@ export function MiningChart({
                   yAxisId="right"
                   strokeWidth={2}
                   dot={{ r: 4 }}
+                  activeDot={{ r: 6, fill: "#10B981", stroke: "#fff", strokeWidth: 2 }}
+                  {...animationConfig}
+                  animationBegin={getAnimationDelay(1)}
                 />
               )}
               
@@ -211,11 +299,13 @@ export function MiningChart({
                   fillOpacity={0.3}
                   stroke="#8B5CF6"
                   yAxisId="left"
+                  {...animationConfig}
+                  animationBegin={getAnimationDelay(2)}
                 />
               )}
               
               {enabledModels.length > 0 && simulationMode && 
-                enabledModels.filter(m => m.id !== "primary").map(model => (
+                enabledModels.filter(m => m.id !== "primary").map((model, idx) => (
                   selectedMetrics.includes("market_value_usd") && (
                     <Line
                       key={`${model.id}-value`}
@@ -227,6 +317,8 @@ export function MiningChart({
                       strokeWidth={1.5}
                       strokeDasharray="5 5"
                       dot={{ r: 3 }}
+                      {...animationConfig}
+                      animationBegin={getAnimationDelay(3 + idx)}
                     />
                   )
                 ))
@@ -243,12 +335,20 @@ export function MiningChart({
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="commodity" />
-              <YAxis yAxisId="left" orientation="left" />
+              <XAxis 
+                dataKey="commodity" 
+                {...animationConfig}
+              />
+              <YAxis 
+                yAxisId="left" 
+                orientation="left"
+                {...animationConfig}
+              />
               <YAxis
                 yAxisId="right"
                 orientation="right"
                 tickFormatter={(value) => formatCurrency(value, 'compact')}
+                {...animationConfig}
               />
               <Tooltip content={renderTooltipContent} />
               <Legend onClick={onLegendClick} />
@@ -259,6 +359,9 @@ export function MiningChart({
                   name="Production (MT)"
                   fill="#0EA5E9"
                   yAxisId="left"
+                  {...animationConfig}
+                  animationBegin={getAnimationDelay(0)}
+                  radius={[4, 4, 0, 0]}
                 />
               )}
               
@@ -268,6 +371,9 @@ export function MiningChart({
                   name="Market Value (USD)"
                   fill="#10B981"
                   yAxisId="right"
+                  {...animationConfig}
+                  animationBegin={getAnimationDelay(1)}
+                  radius={[4, 4, 0, 0]}
                 />
               )}
               
@@ -277,11 +383,14 @@ export function MiningChart({
                   name="Export Growth (%)"
                   fill="#8B5CF6"
                   yAxisId="left"
+                  {...animationConfig}
+                  animationBegin={getAnimationDelay(2)}
+                  radius={[4, 4, 0, 0]}
                 />
               )}
               
               {enabledModels.length > 0 && simulationMode && 
-                enabledModels.filter(m => m.id !== "primary").map(model => (
+                enabledModels.filter(m => m.id !== "primary").map((model, idx) => (
                   selectedMetrics.includes("market_value_usd") && (
                     <Bar
                       key={`${model.id}-value`}
@@ -290,6 +399,9 @@ export function MiningChart({
                       fill={model.color}
                       yAxisId="right"
                       opacity={0.7}
+                      {...animationConfig}
+                      animationBegin={getAnimationDelay(3 + idx)}
+                      radius={[4, 4, 0, 0]}
                     />
                   )
                 ))
@@ -313,8 +425,8 @@ export function MiningChart({
         <Button 
           variant={chartType === 'bar' ? 'default' : 'outline'} 
           size="sm" 
-          onClick={() => setChartType('bar')}
-          className="flex items-center gap-1"
+          onClick={() => handleChartTypeChange('bar')}
+          className="flex items-center gap-1 transition-all duration-200"
         >
           <BarChart3 size={14} />
           <span className="hidden sm:inline">Bar</span>
@@ -322,8 +434,8 @@ export function MiningChart({
         <Button 
           variant={chartType === 'line' ? 'default' : 'outline'} 
           size="sm" 
-          onClick={() => setChartType('line')}
-          className="flex items-center gap-1"
+          onClick={() => handleChartTypeChange('line')}
+          className="flex items-center gap-1 transition-all duration-200"
         >
           <LineChartIcon size={14} />
           <span className="hidden sm:inline">Line</span>
@@ -331,15 +443,32 @@ export function MiningChart({
         <Button 
           variant={chartType === 'composed' ? 'default' : 'outline'} 
           size="sm" 
-          onClick={() => setChartType('composed')}
-          className="flex items-center gap-1"
+          onClick={() => handleChartTypeChange('composed')}
+          className="flex items-center gap-1 transition-all duration-200"
         >
           <Activity size={14} />
           <span className="hidden sm:inline">Mixed</span>
         </Button>
       </div>
       
-      {renderChart()}
+      <div 
+        ref={chartRef} 
+        className="transition-all duration-300 ease-in-out" 
+        style={{ opacity: 1, transform: 'scale(1)' }}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={chartType}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="rounded-lg overflow-hidden"
+          >
+            {renderChart()}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import {
   ResponsiveContainer,
@@ -12,7 +11,6 @@ import {
   Line,
   ComposedChart,
   Area,
-  AnimationTiming,
 } from "recharts";
 import { ChartTooltip } from "./ChartTooltip";
 import type { MiningSectorInsight } from "@/types/market";
@@ -50,19 +48,15 @@ export function MiningChart({
   const [animationActive, setAnimationActive] = useState<boolean>(true);
   const chartRef = useRef<HTMLDivElement>(null);
   
-  // Animation timing effect for rendering
   useEffect(() => {
-    // Temporarily disable animation to prevent flicker when switching chart types
     setAnimationActive(false);
     const timer = setTimeout(() => setAnimationActive(true), 50);
     return () => clearTimeout(timer);
   }, [chartType]);
   
-  // Chart transition effect
   const handleChartTypeChange = (type: 'bar' | 'line' | 'composed') => {
     if (type === chartType) return;
     
-    // Apply scale-down effect to current chart before changing
     if (chartRef.current) {
       chartRef.current.style.transition = 'opacity 300ms, transform 300ms';
       chartRef.current.style.opacity = '0';
@@ -71,7 +65,6 @@ export function MiningChart({
       setTimeout(() => {
         setChartType(type);
         
-        // Apply scale-up effect to new chart
         if (chartRef.current) {
           setTimeout(() => {
             chartRef.current.style.opacity = '1';
@@ -83,7 +76,7 @@ export function MiningChart({
       setChartType(type);
     }
   };
-  
+
   if (isLoading) {
     return (
       <div className="animate-pulse">
@@ -133,14 +126,12 @@ export function MiningChart({
     );
   };
 
-  // Animation configuration for charts
   const animationConfig = {
     isAnimationActive: animationActive,
     animationDuration: animationDuration,
-    animationEasing: 'ease-in-out' as AnimationTiming
+    animationEasing: 'ease-in-out' as const
   };
   
-  // Animation for data elements depending on chart type
   const getAnimationDelay = (index: number): number => {
     return chartType === 'bar' ? index * 50 : 0;
   };

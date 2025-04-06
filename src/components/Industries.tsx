@@ -34,7 +34,7 @@ const industries = [
     description:
       "Stay ahead of crypto market movements with real-time tracking and predictive analysis.",
     type: "cryptocurrency" as const,
-    route: "/dashboard/industry/cryptocurrency"
+    route: "/cryptocurrency-market"
   },
   {
     icon: Zap,

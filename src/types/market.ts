@@ -1,4 +1,3 @@
-
 export type TimeRange = "1D" | "7D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
 
 export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen" | "financial";
@@ -14,6 +13,10 @@ export type PredictionFactors = {
   policy_support?: number;
   environmental_impact?: number;
   energy_efficiency?: number;
+  network_activity?: number;
+  development_activity?: number;
+  institutional_adoption?: number;
+  regulatory_risk?: number;
 };
 
 export type AlternativeModelPrediction = {
@@ -208,7 +211,31 @@ export type GreenHydrogenMetrics = {
   research_development_investment_usd?: number;
   facility_count?: number;
   production_scale?: "Pilot" | "Demonstration" | "Commercial" | "Industrial";
-  environmental_impact_score?: number; // 0-100
+  environmental_impact_score?: number; // 0-100;
+};
+
+export type CryptocurrencyData = {
+  id: string;
+  symbol: string;
+  name: string;
+  current_price_usd: number;
+  market_cap_usd: number;
+  volume_24h_usd: number;
+  circulating_supply: number;
+  total_supply: number | null;
+  max_supply: number | null;
+  price_change_percentage_24h: number;
+  price_change_percentage_7d: number;
+  price_change_percentage_30d: number;
+  all_time_high_usd: number;
+  all_time_high_date: string;
+  timestamp: string;
+  predicted_change: number | null;
+  prediction_timestamp: string;
+  prediction_confidence: number;
+  prediction_explanation: string | null;
+  prediction_factors: PredictionFactors | null;
+  alternative_model_predictions?: AlternativeModelPrediction[];
 };
 
 export type ModelSettings = {

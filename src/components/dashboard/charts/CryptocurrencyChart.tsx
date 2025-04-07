@@ -411,13 +411,11 @@ export function CryptocurrencyChart({
                   dataKey="price_change_percentage_24h"
                   name="24h Change (%)"
                   fill="#10B981"
-                  style={(entry: any) => ({
-                    fill: entry.price_change_percentage_24h >= 0 ? "#10B981" : "#EF4444"
-                  })}
                   yAxisId="left"
                   {...animationConfig}
                   animationBegin={getAnimationDelay(2)}
                   radius={[4, 4, 0, 0]}
+                  className="price-change-bar"
                 />
               )}
               
@@ -622,6 +620,15 @@ export function CryptocurrencyChart({
           </motion.div>
         </AnimatePresence>
       </div>
+      
+      <style jsx>{`
+        .price-change-bar[data-value-positive="true"] {
+          fill: #10B981;
+        }
+        .price-change-bar[data-value-positive="false"] {
+          fill: #EF4444;
+        }
+      `}</style>
     </div>
   );
 }

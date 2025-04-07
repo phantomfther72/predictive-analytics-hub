@@ -10,22 +10,26 @@ export const useCryptocurrencyData = () => {
   return useQuery({
     queryKey: ["cryptocurrencyData"],
     queryFn: async () => {
-      // Fix: Using financial_market_metrics table with a filter for cryptocurrency assets
+      // Using financial_market_metrics table with a filter for cryptocurrency assets
       const { data, error } = await supabase
         .from("financial_market_metrics")
         .select("*")
-        .eq("asset_type", "cryptocurrency") // Assuming there's an asset_type column to filter by
-        .order("market_cap_usd", { ascending: false });
+        .eq("asset_type", "cryptocurrency");
 
       if (error) {
         handleError("Failed to fetch cryptocurrency data", error);
+        return [];
+      }
+
+      if (!data || data.length === 0) {
+        return [];
       }
 
       // Transform the financial market data to match the cryptocurrency data structure
-      return (data as any[]).map(item => ({
+      const cryptoData = data.map(item => ({
         id: item.id,
-        symbol: item.asset.split('-')[0] || item.asset, // Assuming asset might be in format "BTC-USD"
-        name: getCryptoName(item.asset),
+        symbol: (item.asset || "").split('-')[0] || item.asset, 
+        name: getCryptoName(item.asset || ""),
         current_price_usd: item.current_price,
         market_cap_usd: item.volume * 2, // Simple approximation for the demo
         volume_24h_usd: item.volume,
@@ -47,7 +51,9 @@ export const useCryptocurrencyData = () => {
           { id: "momentum-based", multiplier: 1.2, confidenceModifier: 0.85 },
           { id: "sentiment-driven", multiplier: 0.8, confidenceModifier: 0.75 }
         ])
-      })) as CryptocurrencyData[];
+      }));
+
+      return cryptoData as CryptocurrencyData[];
     },
   });
 };

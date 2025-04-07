@@ -106,7 +106,7 @@ For detailed documentation on the data models, API integration, and component st
 
 Contact
 
-For any questions or support, please contact your.email@example.com.
+For any questions or support, please contact your. Alfredjaftha712@gmail.com.
 
 
 ---

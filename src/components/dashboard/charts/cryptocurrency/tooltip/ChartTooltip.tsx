@@ -20,9 +20,10 @@ export interface ChartTooltipProps {
   };
 }
 
-export const ChartTooltip: React.FC = () => {
-  // This function returns the actual tooltip component function
-  return (props: ChartTooltipProps) => {
+// Creating the tooltip component that returns the actual function for Recharts to use
+export const ChartTooltip = () => {
+  // This component returns a function that Recharts will use as the tooltip content renderer
+  return React.memo((props: ChartTooltipProps) => {
     const { active, payload, label, prediction } = props;
     
     if (!active || !payload || !payload.length) {
@@ -47,5 +48,5 @@ export const ChartTooltip: React.FC = () => {
         {prediction && <PredictionDetails prediction={prediction} />}
       </div>
     );
-  };
+  });
 };

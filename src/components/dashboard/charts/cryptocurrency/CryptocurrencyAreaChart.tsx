@@ -12,6 +12,7 @@ import {
   Line
 } from "recharts";
 import { BaseChartProps } from "./types";
+import { chartColors, chartGradients, chartStyles, formatPrice, formatMarketCap } from "./utils/chart-styles";
 
 export function CryptocurrencyAreaChart({
   data,
@@ -29,42 +30,38 @@ export function CryptocurrencyAreaChart({
         data={data}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#2a3042" opacity={0.2} />
+        <CartesianGrid {...chartStyles.cartesianGridStyle} />
         <defs>
-          <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+          <linearGradient id={chartGradients.price.id} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={chartGradients.price.stopColor} stopOpacity={0.8}/>
+            <stop offset="95%" stopColor={chartGradients.price.stopColor} stopOpacity={0}/>
           </linearGradient>
-          <linearGradient id="colorMarketCap" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+          <linearGradient id={chartGradients.marketCap.id} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={chartGradients.marketCap.stopColor} stopOpacity={0.8}/>
+            <stop offset="95%" stopColor={chartGradients.marketCap.stopColor} stopOpacity={0}/>
           </linearGradient>
-          <linearGradient id="colorChange" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#0EA5E9" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#0EA5E9" stopOpacity={0}/>
+          <linearGradient id={chartGradients.change.id} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={chartGradients.change.stopColor} stopOpacity={0.8}/>
+            <stop offset="95%" stopColor={chartGradients.change.stopColor} stopOpacity={0}/>
           </linearGradient>
         </defs>
         <XAxis 
           dataKey="symbol" 
-          tick={{ fill: '#e2e8f0' }}
+          tick={chartStyles.axisTickStyle}
           {...animationConfig}
         />
         <YAxis 
           yAxisId="left" 
           orientation="left" 
-          tick={{ fill: '#e2e8f0' }}
-          tickFormatter={(value) => `$${value.toLocaleString()}`}
+          tick={chartStyles.axisTickStyle}
+          tickFormatter={formatPrice}
           {...animationConfig}
         />
         <YAxis
           yAxisId="right"
           orientation="right"
-          tick={{ fill: '#e2e8f0' }}
-          tickFormatter={(value) => {
-            if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
-            if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
-            return `$${value.toLocaleString()}`;
-          }}
+          tick={chartStyles.axisTickStyle}
+          tickFormatter={formatMarketCap}
           {...animationConfig}
         />
         <Tooltip content={chartTooltip} />
@@ -75,8 +72,8 @@ export function CryptocurrencyAreaChart({
             type="monotone"
             dataKey="current_price_usd"
             name="Current Price (USD)"
-            stroke="#10B981"
-            fill="url(#colorPrice)"
+            stroke={chartColors.primary}
+            fill={`url(#${chartGradients.price.id})`}
             yAxisId="left"
             strokeWidth={2}
             activeDot={{ r: 6 }}
@@ -90,8 +87,8 @@ export function CryptocurrencyAreaChart({
             type="monotone"
             dataKey="market_cap_usd"
             name="Market Cap (USD)"
-            stroke="#8B5CF6"
-            fill="url(#colorMarketCap)"
+            stroke={chartColors.secondary}
+            fill={`url(#${chartGradients.marketCap.id})`}
             yAxisId="right"
             strokeWidth={2}
             activeDot={{ r: 6 }}
@@ -105,8 +102,8 @@ export function CryptocurrencyAreaChart({
             type="monotone"
             dataKey="price_change_percentage_24h"
             name="24h Change (%)"
-            stroke="#0EA5E9"
-            fill="url(#colorChange)"
+            stroke={chartColors.tertiary}
+            fill={`url(#${chartGradients.change.id})`}
             yAxisId="left"
             strokeWidth={2}
             activeDot={{ r: 6 }}
@@ -125,8 +122,8 @@ export function CryptocurrencyAreaChart({
                 name={`${model.name} - Price`}
                 stroke={model.color}
                 yAxisId="left"
-                strokeWidth={1.5}
-                strokeDasharray="5 5"
+                strokeWidth={chartStyles.predictionLineStyle.strokeWidth}
+                strokeDasharray={chartStyles.predictionLineStyle.strokeDasharray}
                 dot={{ r: 3 }}
                 {...animationConfig}
                 animationBegin={getAnimationDelay(3 + idx)}

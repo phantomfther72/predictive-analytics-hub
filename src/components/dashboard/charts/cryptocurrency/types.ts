@@ -2,6 +2,7 @@
 import { ModelSettings } from "../use-chart-state";
 import { CryptocurrencyData } from "@/types/market";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
+import { AnimationConfig } from "./utils/chart-animations";
 
 export interface BaseChartProps {
   data: CryptocurrencyData[];
@@ -9,11 +10,7 @@ export interface BaseChartProps {
   onLegendClick: (data: Payload) => void;
   enabledModels?: ModelSettings[];
   simulationMode?: boolean;
-  animationConfig: {
-    isAnimationActive: boolean;
-    animationDuration: number;
-    animationEasing: 'ease-in-out';
-  };
+  animationConfig: AnimationConfig;
   getAnimationDelay: (index: number) => number;
   chartTooltip: any;
 }

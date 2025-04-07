@@ -12,6 +12,8 @@ import { CryptocurrencyComposedChart } from "./CryptocurrencyComposedChart";
 import { ChartTooltip } from "./tooltip";
 import { motion, AnimatePresence } from "framer-motion";
 import { CryptocurrencyData } from "@/types/market";
+import { chartStyles } from "./utils/chart-styles";
+import { createChartAnimationConfig, entranceAnimations } from "./utils/chart-animations";
 
 export type ChartType = 'area' | 'line' | 'bar' | 'composed';
 
@@ -39,7 +41,6 @@ export function CryptocurrencyChart({
   description
 }: CryptocurrencyChartProps) {
   const [chartType, setChartType] = useState<ChartType>('area');
-  const [animationDuration, setAnimationDuration] = useState<number>(900);
   const [animationActive, setAnimationActive] = useState<boolean>(true);
   const chartRef = useRef<HTMLDivElement>(null);
   
@@ -91,16 +92,9 @@ export function CryptocurrencyChart({
     );
   }
 
-  const animationConfig = {
-    isAnimationActive: animationActive,
-    animationDuration: animationDuration,
-    animationEasing: 'ease-in-out' as const
-  };
+  // Get animation configuration
+  const { animationConfig, getAnimationDelay } = createChartAnimationConfig(animationActive);
   
-  const getAnimationDelay = (index: number): number => {
-    return chartType === 'bar' ? index * 50 : 0;
-  };
-
   const chartTooltip = <ChartTooltip />;
 
   const renderChart = () => {
@@ -140,16 +134,16 @@ export function CryptocurrencyChart({
       
       <div 
         ref={chartRef} 
-        className="transition-all duration-300 ease-in-out bg-slate-900 rounded-lg p-4" 
+        className={`transition-all duration-300 ease-in-out ${chartStyles.containerStyle}`}
         style={{ opacity: 1, transform: 'scale(1)' }}
       >
         <AnimatePresence mode="wait">
           <motion.div
             key={chartType}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
+            initial={entranceAnimations.fadeIn.initial}
+            animate={entranceAnimations.fadeIn.animate}
+            exit={entranceAnimations.fadeIn.exit}
+            transition={entranceAnimations.fadeIn.transition}
             className="rounded-lg overflow-hidden"
           >
             {renderChart()}

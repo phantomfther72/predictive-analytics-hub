@@ -2,6 +2,7 @@
 import React from "react";
 import { TooltipRow } from "./TooltipRow";
 import { PredictionDetails } from "./PredictionDetails";
+import { formatTooltipValue } from "./formatter";
 
 export interface ChartTooltipProps {
   active?: boolean;
@@ -20,8 +21,8 @@ export interface ChartTooltipProps {
 }
 
 export const ChartTooltip: React.FC = () => {
-  // This is a factory function that returns the actual tooltip component
-  const renderTooltipContent = (props: ChartTooltipProps) => {
+  // This function returns the actual tooltip component function
+  return (props: ChartTooltipProps) => {
     const { active, payload, label, prediction } = props;
     
     if (!active || !payload || !payload.length) {
@@ -38,7 +39,7 @@ export const ChartTooltip: React.FC = () => {
       <div className="bg-white p-4 border rounded-lg shadow-lg min-w-[200px]">
         <p className="font-medium mb-3 text-gray-600">{formattedDate || label}</p>
         <div className="space-y-2">
-          {payload.map((entry, index) => (
+          {payload.map((entry: any, index: number) => (
             <TooltipRow key={index} entry={entry} />
           ))}
         </div>
@@ -47,6 +48,4 @@ export const ChartTooltip: React.FC = () => {
       </div>
     );
   };
-
-  return renderTooltipContent;
 };

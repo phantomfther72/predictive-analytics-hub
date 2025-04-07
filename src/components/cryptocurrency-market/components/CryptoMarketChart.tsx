@@ -31,9 +31,9 @@ const CryptoMarketChart: React.FC<CryptoMarketChartProps> = ({
           data={data.slice(0, 10)}
           selectedMetrics={selectedMetrics}
           onLegendClick={onLegendClick}
-          timeRange={timeRange}
           title="Market Performance"
           description={`Showing data for ${timeRange} time range`}
+          timeRange={timeRange}
         />
       </CardContent>
     </Card>

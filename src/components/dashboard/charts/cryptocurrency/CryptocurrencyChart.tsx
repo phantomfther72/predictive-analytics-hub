@@ -9,7 +9,7 @@ import { CryptocurrencyAreaChart } from "./CryptocurrencyAreaChart";
 import { CryptocurrencyLineChart } from "./CryptocurrencyLineChart";
 import { CryptocurrencyBarChart } from "./CryptocurrencyBarChart";
 import { CryptocurrencyComposedChart } from "./CryptocurrencyComposedChart";
-import { ChartTooltip } from "./tooltip";
+import { ChartTooltip } from "./ChartTooltip";
 import { motion, AnimatePresence } from "framer-motion";
 import { CryptocurrencyData } from "@/types/market";
 import { chartStyles } from "./utils/chart-styles";
@@ -95,6 +95,7 @@ export function CryptocurrencyChart({
   // Get animation configuration
   const { animationConfig, getAnimationDelay } = createChartAnimationConfig(animationActive);
   
+  // Use the correct tooltip component without calling it as a function
   const chartTooltip = <ChartTooltip />;
 
   const renderChart = () => {
@@ -154,10 +155,10 @@ export function CryptocurrencyChart({
       <style>
         {`
         .price-change-bar[data-value-positive="true"] {
-          fill: #10B981;
+          fill: ${chartColors.primary};
         }
         .price-change-bar[data-value-positive="false"] {
-          fill: #EF4444;
+          fill: ${chartColors.negative};
         }
         `}
       </style>

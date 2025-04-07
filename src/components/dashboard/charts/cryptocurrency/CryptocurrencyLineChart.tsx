@@ -11,6 +11,7 @@ import {
   Legend
 } from "recharts";
 import { BaseChartProps } from "./types";
+import { chartColors, chartGradients, chartStyles, formatPrice, formatMarketCap } from "./utils/chart-styles";
 
 export function CryptocurrencyLineChart({
   data,
@@ -28,34 +29,30 @@ export function CryptocurrencyLineChart({
         data={data}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#2a3042" opacity={0.2} />
+        <CartesianGrid {...chartStyles.cartesianGridStyle} />
         <defs>
-          <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+          <linearGradient id={chartGradients.price.id} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={chartGradients.price.stopColor} stopOpacity={0.8}/>
+            <stop offset="95%" stopColor={chartGradients.price.stopColor} stopOpacity={0}/>
           </linearGradient>
         </defs>
         <XAxis 
           dataKey="symbol" 
-          tick={{ fill: '#e2e8f0' }}
+          tick={chartStyles.axisTickStyle}
           {...animationConfig}
         />
         <YAxis 
           yAxisId="left" 
           orientation="left" 
-          tick={{ fill: '#e2e8f0' }}
-          tickFormatter={(value) => `$${value.toLocaleString()}`}
+          tick={chartStyles.axisTickStyle}
+          tickFormatter={formatPrice}
           {...animationConfig}
         />
         <YAxis
           yAxisId="right"
           orientation="right"
-          tick={{ fill: '#e2e8f0' }}
-          tickFormatter={(value) => {
-            if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
-            if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
-            return `$${value.toLocaleString()}`;
-          }}
+          tick={chartStyles.axisTickStyle}
+          tickFormatter={formatMarketCap}
           {...animationConfig}
         />
         <Tooltip content={chartTooltip} />
@@ -66,12 +63,13 @@ export function CryptocurrencyLineChart({
             type="monotone"
             dataKey="current_price_usd"
             name="Current Price (USD)"
-            stroke="#10B981"
+            stroke={chartColors.primary}
             yAxisId="left"
-            strokeWidth={2}
-            dot={{ r: 4 }}
-            activeDot={{ r: 6, fill: "#10B981", stroke: "#fff", strokeWidth: 2 }}
+            strokeWidth={chartStyles.primaryLineStyle.strokeWidth}
+            dot={chartStyles.dotStyle}
+            activeDot={chartStyles.activeDotStyle}
             {...animationConfig}
+            animationBegin={getAnimationDelay(0)}
           />
         )}
         
@@ -80,12 +78,13 @@ export function CryptocurrencyLineChart({
             type="monotone"
             dataKey="market_cap_usd"
             name="Market Cap (USD)"
-            stroke="#8B5CF6"
+            stroke={chartColors.secondary}
             yAxisId="right"
-            strokeWidth={2}
-            dot={{ r: 4 }}
-            activeDot={{ r: 6, fill: "#8B5CF6", stroke: "#fff", strokeWidth: 2 }}
+            strokeWidth={chartStyles.secondaryLineStyle.strokeWidth}
+            dot={chartStyles.dotStyle}
+            activeDot={{ ...chartStyles.activeDotStyle, fill: chartColors.secondary }}
             {...animationConfig}
+            animationBegin={getAnimationDelay(1)}
           />
         )}
         
@@ -94,17 +93,18 @@ export function CryptocurrencyLineChart({
             type="monotone"
             dataKey="price_change_percentage_24h"
             name="24h Change (%)"
-            stroke="#0EA5E9"
+            stroke={chartColors.tertiary}
             yAxisId="left"
-            strokeWidth={2}
-            dot={{ r: 4 }}
-            activeDot={{ r: 6, fill: "#0EA5E9", stroke: "#fff", strokeWidth: 2 }}
+            strokeWidth={chartStyles.tertiaryLineStyle.strokeWidth}
+            dot={chartStyles.dotStyle}
+            activeDot={{ ...chartStyles.activeDotStyle, fill: chartColors.tertiary }}
             {...animationConfig}
+            animationBegin={getAnimationDelay(2)}
           />
         )}
         
         {enabledModels.length > 0 && simulationMode && 
-          enabledModels.filter(m => m.id !== "primary").map(model => (
+          enabledModels.filter(m => m.id !== "primary").map((model, idx) => (
             selectedMetrics.includes("current_price_usd") && (
               <Line
                 key={`${model.id}-price`}
@@ -113,10 +113,10 @@ export function CryptocurrencyLineChart({
                 name={`${model.name} - Price`}
                 stroke={model.color}
                 yAxisId="left"
-                strokeWidth={1.5}
-                strokeDasharray="5 5"
+                {...chartStyles.predictionLineStyle}
                 dot={{ r: 3 }}
                 {...animationConfig}
+                animationBegin={getAnimationDelay(3 + idx)}
               />
             )
           ))

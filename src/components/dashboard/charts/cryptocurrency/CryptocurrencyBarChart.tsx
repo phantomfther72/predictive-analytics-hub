@@ -11,6 +11,7 @@ import {
   Legend
 } from "recharts";
 import { BaseChartProps } from "./types";
+import { chartColors, chartStyles, formatPrice, formatMarketCap } from "./utils/chart-styles";
 
 export function CryptocurrencyBarChart({
   data,
@@ -28,28 +29,24 @@ export function CryptocurrencyBarChart({
         data={data}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#2a3042" opacity={0.2} />
+        <CartesianGrid {...chartStyles.cartesianGridStyle} />
         <XAxis 
           dataKey="symbol" 
-          tick={{ fill: '#e2e8f0' }}
+          tick={chartStyles.axisTickStyle}
           {...animationConfig}
         />
         <YAxis 
           yAxisId="left" 
           orientation="left"
-          tick={{ fill: '#e2e8f0' }}
-          tickFormatter={(value) => `$${value.toLocaleString()}`}
+          tick={chartStyles.axisTickStyle}
+          tickFormatter={formatPrice}
           {...animationConfig}
         />
         <YAxis
           yAxisId="right"
           orientation="right"
-          tick={{ fill: '#e2e8f0' }}
-          tickFormatter={(value) => {
-            if (value >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
-            if (value >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
-            return `$${value.toLocaleString()}`;
-          }}
+          tick={chartStyles.axisTickStyle}
+          tickFormatter={formatMarketCap}
           {...animationConfig}
         />
         <Tooltip content={chartTooltip} />
@@ -59,11 +56,11 @@ export function CryptocurrencyBarChart({
           <Bar
             dataKey="current_price_usd"
             name="Current Price (USD)"
-            fill="#10B981"
+            fill={chartColors.primary}
             yAxisId="left"
             {...animationConfig}
             animationBegin={getAnimationDelay(0)}
-            radius={[4, 4, 0, 0]}
+            radius={chartStyles.barRadius}
           />
         )}
         
@@ -71,11 +68,11 @@ export function CryptocurrencyBarChart({
           <Bar
             dataKey="market_cap_usd"
             name="Market Cap (USD)"
-            fill="#8B5CF6"
+            fill={chartColors.secondary}
             yAxisId="right"
             {...animationConfig}
             animationBegin={getAnimationDelay(1)}
-            radius={[4, 4, 0, 0]}
+            radius={chartStyles.barRadius}
           />
         )}
         
@@ -83,11 +80,11 @@ export function CryptocurrencyBarChart({
           <Bar
             dataKey="price_change_percentage_24h"
             name="24h Change (%)"
-            fill="#10B981"
+            fill={chartColors.tertiary}
             yAxisId="left"
             {...animationConfig}
             animationBegin={getAnimationDelay(2)}
-            radius={[4, 4, 0, 0]}
+            radius={chartStyles.barRadius}
             className="price-change-bar"
           />
         )}
@@ -104,7 +101,7 @@ export function CryptocurrencyBarChart({
                 opacity={0.7}
                 {...animationConfig}
                 animationBegin={getAnimationDelay(3 + idx)}
-                radius={[4, 4, 0, 0]}
+                radius={chartStyles.barRadius}
               />
             )
           ))

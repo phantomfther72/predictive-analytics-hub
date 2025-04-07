@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import {
   ResponsiveContainer,
@@ -58,14 +57,12 @@ export function CryptocurrencyChart({
   const [animationActive, setAnimationActive] = useState<boolean>(true);
   const chartRef = useRef<HTMLDivElement>(null);
   
-  // Animation timing effect for rendering
   useEffect(() => {
     setAnimationActive(false);
     const timer = setTimeout(() => setAnimationActive(true), 50);
     return () => clearTimeout(timer);
   }, [chartType]);
   
-  // Chart transition effect
   const handleChartTypeChange = (type: 'area' | 'line' | 'bar' | 'composed') => {
     if (type === chartType) return;
     
@@ -138,14 +135,12 @@ export function CryptocurrencyChart({
     );
   };
 
-  // Animation configuration for charts
   const animationConfig = {
     isAnimationActive: animationActive,
     animationDuration: animationDuration,
     animationEasing: 'ease-in-out' as const
   };
   
-  // Animation for data elements depending on chart type
   const getAnimationDelay = (index: number): number => {
     return chartType === 'bar' ? index * 50 : 0;
   };
@@ -415,7 +410,10 @@ export function CryptocurrencyChart({
                 <Bar
                   dataKey="price_change_percentage_24h"
                   name="24h Change (%)"
-                  fill={(entry) => entry.price_change_percentage_24h >= 0 ? "#10B981" : "#EF4444"}
+                  fill="#10B981"
+                  style={(entry: any) => ({
+                    fill: entry.price_change_percentage_24h >= 0 ? "#10B981" : "#EF4444"
+                  })}
                   yAxisId="left"
                   {...animationConfig}
                   animationBegin={getAnimationDelay(2)}

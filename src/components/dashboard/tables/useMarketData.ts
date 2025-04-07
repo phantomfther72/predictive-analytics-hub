@@ -20,7 +20,7 @@ export const useMarketData = () => {
     miningData: miningQuery.data,
     agricultureData: agricultureQuery.data,
     hydrogenData: hydrogenQuery.data,
-    cryptoData: cryptoQuery.data,
+    cryptoData: cryptoQuery.data || [], // Ensure we always return an array even if data is null
     isLoadingFinancial: financialQuery.isLoading,
     isLoadingHousing: housingQuery.isLoading,
     isLoadingMining: miningQuery.isLoading,

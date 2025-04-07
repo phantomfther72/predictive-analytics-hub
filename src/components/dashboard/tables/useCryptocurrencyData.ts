@@ -12,7 +12,7 @@ export const useCryptocurrencyData = () => {
     queryFn: async () => {
       try {
         // Using financial_market_metrics table with a filter for cryptocurrency assets
-        const { data, error } = await supabase
+        const { data: cryptoData, error } = await supabase
           .from("financial_market_metrics")
           .select("*")
           .eq("asset_type", "cryptocurrency");
@@ -22,12 +22,12 @@ export const useCryptocurrencyData = () => {
           return [];
         }
 
-        if (!data || data.length === 0) {
+        if (!cryptoData || cryptoData.length === 0) {
           return [];
         }
 
         // Transform the financial market data to match the cryptocurrency data structure
-        const cryptoData = data.map(item => ({
+        const transformedData = cryptoData.map(item => ({
           id: item.id,
           symbol: (item.asset || "").split('-')[0] || item.asset, 
           name: getCryptoName(item.asset || ""),
@@ -54,7 +54,7 @@ export const useCryptocurrencyData = () => {
           ])
         }));
 
-        return cryptoData as CryptocurrencyData[];
+        return transformedData as CryptocurrencyData[];
       } catch (error) {
         console.error("Error in cryptocurrency data fetch:", error);
         return [];

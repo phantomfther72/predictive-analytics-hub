@@ -1,6 +1,7 @@
 
 import React from "react";
-import { formatCryptoPrice, formatMarketCap, formatPercentChange } from "@/components/cryptocurrency-market/utils/formatter";
+import { ChartTooltip as BaseChartTooltip } from "./tooltip";
+import { formatTooltipValue } from "./tooltip/formatter";
 
 export function ChartTooltip() {
   const renderTooltipContent = (props: any) => {
@@ -34,20 +35,4 @@ export function ChartTooltip() {
   };
 
   return renderTooltipContent;
-}
-
-function formatTooltipValue(value: any, name: string | number | undefined) {
-  if (typeof value !== 'number') return value;
-  
-  if (typeof name === 'string') {
-    if (name.toLowerCase().includes('price')) {
-      return formatCryptoPrice(value);
-    } else if (name.toLowerCase().includes('market cap')) {
-      return formatMarketCap(value);
-    } else if (name.toLowerCase().includes('change')) {
-      return formatPercentChange(value);
-    }
-  }
-  
-  return value.toLocaleString();
 }

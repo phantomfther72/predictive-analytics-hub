@@ -9,7 +9,7 @@ import { CryptocurrencyAreaChart } from "./CryptocurrencyAreaChart";
 import { CryptocurrencyLineChart } from "./CryptocurrencyLineChart";
 import { CryptocurrencyBarChart } from "./CryptocurrencyBarChart";
 import { CryptocurrencyComposedChart } from "./CryptocurrencyComposedChart";
-import { ChartTooltip } from "./ChartTooltip";
+import { ChartTooltip } from "./tooltip";
 import { motion, AnimatePresence } from "framer-motion";
 import { CryptocurrencyData } from "@/types/market";
 
@@ -101,6 +101,8 @@ export function CryptocurrencyChart({
     return chartType === 'bar' ? index * 50 : 0;
   };
 
+  const chartTooltip = <ChartTooltip />;
+
   const renderChart = () => {
     const commonProps = {
       data,
@@ -110,7 +112,7 @@ export function CryptocurrencyChart({
       simulationMode,
       animationConfig,
       getAnimationDelay,
-      chartTooltip: <ChartTooltip />
+      chartTooltip
     };
 
     switch(chartType) {

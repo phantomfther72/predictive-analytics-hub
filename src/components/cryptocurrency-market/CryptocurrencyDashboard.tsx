@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CryptocurrencyChart } from "@/components/dashboard/charts/CryptocurrencyChart";
+import { CryptocurrencyChart } from "@/components/dashboard/charts/cryptocurrency";
 import { CryptocurrencyData } from "@/types/market";
 import { formatCryptoPrice, formatMarketCap, formatPercentChange, formatVolume, formatSupply, getColorForChange } from "./utils/formatter";
 import { Bitcoin, ChevronDown, ChevronUp, DollarSign, BarChart3, TrendingUp, TrendingDown, Search, Filter, RefreshCw, CircleDollarSign, Wallet } from "lucide-react";

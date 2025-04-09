@@ -1,6 +1,6 @@
 
 // Common styling for cryptocurrency charts
-import { ChartProps } from "recharts";
+import { Props as RechartsProps } from "recharts/types/component/DefaultProps";
 
 // Chart Colors
 export const chartColors = {
@@ -82,7 +82,7 @@ export const composedChartMargins = {
 };
 
 // Common Chart Props
-export const commonChartProps: Partial<ChartProps> = {
+export const commonChartProps: Partial<RechartsProps> = {
   className: "w-full h-[300px] md:h-[400px]",
   margin: { top: 20, right: 30, left: 20, bottom: 5 }
 };

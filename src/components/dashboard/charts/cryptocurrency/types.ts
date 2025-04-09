@@ -4,6 +4,8 @@ import { CryptocurrencyData } from "@/types/market";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
 import { AnimationConfig } from "./utils/chart-animations";
 
+export type ChartType = "area" | "line" | "bar" | "composed";
+
 export interface BaseChartProps {
   data: CryptocurrencyData[];
   selectedMetrics: string[];
@@ -13,4 +15,7 @@ export interface BaseChartProps {
   animationConfig: AnimationConfig;
   getAnimationDelay: (index: number) => number;
   chartTooltip: any;
+  title?: string;
+  description?: string;
+  timeRange?: string;
 }

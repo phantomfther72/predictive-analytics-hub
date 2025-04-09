@@ -1,6 +1,6 @@
 
 // Common styling for cryptocurrency charts
-import { CategoricalChartProps } from "recharts";
+import { ChartProps } from "recharts";
 
 // Chart Colors
 export const chartColors = {
@@ -16,6 +16,37 @@ export const chartColors = {
   amber: "#F59E0B", // amber-500
   dark: "#1E293B", // slate-800
   light: "#F8FAFC", // slate-50
+};
+
+// Chart Gradients
+export const chartGradients = {
+  price: {
+    id: "gradientPrice",
+    stopColor: chartColors.primary
+  },
+  marketCap: {
+    id: "gradientMarketCap",
+    stopColor: chartColors.secondary
+  },
+  change: {
+    id: "gradientChange",
+    stopColor: chartColors.tertiary
+  }
+};
+
+// Chart Styles 
+export const chartStyles = {
+  axisTickStyle: {
+    fontSize: 12
+  },
+  predictionLineStyle: {
+    strokeWidth: 2,
+    strokeDasharray: "3 3"
+  },
+  cartesianGridStyle: {
+    strokeDasharray: "3 3", 
+    vertical: false
+  }
 };
 
 // Bar Chart Margin
@@ -51,7 +82,7 @@ export const composedChartMargins = {
 };
 
 // Common Chart Props
-export const commonChartProps: Partial<CategoricalChartProps> = {
+export const commonChartProps: Partial<ChartProps> = {
   className: "w-full h-[300px] md:h-[400px]",
   margin: { top: 20, right: 30, left: 20, bottom: 5 }
 };
@@ -67,4 +98,21 @@ export const tooltipCursor = {
   stroke: chartColors.neutral, 
   strokeWidth: 1, 
   strokeDasharray: "5 5" 
+};
+
+// Format functions for axis and tooltips
+export const formatPrice = (value: number) => {
+  if (value >= 1000) {
+    return `$${(value / 1000).toFixed(1)}K`;
+  }
+  return `$${value}`;
+};
+
+export const formatMarketCap = (value: number) => {
+  if (value >= 1_000_000_000) {
+    return `$${(value / 1_000_000_000).toFixed(1)}B`;
+  } else if (value >= 1_000_000) {
+    return `$${(value / 1_000_000).toFixed(1)}M`;
+  }
+  return `$${value.toLocaleString()}`;
 };

@@ -12,7 +12,7 @@ import {
   Line
 } from "recharts";
 import { BaseChartProps } from "./types";
-import { chartColors, chartGradients, chartStyles, formatPrice, formatMarketCap } from "./utils/chart-styles";
+import { chartColors, areaChartMargins, tooltipCursor, strokeWidth } from "./utils/chart-styles";
 
 export function CryptocurrencyAreaChart({
   data,
@@ -22,116 +22,106 @@ export function CryptocurrencyAreaChart({
   simulationMode = false,
   animationConfig,
   getAnimationDelay,
-  chartTooltip
+  chartTooltip,
+  title,
+  description,
+  timeRange
 }: BaseChartProps) {
+  // Create gradients for each metric
+  const renderGradients = () => {
+    return selectedMetrics.map((metric, index) => {
+      const color = Object.values(chartColors)[index % Object.values(chartColors).length];
+      const id = `gradient-${metric}`;
+      
+      return (
+        <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" stopColor={color} stopOpacity={0.8}/>
+          <stop offset="95%" stopColor={color} stopOpacity={0}/>
+        </linearGradient>
+      );
+    });
+  };
+
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <AreaChart
-        data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid {...chartStyles.cartesianGridStyle} />
-        <defs>
-          <linearGradient id={chartGradients.price.id} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={chartGradients.price.stopColor} stopOpacity={0.8}/>
-            <stop offset="95%" stopColor={chartGradients.price.stopColor} stopOpacity={0}/>
-          </linearGradient>
-          <linearGradient id={chartGradients.marketCap.id} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={chartGradients.marketCap.stopColor} stopOpacity={0.8}/>
-            <stop offset="95%" stopColor={chartGradients.marketCap.stopColor} stopOpacity={0}/>
-          </linearGradient>
-          <linearGradient id={chartGradients.change.id} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={chartGradients.change.stopColor} stopOpacity={0.8}/>
-            <stop offset="95%" stopColor={chartGradients.change.stopColor} stopOpacity={0}/>
-          </linearGradient>
-        </defs>
-        <XAxis 
-          dataKey="symbol" 
-          tick={chartStyles.axisTickStyle}
-          {...animationConfig}
-        />
-        <YAxis 
-          yAxisId="left" 
-          orientation="left" 
-          tick={chartStyles.axisTickStyle}
-          tickFormatter={formatPrice}
-          {...animationConfig}
-        />
-        <YAxis
-          yAxisId="right"
-          orientation="right"
-          tick={chartStyles.axisTickStyle}
-          tickFormatter={formatMarketCap}
-          {...animationConfig}
-        />
-        <Tooltip content={chartTooltip} />
-        <Legend onClick={onLegendClick} />
-        
-        {selectedMetrics.includes("current_price_usd") && (
-          <Area
-            type="monotone"
-            dataKey="current_price_usd"
-            name="Current Price (USD)"
-            stroke={chartColors.primary}
-            fill={`url(#${chartGradients.price.id})`}
-            yAxisId="left"
-            strokeWidth={2}
-            activeDot={{ r: 6 }}
+    <div className="w-full h-full">
+      {title && (
+        <div className="mb-2">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+        </div>
+      )}
+      
+      <ResponsiveContainer width="100%" height={400}>
+        <AreaChart
+          data={data}
+          margin={areaChartMargins}
+        >
+          <defs>
+            {renderGradients()}
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <XAxis 
+            dataKey="symbol" 
+            tick={{ fontSize: 12 }}
+            tickLine={false}
             {...animationConfig}
-            animationBegin={getAnimationDelay(0)}
           />
-        )}
-        
-        {selectedMetrics.includes("market_cap_usd") && (
-          <Area
-            type="monotone"
-            dataKey="market_cap_usd"
-            name="Market Cap (USD)"
-            stroke={chartColors.secondary}
-            fill={`url(#${chartGradients.marketCap.id})`}
-            yAxisId="right"
-            strokeWidth={2}
-            activeDot={{ r: 6 }}
+          <YAxis 
+            tick={{ fontSize: 12 }}
+            tickLine={false}
+            axisLine={false}
             {...animationConfig}
-            animationBegin={getAnimationDelay(1)}
           />
-        )}
-        
-        {selectedMetrics.includes("price_change_percentage_24h") && (
-          <Area
-            type="monotone"
-            dataKey="price_change_percentage_24h"
-            name="24h Change (%)"
-            stroke={chartColors.tertiary}
-            fill={`url(#${chartGradients.change.id})`}
-            yAxisId="left"
-            strokeWidth={2}
-            activeDot={{ r: 6 }}
-            {...animationConfig}
-            animationBegin={getAnimationDelay(2)}
-          />
-        )}
-        
-        {enabledModels.length > 0 && simulationMode && 
-          enabledModels.filter(m => m.id !== "primary").map((model, idx) => (
-            selectedMetrics.includes("current_price_usd") && (
-              <Line
-                key={`${model.id}-price`}
+          <Tooltip content={chartTooltip} cursor={tooltipCursor} />
+          <Legend onClick={onLegendClick} />
+          
+          {selectedMetrics.map((metric, index) => {
+            const color = Object.values(chartColors)[index % Object.values(chartColors).length];
+            const gradientId = `gradient-${metric}`;
+            
+            return (
+              <Area
+                key={metric}
                 type="monotone"
-                dataKey={(dataPoint) => dataPoint.current_price_usd * (1 + (dataPoint.predicted_change || 0) * model.weight / 100)}
-                name={`${model.name} - Price`}
-                stroke={model.color}
-                yAxisId="left"
-                strokeWidth={chartStyles.predictionLineStyle.strokeWidth}
-                strokeDasharray={chartStyles.predictionLineStyle.strokeDasharray}
-                dot={{ r: 3 }}
-                {...animationConfig}
-                animationBegin={getAnimationDelay(3 + idx)}
+                dataKey={metric}
+                name={metric.charAt(0).toUpperCase() + metric.slice(1).replace(/_/g, " ")}
+                stroke={color}
+                fill={`url(#${gradientId})`}
+                strokeWidth={strokeWidth}
+                isAnimationActive={animationConfig.isAnimationActive}
+                animationDuration={animationConfig.animationDuration}
+                animationEasing={animationConfig.animationEasing}
+                animationBegin={getAnimationDelay(index)}
               />
-            )
-          ))
-        }
-      </AreaChart>
-    </ResponsiveContainer>
+            );
+          })}
+          
+          {enabledModels.length > 0 && simulationMode && 
+            enabledModels.filter(m => m.id !== "primary").map((model, idx) => (
+              selectedMetrics.map((metric, metricIdx) => (
+                <Line
+                  key={`${model.id}-${metric}`}
+                  type="monotone"
+                  dataKey={(dataPoint) => {
+                    const baseValue = dataPoint[metric as keyof typeof dataPoint];
+                    if (typeof baseValue !== 'number') return null;
+                    return baseValue * (1 + (dataPoint.predicted_change || 0) * model.weight / 100);
+                  }}
+                  name={`${model.name} - ${metric}`}
+                  stroke={model.color}
+                  strokeWidth={2}
+                  strokeDasharray="3 3"
+                  dot={{ r: 3 }}
+                  isAnimationActive={animationConfig.isAnimationActive}
+                  animationDuration={animationConfig.animationDuration}
+                  animationEasing={animationConfig.animationEasing}
+                  animationBegin={getAnimationDelay(selectedMetrics.length + idx + metricIdx)}
+                />
+              ))
+            ))
+          }
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

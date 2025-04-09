@@ -7,7 +7,7 @@ import {
   BarChart3, 
   Activity
 } from "lucide-react";
-import { ChartType } from "./CryptocurrencyChart";
+import { ChartType } from "./types";
 
 interface ChartTypeSelectorProps {
   chartType: ChartType;

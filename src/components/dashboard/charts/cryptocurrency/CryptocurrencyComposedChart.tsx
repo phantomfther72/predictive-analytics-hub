@@ -13,28 +13,22 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import { ChartTooltip } from "./ChartTooltip";
-import { CryptocurrencyData } from "@/types/market";
+import { BaseChartProps } from "./types";
 import { chartColors, composedChartMargins, tooltipCursor, strokeWidth, dotSize } from "./utils/chart-styles";
-import { useChartAnimations } from "./utils/chart-animations";
 
-interface CryptocurrencyComposedChartProps {
-  data: CryptocurrencyData[];
-  selectedMetrics: string[];
-  title?: string;
-  description?: string;
-  timeRange?: string;
-}
-
-export const CryptocurrencyComposedChart: React.FC<CryptocurrencyComposedChartProps> = ({
+export const CryptocurrencyComposedChart: React.FC<BaseChartProps> = ({
   data,
   selectedMetrics,
+  onLegendClick,
+  enabledModels,
+  simulationMode,
+  animationConfig,
+  getAnimationDelay,
+  chartTooltip,
   title,
   description,
   timeRange,
 }) => {
-  const { animations } = useChartAnimations();
-  
   // Map metrics to appropriate chart types
   const getChartType = (metric: string) => {
     if (metric.includes("volume") || metric.includes("market_cap")) {
@@ -68,7 +62,7 @@ export const CryptocurrencyComposedChart: React.FC<CryptocurrencyComposedChartPr
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis 
-            dataKey="name" 
+            dataKey="symbol" 
             tick={{ fontSize: 12 }} 
             tickLine={false} 
           />
@@ -77,60 +71,54 @@ export const CryptocurrencyComposedChart: React.FC<CryptocurrencyComposedChartPr
             tickLine={false} 
             axisLine={false} 
           />
-          <Tooltip content={<ChartTooltip />} cursor={tooltipCursor} />
-          <Legend />
+          <Tooltip content={chartTooltip} cursor={tooltipCursor} />
+          <Legend onClick={onLegendClick} />
           <ReferenceLine y={0} stroke="#666" />
           
           {selectedMetrics.map((metric, index) => {
             const chartType = getChartType(metric);
             const color = getColor(index);
             const name = metric.charAt(0).toUpperCase() + metric.slice(1).replace(/_/g, " ");
+            const commonProps = {
+              key: metric,
+              dataKey: metric,
+              name,
+              animationBegin: getAnimationDelay(index),
+              animationDuration: animationConfig.animationDuration,
+              animationEasing: animationConfig.animationEasing,
+              isAnimationActive: animationConfig.isAnimationActive
+            };
 
             switch (chartType) {
               case "bar":
                 return (
                   <Bar
-                    key={metric}
-                    dataKey={metric}
-                    name={name}
+                    {...commonProps}
                     fill={color}
                     radius={[4, 4, 0, 0]}
-                    animationBegin={animations.delay}
-                    animationDuration={animations.duration}
-                    animationEasing={animations.easing}
                   />
                 );
               case "line":
                 return (
                   <Line
-                    key={metric}
+                    {...commonProps}
                     type="monotone"
-                    dataKey={metric}
-                    name={name}
                     stroke={color}
                     strokeWidth={strokeWidth}
                     dot={{ r: dotSize }}
                     activeDot={{ r: dotSize + 2 }}
-                    animationBegin={animations.delay}
-                    animationDuration={animations.duration}
-                    animationEasing={animations.easing}
                   />
                 );
               case "area":
               default:
                 return (
                   <Area
-                    key={metric}
+                    {...commonProps}
                     type="monotone"
-                    dataKey={metric}
-                    name={name}
                     fill={color}
                     stroke={color}
                     fillOpacity={0.3}
                     strokeWidth={strokeWidth}
-                    animationBegin={animations.delay}
-                    animationDuration={animations.duration}
-                    animationEasing={animations.easing}
                   />
                 );
             }

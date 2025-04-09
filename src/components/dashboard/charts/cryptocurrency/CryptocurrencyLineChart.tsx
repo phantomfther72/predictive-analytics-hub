@@ -11,28 +11,22 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import { ChartTooltip } from "./ChartTooltip";
-import { CryptocurrencyData } from "@/types/market";
+import { BaseChartProps } from "./types";
 import { chartColors, lineChartMargins, tooltipCursor, strokeWidth, dotSize } from "./utils/chart-styles";
-import { useChartAnimations } from "./utils/chart-animations";
 
-interface CryptocurrencyLineChartProps {
-  data: CryptocurrencyData[];
-  selectedMetrics: string[];
-  title?: string;
-  description?: string;
-  timeRange?: string;
-}
-
-export const CryptocurrencyLineChart: React.FC<CryptocurrencyLineChartProps> = ({
+export const CryptocurrencyLineChart: React.FC<BaseChartProps> = ({
   data,
   selectedMetrics,
+  onLegendClick,
+  enabledModels,
+  simulationMode,
+  animationConfig,
+  getAnimationDelay,
+  chartTooltip,
   title,
   description,
   timeRange,
 }) => {
-  const { animations } = useChartAnimations();
-  
   // Function to determine color based on index
   const getColor = (index: number) => {
     const colorKeys = Object.keys(chartColors) as Array<keyof typeof chartColors>;
@@ -55,7 +49,7 @@ export const CryptocurrencyLineChart: React.FC<CryptocurrencyLineChartProps> = (
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis 
-            dataKey="name" 
+            dataKey="symbol" 
             tick={{ fontSize: 12 }} 
             tickLine={false} 
           />
@@ -64,8 +58,8 @@ export const CryptocurrencyLineChart: React.FC<CryptocurrencyLineChartProps> = (
             tickLine={false} 
             axisLine={false} 
           />
-          <Tooltip content={<ChartTooltip />} cursor={tooltipCursor} />
-          <Legend />
+          <Tooltip content={chartTooltip} cursor={tooltipCursor} />
+          <Legend onClick={onLegendClick} />
           <ReferenceLine y={0} stroke="#666" />
           
           {selectedMetrics.map((metric, index) => (
@@ -78,9 +72,10 @@ export const CryptocurrencyLineChart: React.FC<CryptocurrencyLineChartProps> = (
               strokeWidth={strokeWidth}
               dot={{ r: dotSize }}
               activeDot={{ r: dotSize + 2 }}
-              animationBegin={animations.delay}
-              animationDuration={animations.duration}
-              animationEasing={animations.easing}
+              animationBegin={getAnimationDelay(index)}
+              animationDuration={animationConfig.animationDuration}
+              animationEasing={animationConfig.animationEasing}
+              isAnimationActive={animationConfig.isAnimationActive}
             />
           ))}
         </LineChart>

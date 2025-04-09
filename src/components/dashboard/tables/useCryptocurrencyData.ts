@@ -30,21 +30,41 @@ const mockCryptoData = (): CryptocurrencyData[] => {
     { symbol: "LTC", name: "Litecoin" },
   ];
 
-  return cryptos.map((crypto, index) => ({
-    id: `crypto-${index}`,
-    name: crypto.name,
-    symbol: crypto.symbol,
-    current_price: 10000 / (index + 1) + Math.random() * 1000,
-    market_cap: 100000000 / (index + 1) + Math.random() * 10000000,
-    total_volume: 5000000 / (index + 1) + Math.random() * 1000000,
-    price_change_percentage_24h: (Math.random() * 10) * (Math.random() > 0.5 ? 1 : -1),
-    sparkline_data: Array(24).fill(0).map(() => 100 + Math.random() * 50),
-    predicted_change: (Math.random() * 15) * (Math.random() > 0.5 ? 1 : -1),
-    prediction_confidence: 0.5 + Math.random() * 0.5,
-    prediction_factors: {
-      market_sentiment: Math.random() * 100,
-      technical_indicators: Math.random() * 100,
-      social_volume: Math.random() * 100,
-    },
-  }));
+  const timestamp = new Date().toISOString();
+  
+  return cryptos.map((crypto, index) => {
+    const price = 10000 / (index + 1) + Math.random() * 1000;
+    const marketCap = 100000000 / (index + 1) + Math.random() * 10000000;
+    const volume = 5000000 / (index + 1) + Math.random() * 1000000;
+    const priceChange = (Math.random() * 10) * (Math.random() > 0.5 ? 1 : -1);
+    const predictedChange = (Math.random() * 15) * (Math.random() > 0.5 ? 1 : -1);
+    
+    return {
+      id: `crypto-${index}`,
+      symbol: crypto.symbol,
+      name: crypto.name,
+      current_price_usd: price,
+      market_cap_usd: marketCap,
+      volume_24h_usd: volume,
+      circulating_supply: marketCap / price * 0.8,
+      total_supply: marketCap / price,
+      max_supply: marketCap / price * 1.2,
+      price_change_percentage_24h: priceChange,
+      price_change_percentage_7d: priceChange * 1.3,
+      price_change_percentage_30d: priceChange * 1.7,
+      all_time_high_usd: price * 1.5,
+      all_time_high_date: new Date(Date.now() - Math.random() * 31536000000).toISOString(), // Random date in the last year
+      timestamp: timestamp,
+      predicted_change: predictedChange,
+      prediction_timestamp: timestamp,
+      prediction_confidence: 0.5 + Math.random() * 0.5,
+      prediction_explanation: null,
+      prediction_factors: {
+        market_sentiment: Math.random() * 100,
+        volatility: Math.random() * 100,
+        sentiment: Math.random() * 100,
+        market_trend: Math.random() * 100,
+      },
+    };
+  });
 };

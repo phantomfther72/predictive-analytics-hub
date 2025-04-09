@@ -8,6 +8,9 @@ import { CryptocurrencyComposedChart } from "./CryptocurrencyComposedChart";
 import { ChartTypeSelector } from "./ChartTypeSelector";
 import { Payload } from "recharts/types/component/DefaultLegendContent";
 import { chartColors } from "./utils/chart-styles";
+import { ChartType } from "./types";
+import { createChartAnimationConfig } from "./utils/chart-animations";
+import { ChartTooltip } from "./tooltip/ChartTooltip";
 
 export interface CryptocurrencyChartProps {
   data: CryptocurrencyData[];
@@ -26,9 +29,14 @@ export const CryptocurrencyChart: React.FC<CryptocurrencyChartProps> = ({
   description,
   timeRange,
 }) => {
-  const [chartType, setChartType] = useState<
-    "area" | "line" | "bar" | "composed"
-  >("area");
+  const [chartType, setChartType] = useState<ChartType>("area");
+  const { animationConfig, getAnimationDelay } = createChartAnimationConfig(true);
+  const chartTooltip = <ChartTooltip />;
+
+  // Function for handling chart type changes
+  const handleChartTypeChange = (type: ChartType) => {
+    setChartType(type);
+  };
 
   // Filter data if needed
   const chartData = React.useMemo(() => {
@@ -36,42 +44,39 @@ export const CryptocurrencyChart: React.FC<CryptocurrencyChartProps> = ({
     return data;
   }, [data]);
 
+  // Base chart props
+  const baseChartProps = {
+    data: chartData,
+    selectedMetrics,
+    onLegendClick: onLegendClick || (() => {}),
+    animationConfig,
+    getAnimationDelay,
+    chartTooltip,
+    title,
+    description,
+    timeRange,
+  };
+
   // Mapping for chart types
   const chartComponents = {
     area: (
       <CryptocurrencyAreaChart
-        data={chartData}
-        selectedMetrics={selectedMetrics}
-        title={title}
-        description={description}
-        timeRange={timeRange}
+        {...baseChartProps}
       />
     ),
     line: (
       <CryptocurrencyLineChart
-        data={chartData}
-        selectedMetrics={selectedMetrics}
-        title={title}
-        description={description}
-        timeRange={timeRange}
+        {...baseChartProps}
       />
     ),
     bar: (
       <CryptocurrencyBarChart
-        data={chartData}
-        selectedMetrics={selectedMetrics}
-        title={title}
-        description={description}
-        timeRange={timeRange}
+        {...baseChartProps}
       />
     ),
     composed: (
       <CryptocurrencyComposedChart
-        data={chartData}
-        selectedMetrics={selectedMetrics}
-        title={title}
-        description={description}
-        timeRange={timeRange}
+        {...baseChartProps}
       />
     ),
   };
@@ -85,7 +90,7 @@ export const CryptocurrencyChart: React.FC<CryptocurrencyChartProps> = ({
             <p className="text-sm text-muted-foreground">{description}</p>
           )}
         </div>
-        <ChartTypeSelector chartType={chartType} setChartType={setChartType} />
+        <ChartTypeSelector chartType={chartType} onChartTypeChange={handleChartTypeChange} />
       </div>
 
       <div className="w-full relative">

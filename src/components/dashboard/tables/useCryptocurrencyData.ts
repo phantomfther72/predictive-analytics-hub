@@ -1,90 +1,50 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryUtils } from "./useQueryUtils";
 import { CryptocurrencyData } from "@/types/market";
 
 export const useCryptocurrencyData = () => {
-  const { handleError, processAlternativeModels, parsePredictionFactors } = useQueryUtils();
-
   return useQuery({
-    queryKey: ["cryptocurrencyData"],
+    queryKey: ["cryptocurrency-data"],
     queryFn: async (): Promise<CryptocurrencyData[]> => {
-      try {
-        // Using financial_market_metrics table with a filter for cryptocurrency assets
-        const { data: cryptoData, error } = await supabase
-          .from("financial_market_metrics")
-          .select("*")
-          .eq("asset_type", "cryptocurrency");
-
-        if (error) {
-          handleError("Failed to fetch cryptocurrency data", error);
-          return [];
-        }
-
-        if (!cryptoData || cryptoData.length === 0) {
-          return [];
-        }
-
-        // Transform the financial market data to match the cryptocurrency data structure
-        const transformedData = cryptoData.map(item => {
-          // Simple models mapping to avoid circular reference
-          const alternativeModels = [
-            { id: "momentum-based", multiplier: 1.2, confidenceModifier: 0.85 },
-            { id: "sentiment-driven", multiplier: 0.8, confidenceModifier: 0.75 }
-          ];
-          
-          return {
-            id: item.id,
-            symbol: (item.asset || "").split('-')[0] || item.asset, 
-            name: getCryptoName(item.asset || ""),
-            current_price_usd: item.current_price,
-            market_cap_usd: item.volume * 2, // Simple approximation for the demo
-            volume_24h_usd: item.volume,
-            circulating_supply: Math.floor(Math.random() * 100000000) + 1000000, // Sample data
-            total_supply: null,
-            max_supply: null,
-            price_change_percentage_24h: item.change_percentage_24h,
-            price_change_percentage_7d: item.change_percentage_24h * 1.2, // Sample data
-            price_change_percentage_30d: item.change_percentage_24h * 0.8, // Sample data
-            all_time_high_usd: item.current_price * 1.5, // Sample data
-            all_time_high_date: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(),
-            timestamp: item.timestamp,
-            predicted_change: item.predicted_change,
-            prediction_timestamp: item.prediction_timestamp,
-            prediction_confidence: item.prediction_confidence,
-            prediction_explanation: item.prediction_explanation,
-            prediction_factors: parsePredictionFactors(item.prediction_factors),
-            alternative_model_predictions: processAlternativeModels(item, alternativeModels)
-          };
-        });
-
-        return transformedData;
-      } catch (error) {
-        console.error("Error in cryptocurrency data fetch:", error);
-        return [];
-      }
+      // You could fetch from Supabase here if connected
+      // For now we'll return mock data
+      return mockCryptoData();
     },
   });
 };
 
-// Helper function to get a crypto name from its symbol
-const getCryptoName = (symbol: string): string => {
-  const cryptoNames: Record<string, string> = {
-    'BTC': 'Bitcoin',
-    'ETH': 'Ethereum',
-    'XRP': 'Ripple',
-    'LTC': 'Litecoin',
-    'ADA': 'Cardano',
-    'DOT': 'Polkadot',
-    'BNB': 'Binance Coin',
-    'LINK': 'Chainlink',
-    'XLM': 'Stellar',
-    'DOGE': 'Dogecoin'
-  };
-  
-  // Extract the first part if it's a pair format like BTC-USD
-  const baseSymbol = symbol.split('-')[0] || symbol;
-  
-  return cryptoNames[baseSymbol] || baseSymbol;
+// Mock data function
+const mockCryptoData = (): CryptocurrencyData[] => {
+  // Fixed Crypto list
+  const cryptos = [
+    { symbol: "BTC", name: "Bitcoin" },
+    { symbol: "ETH", name: "Ethereum" },
+    { symbol: "SOL", name: "Solana" },
+    { symbol: "BNB", name: "Binance Coin" },
+    { symbol: "XRP", name: "Ripple" },
+    { symbol: "ADA", name: "Cardano" },
+    { symbol: "DOGE", name: "Dogecoin" },
+    { symbol: "DOT", name: "Polkadot" },
+    { symbol: "MATIC", name: "Polygon" },
+    { symbol: "LTC", name: "Litecoin" },
+  ];
+
+  return cryptos.map((crypto, index) => ({
+    id: `crypto-${index}`,
+    name: crypto.name,
+    symbol: crypto.symbol,
+    current_price: 10000 / (index + 1) + Math.random() * 1000,
+    market_cap: 100000000 / (index + 1) + Math.random() * 10000000,
+    total_volume: 5000000 / (index + 1) + Math.random() * 1000000,
+    price_change_percentage_24h: (Math.random() * 10) * (Math.random() > 0.5 ? 1 : -1),
+    sparkline_data: Array(24).fill(0).map(() => 100 + Math.random() * 50),
+    predicted_change: (Math.random() * 15) * (Math.random() > 0.5 ? 1 : -1),
+    prediction_confidence: 0.5 + Math.random() * 0.5,
+    prediction_factors: {
+      market_sentiment: Math.random() * 100,
+      technical_indicators: Math.random() * 100,
+      social_volume: Math.random() * 100,
+    },
+  }));
 };

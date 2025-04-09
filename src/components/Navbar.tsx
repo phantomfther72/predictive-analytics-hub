@@ -82,6 +82,12 @@ const Navbar = () => {
             >
               Testimonials
             </a>
+            <Link
+              to="/pricing"
+              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Pricing
+            </Link>
             <button 
               onClick={() => navigate('/dashboard')}
               className="bg-gradient-to-r from-blue-700 to-teal-600 text-white px-6 py-2 rounded-lg hover:opacity-90 transition-all shadow-sm"
@@ -162,6 +168,21 @@ const Navbar = () => {
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
+                className="w-full"
+              >
+                <Link
+                  to="/pricing"
+                  className="flex w-full items-center px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors touch-target"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span className="font-medium">Pricing</span>
+                </Link>
+              </motion.div>
+              
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
                 className="pt-2 pb-3 px-1"
               >
                 <button 

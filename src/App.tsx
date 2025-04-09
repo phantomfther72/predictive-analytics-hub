@@ -15,6 +15,7 @@ import NotFound from './pages/NotFound';
 import Dashboard from './pages/Dashboard';
 import MarketDataTables from './components/MarketDataTables';
 import { Toaster } from './components/ui/toaster';
+import Pricing from './pages/Pricing';
 
 // Lazy load market pages to improve performance
 const HousingMarket = lazy(() => import('./pages/HousingMarket'));
@@ -33,6 +34,7 @@ function App() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
         <Route path="/market-data" element={<MarketDataTables />} />
+        <Route path="/pricing" element={<Pricing />} />
 
         {/* Lazy-loaded market pages */}
         <Route path="/housing-market" element={<Suspense fallback={<div>Loading...</div>}><HousingMarket /></Suspense>} />

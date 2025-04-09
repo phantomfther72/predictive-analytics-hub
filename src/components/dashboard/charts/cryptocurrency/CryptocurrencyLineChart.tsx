@@ -1,127 +1,90 @@
 
 import React from "react";
 import {
-  ResponsiveContainer,
-  ComposedChart,
+  LineChart,
   Line,
+  CartesianGrid,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
-  Legend
+  Legend,
+  ResponsiveContainer,
+  ReferenceLine,
 } from "recharts";
-import { BaseChartProps } from "./types";
-import { chartColors, chartGradients, chartStyles, formatPrice, formatMarketCap } from "./utils/chart-styles";
+import { ChartTooltip } from "./ChartTooltip";
+import { CryptocurrencyData } from "@/types/market";
+import { chartColors, lineChartMargins, tooltipCursor, strokeWidth, dotSize } from "./utils/chart-styles";
+import { useChartAnimations } from "./utils/chart-animations";
 
-export function CryptocurrencyLineChart({
+interface CryptocurrencyLineChartProps {
+  data: CryptocurrencyData[];
+  selectedMetrics: string[];
+  title?: string;
+  description?: string;
+  timeRange?: string;
+}
+
+export const CryptocurrencyLineChart: React.FC<CryptocurrencyLineChartProps> = ({
   data,
   selectedMetrics,
-  onLegendClick,
-  enabledModels = [],
-  simulationMode = false,
-  animationConfig,
-  getAnimationDelay,
-  chartTooltip
-}: BaseChartProps) {
+  title,
+  description,
+  timeRange,
+}) => {
+  const { animations } = useChartAnimations();
+  
+  // Function to determine color based on index
+  const getColor = (index: number) => {
+    const colorKeys = Object.keys(chartColors) as Array<keyof typeof chartColors>;
+    return chartColors[colorKeys[index % colorKeys.length]];
+  };
+
   return (
-    <ResponsiveContainer width="100%" height={400}>
-      <ComposedChart
-        data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid {...chartStyles.cartesianGridStyle} />
-        <defs>
-          <linearGradient id={chartGradients.price.id} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={chartGradients.price.stopColor} stopOpacity={0.8}/>
-            <stop offset="95%" stopColor={chartGradients.price.stopColor} stopOpacity={0}/>
-          </linearGradient>
-        </defs>
-        <XAxis 
-          dataKey="symbol" 
-          tick={chartStyles.axisTickStyle}
-          {...animationConfig}
-        />
-        <YAxis 
-          yAxisId="left" 
-          orientation="left" 
-          tick={chartStyles.axisTickStyle}
-          tickFormatter={formatPrice}
-          {...animationConfig}
-        />
-        <YAxis
-          yAxisId="right"
-          orientation="right"
-          tick={chartStyles.axisTickStyle}
-          tickFormatter={formatMarketCap}
-          {...animationConfig}
-        />
-        <Tooltip content={chartTooltip} />
-        <Legend onClick={onLegendClick} />
-        
-        {selectedMetrics.includes("current_price_usd") && (
-          <Line
-            type="monotone"
-            dataKey="current_price_usd"
-            name="Current Price (USD)"
-            stroke={chartColors.primary}
-            yAxisId="left"
-            strokeWidth={chartStyles.primaryLineStyle.strokeWidth}
-            dot={chartStyles.dotStyle}
-            activeDot={chartStyles.activeDotStyle}
-            {...animationConfig}
-            animationBegin={getAnimationDelay(0)}
+    <div className="w-full h-full">
+      {title && (
+        <div className="mb-2">
+          <h3 className="text-lg font-semibold">{title}</h3>
+          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+        </div>
+      )}
+      
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart
+          data={data}
+          margin={lineChartMargins}
+        >
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <XAxis 
+            dataKey="name" 
+            tick={{ fontSize: 12 }} 
+            tickLine={false} 
           />
-        )}
-        
-        {selectedMetrics.includes("market_cap_usd") && (
-          <Line
-            type="monotone"
-            dataKey="market_cap_usd"
-            name="Market Cap (USD)"
-            stroke={chartColors.secondary}
-            yAxisId="right"
-            strokeWidth={chartStyles.secondaryLineStyle.strokeWidth}
-            dot={chartStyles.dotStyle}
-            activeDot={{ ...chartStyles.activeDotStyle, fill: chartColors.secondary }}
-            {...animationConfig}
-            animationBegin={getAnimationDelay(1)}
+          <YAxis 
+            tick={{ fontSize: 12 }} 
+            tickLine={false} 
+            axisLine={false} 
           />
-        )}
-        
-        {selectedMetrics.includes("price_change_percentage_24h") && (
-          <Line
-            type="monotone"
-            dataKey="price_change_percentage_24h"
-            name="24h Change (%)"
-            stroke={chartColors.tertiary}
-            yAxisId="left"
-            strokeWidth={chartStyles.tertiaryLineStyle.strokeWidth}
-            dot={chartStyles.dotStyle}
-            activeDot={{ ...chartStyles.activeDotStyle, fill: chartColors.tertiary }}
-            {...animationConfig}
-            animationBegin={getAnimationDelay(2)}
-          />
-        )}
-        
-        {enabledModels.length > 0 && simulationMode && 
-          enabledModels.filter(m => m.id !== "primary").map((model, idx) => (
-            selectedMetrics.includes("current_price_usd") && (
-              <Line
-                key={`${model.id}-price`}
-                type="monotone"
-                dataKey={(dataPoint) => dataPoint.current_price_usd * (1 + (dataPoint.predicted_change || 0) * model.weight / 100)}
-                name={`${model.name} - Price`}
-                stroke={model.color}
-                yAxisId="left"
-                {...chartStyles.predictionLineStyle}
-                dot={{ r: 3 }}
-                {...animationConfig}
-                animationBegin={getAnimationDelay(3 + idx)}
-              />
-            )
-          ))
-        }
-      </ComposedChart>
-    </ResponsiveContainer>
+          <Tooltip content={<ChartTooltip />} cursor={tooltipCursor} />
+          <Legend />
+          <ReferenceLine y={0} stroke="#666" />
+          
+          {selectedMetrics.map((metric, index) => (
+            <Line
+              key={metric}
+              type="monotone"
+              dataKey={metric}
+              name={metric.charAt(0).toUpperCase() + metric.slice(1).replace(/_/g, " ")}
+              stroke={getColor(index)}
+              strokeWidth={strokeWidth}
+              dot={{ r: dotSize }}
+              activeDot={{ r: dotSize + 2 }}
+              animationBegin={animations.delay}
+              animationDuration={animations.duration}
+              animationEasing={animations.easing}
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
-}
+};

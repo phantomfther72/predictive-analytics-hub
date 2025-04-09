@@ -8,6 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PaymentModal } from "../payment/PaymentModal";
+import { SubscriptionManager } from "../subscription/SubscriptionManager";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { AtSign, User, Bell } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 export const DashboardProfile = () => {
   const { toast } = useToast();
@@ -61,44 +66,101 @@ export const DashboardProfile = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Profile Settings</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-2">
-            <label className="text-sm font-medium">Email</label>
-            <input
-              type="email"
-              className="w-full px-3 py-2 border rounded-md bg-muted"
-              value={profile?.email}
-              disabled
-            />
-          </div>
-          <div className="grid gap-2">
-            <label className="text-sm font-medium">Subscription Tier</label>
-            <div className="flex items-center gap-2">
-              <Badge variant={profile?.subscription_tier === 'premium' ? 'default' : 'secondary'}>
-                {profile?.subscription_tier === 'premium' ? 'Premium' : 'Free'}
-              </Badge>
-              {profile?.subscription_tier === 'premium' ? (
-                <span className="text-sm text-muted-foreground">
-                  Valid until {new Date(profile.subscription_end_date).toLocaleDateString()}
-                </span>
-              ) : (
-                <span className="text-sm text-muted-foreground">
-                  - Basic access to market analytics
-                </span>
-              )}
-            </div>
-          </div>
-          {profile?.subscription_tier !== 'premium' && (
-            <Button onClick={() => setPaymentModalOpen(true)}>
-              Upgrade to Premium
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+      
+      <Tabs defaultValue="personal">
+        <TabsList className="mb-4">
+          <TabsTrigger value="personal">Personal Info</TabsTrigger>
+          <TabsTrigger value="subscription">Subscription</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="personal">
+          <Card>
+            <CardHeader>
+              <CardTitle>Personal Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <AtSign size={16} />
+                  Email
+                </label>
+                <input
+                  type="email"
+                  className="w-full px-3 py-2 border rounded-md bg-muted"
+                  value={profile?.email}
+                  disabled
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <User size={16} />
+                  Username
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-md"
+                  placeholder="Choose a username"
+                />
+              </div>
+              
+              <Button variant="outline">Update Profile</Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="subscription">
+          <SubscriptionManager />
+        </TabsContent>
+        
+        <TabsContent value="notifications">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell size={18} />
+                Notification Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-border pb-3">
+                  <div>
+                    <p className="font-medium">Market Updates</p>
+                    <p className="text-sm text-muted-foreground">Receive daily market summaries</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                
+                <div className="flex items-center justify-between border-b border-border pb-3">
+                  <div>
+                    <p className="font-medium">Price Alerts</p>
+                    <p className="text-sm text-muted-foreground">Get notified of significant price changes</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                
+                <div className="flex items-center justify-between border-b border-border pb-3">
+                  <div>
+                    <p className="font-medium">Prediction Alerts</p>
+                    <p className="text-sm text-muted-foreground">Notifications for new AI predictions</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Email Communications</p>
+                    <p className="text-sm text-muted-foreground">Receive newsletters and product updates</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      
       <PaymentModal 
         open={paymentModalOpen} 
         onOpenChange={setPaymentModalOpen} 

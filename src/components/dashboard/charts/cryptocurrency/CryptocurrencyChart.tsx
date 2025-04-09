@@ -1,167 +1,130 @@
 
-import React, { useState, useRef, useEffect } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingDown } from "lucide-react";
-import { Payload } from "recharts/types/component/DefaultLegendContent";
-import { ModelSettings } from "../use-chart-state";
-import { ChartTypeSelector } from "./ChartTypeSelector";
+import React, { useState } from "react";
+import { CryptocurrencyData } from "@/types/market";
 import { CryptocurrencyAreaChart } from "./CryptocurrencyAreaChart";
 import { CryptocurrencyLineChart } from "./CryptocurrencyLineChart";
 import { CryptocurrencyBarChart } from "./CryptocurrencyBarChart";
 import { CryptocurrencyComposedChart } from "./CryptocurrencyComposedChart";
-import { ChartTooltip } from "./ChartTooltip";
-import { motion, AnimatePresence } from "framer-motion";
-import { CryptocurrencyData } from "@/types/market";
-import { chartStyles } from "./utils/chart-styles";
-import { createChartAnimationConfig, entranceAnimations } from "./utils/chart-animations";
-
-export type ChartType = 'area' | 'line' | 'bar' | 'composed';
+import { ChartTypeSelector } from "./ChartTypeSelector";
+import { Payload } from "recharts/types/component/DefaultLegendContent";
+import { chartColors } from "./utils/chart-styles";
 
 export interface CryptocurrencyChartProps {
-  data?: CryptocurrencyData[];
-  isLoading?: boolean;
+  data: CryptocurrencyData[];
   selectedMetrics: string[];
-  onLegendClick: (data: Payload) => void;
-  enabledModels?: ModelSettings[];
-  simulationMode?: boolean;
-  timeRange?: string;
+  onLegendClick?: (payload: Payload) => void;
   title?: string;
   description?: string;
+  timeRange?: string;
 }
 
-export function CryptocurrencyChart({
+export const CryptocurrencyChart: React.FC<CryptocurrencyChartProps> = ({
   data,
-  isLoading,
   selectedMetrics,
   onLegendClick,
-  enabledModels = [],
-  simulationMode = false,
-  timeRange = "7D",
   title,
-  description
-}: CryptocurrencyChartProps) {
-  const [chartType, setChartType] = useState<ChartType>('area');
-  const [animationActive, setAnimationActive] = useState<boolean>(true);
-  const chartRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    setAnimationActive(false);
-    const timer = setTimeout(() => setAnimationActive(true), 50);
-    return () => clearTimeout(timer);
-  }, [chartType]);
-  
-  const handleChartTypeChange = (type: ChartType) => {
-    if (type === chartType) return;
-    
-    if (chartRef.current) {
-      chartRef.current.style.transition = 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)';
-      chartRef.current.style.opacity = '0';
-      chartRef.current.style.transform = 'scale(0.98)';
-      
-      setTimeout(() => {
-        setChartType(type);
-        
-        setTimeout(() => {
-          if (chartRef.current) {
-            chartRef.current.style.opacity = '1';
-            chartRef.current.style.transform = 'scale(1)';
-          }
-        }, 50);
-      }, 300);
-    } else {
-      setChartType(type);
-    }
-  };
-  
-  if (isLoading) {
-    return (
-      <div className="animate-pulse">
-        <Skeleton className="h-[400px] w-full rounded-lg" />
-      </div>
-    );
-  }
+  description,
+  timeRange,
+}) => {
+  const [chartType, setChartType] = useState<
+    "area" | "line" | "bar" | "composed"
+  >("area");
 
-  if (!data?.length) {
-    return (
-      <div className="flex items-center justify-center h-[400px] border border-dashed border-slate-200 rounded-lg bg-slate-50">
-        <div className="text-center text-slate-500">
-          <TrendingDown className="mx-auto h-10 w-10 mb-3 text-slate-300" />
-          <p>No cryptocurrency data available</p>
-        </div>
-      </div>
-    );
-  }
+  // Filter data if needed
+  const chartData = React.useMemo(() => {
+    if (!data || data.length === 0) return [];
+    return data;
+  }, [data]);
 
-  // Get animation configuration
-  const { animationConfig, getAnimationDelay } = createChartAnimationConfig(animationActive);
-  
-  // Use the correct tooltip component without calling it as a function
-  const chartTooltip = <ChartTooltip />;
-
-  const renderChart = () => {
-    const commonProps = {
-      data,
-      selectedMetrics,
-      onLegendClick,
-      enabledModels,
-      simulationMode,
-      animationConfig,
-      getAnimationDelay,
-      chartTooltip
-    };
-
-    switch(chartType) {
-      case 'line':
-        return <CryptocurrencyLineChart {...commonProps} />;
-      case 'bar':
-        return <CryptocurrencyBarChart {...commonProps} />;
-      case 'composed':
-        return <CryptocurrencyComposedChart {...commonProps} />;
-      default: // area chart
-        return <CryptocurrencyAreaChart {...commonProps} />;
-    }
+  // Mapping for chart types
+  const chartComponents = {
+    area: (
+      <CryptocurrencyAreaChart
+        data={chartData}
+        selectedMetrics={selectedMetrics}
+        title={title}
+        description={description}
+        timeRange={timeRange}
+      />
+    ),
+    line: (
+      <CryptocurrencyLineChart
+        data={chartData}
+        selectedMetrics={selectedMetrics}
+        title={title}
+        description={description}
+        timeRange={timeRange}
+      />
+    ),
+    bar: (
+      <CryptocurrencyBarChart
+        data={chartData}
+        selectedMetrics={selectedMetrics}
+        title={title}
+        description={description}
+        timeRange={timeRange}
+      />
+    ),
+    composed: (
+      <CryptocurrencyComposedChart
+        data={chartData}
+        selectedMetrics={selectedMetrics}
+        title={title}
+        description={description}
+        timeRange={timeRange}
+      />
+    ),
   };
 
   return (
-    <div className="space-y-4">
-      {(title || description) && (
-        <div className="flex flex-col space-y-1.5">
+    <div className="w-full space-y-4">
+      <div className="flex justify-between items-center">
+        <div>
           {title && <h3 className="text-lg font-semibold">{title}</h3>}
-          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+          {description && (
+            <p className="text-sm text-muted-foreground">{description}</p>
+          )}
+        </div>
+        <ChartTypeSelector chartType={chartType} setChartType={setChartType} />
+      </div>
+
+      <div className="w-full relative">
+        {chartData.length > 0 ? (
+          chartComponents[chartType]
+        ) : (
+          <div className="h-80 flex items-center justify-center bg-slate-50 dark:bg-slate-900 rounded-lg">
+            <div className="text-center">
+              <p className="text-muted-foreground">No data available</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {selectedMetrics.length > 0 && (
+        <div className="flex flex-wrap gap-3 mt-2">
+          {selectedMetrics.map((metric, index) => (
+            <div
+              key={metric}
+              className="flex items-center gap-2 text-sm"
+              onClick={() => onLegendClick?.({ value: metric })}
+              style={{ cursor: onLegendClick ? "pointer" : "default" }}
+            >
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{
+                  backgroundColor: chartColors[
+                    Object.keys(chartColors)[index % Object.keys(chartColors).length] as keyof typeof chartColors
+                  ],
+                }}
+              ></div>
+              <span>
+                {metric.charAt(0).toUpperCase() +
+                  metric.slice(1).replace(/_/g, " ")}
+              </span>
+            </div>
+          ))}
         </div>
       )}
-      
-      <ChartTypeSelector chartType={chartType} onChartTypeChange={handleChartTypeChange} />
-      
-      <div 
-        ref={chartRef} 
-        className={`transition-all duration-300 ease-in-out ${chartStyles.containerStyle}`}
-        style={{ opacity: 1, transform: 'scale(1)' }}
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={chartType}
-            initial={entranceAnimations.fadeIn.initial}
-            animate={entranceAnimations.fadeIn.animate}
-            exit={entranceAnimations.fadeIn.exit}
-            transition={entranceAnimations.fadeIn.transition}
-            className="rounded-lg overflow-hidden"
-          >
-            {renderChart()}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-      
-      <style>
-        {`
-        .price-change-bar[data-value-positive="true"] {
-          fill: ${chartColors.primary};
-        }
-        .price-change-bar[data-value-positive="false"] {
-          fill: ${chartColors.negative};
-        }
-        `}
-      </style>
     </div>
   );
-}
+};

@@ -63,13 +63,13 @@ export function MarketInsightsCarousel({
   return (
     <div 
       className={cn(
-        "relative rounded-xl p-6 shadow-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700",
+        "relative rounded-xl p-6 shadow-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full",
         className
       )}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="absolute top-3 right-3 flex gap-1">
+      <div className="absolute top-3 right-3 flex gap-1 z-10">
         {insights.map((_, index) => (
           <button
             key={index}

@@ -60,6 +60,7 @@ const config: Config = {
       fontFamily: {
         sans: ["Inter", ...fontFamily.sans],
         heading: ["Poppins", ...fontFamily.sans],
+        poppins: ["Poppins", ...fontFamily.sans],
       },
       keyframes: {
         "accordion-down": {

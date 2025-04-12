@@ -14,6 +14,7 @@ import MiningMarket from "@/pages/MiningMarket";
 import GreenHydrogenMarket from "@/pages/GreenHydrogenMarket";
 import FinancialMarket from "@/pages/FinancialMarket";
 import CryptocurrencyMarket from "@/pages/CryptocurrencyMarket";
+import MedicalMarket from "@/pages/MedicalMarket";
 import NotFound from "@/pages/NotFound";
 import { MarketType } from "@/types/market";
 

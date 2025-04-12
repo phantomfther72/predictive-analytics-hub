@@ -24,6 +24,7 @@ const MiningMarket = lazy(() => import('./pages/MiningMarket'));
 const GreenHydrogenMarket = lazy(() => import('./pages/GreenHydrogenMarket'));
 const FinancialMarket = lazy(() => import('./pages/FinancialMarket'));
 const CryptocurrencyMarket = lazy(() => import('./pages/CryptocurrencyMarket'));
+const MedicalMarket = lazy(() => import('./pages/MedicalMarket'));
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
         <Route path="/green-hydrogen-market" element={<Suspense fallback={<div>Loading...</div>}><GreenHydrogenMarket /></Suspense>} />
         <Route path="/financial-market" element={<Suspense fallback={<div>Loading...</div>}><FinancialMarket /></Suspense>} />
         <Route path="/cryptocurrency-market" element={<Suspense fallback={<div>Loading...</div>}><CryptocurrencyMarket /></Suspense>} />
+        <Route path="/medical-market" element={<Suspense fallback={<div>Loading...</div>}><MedicalMarket /></Suspense>} />
 
         {/* Not found route */}
         <Route path="*" element={<NotFound />} />

@@ -1,6 +1,6 @@
 export type TimeRange = "1D" | "7D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
 
-export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen" | "financial";
+export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen" | "financial" | "medical";
 
 export type PredictionFactors = {
   market_trend: number;
@@ -17,6 +17,10 @@ export type PredictionFactors = {
   development_activity?: number;
   institutional_adoption?: number;
   regulatory_risk?: number;
+  patient_volume?: number;
+  healthcare_policy?: number;
+  equipment_utilization?: number;
+  staffing_levels?: number;
 };
 
 export type AlternativeModelPrediction = {
@@ -161,7 +165,6 @@ export type AgricultureMarketData = {
   prediction_factors: PredictionFactors | null;
   alternative_model_predictions?: AlternativeModelPrediction[];
   
-  // Enhanced metrics for agriculture
   soil_health_index?: number;
   nutrient_efficiency_pct?: number;
   pest_resistance_score?: number;
@@ -193,7 +196,6 @@ export type GreenHydrogenMetrics = {
   prediction_factors: PredictionFactors | null;
   alternative_model_predictions?: AlternativeModelPrediction[];
   
-  // Enhanced metrics for green hydrogen
   energy_consumption_kwh_per_kg?: number;
   water_consumption_liters_per_kg?: number;
   carbon_intensity_g_co2_per_kwh?: number;
@@ -203,7 +205,7 @@ export type GreenHydrogenMetrics = {
   renewable_energy_source?: "Solar" | "Wind" | "Hydro" | "Mixed";
   renewable_energy_percentage?: number;
   transport_efficiency_pct?: number;
-  tech_readiness_level?: number; // 1-9 scale
+  tech_readiness_level?: number;
   export_agreements_volume?: number;
   domestic_use_percentage?: number;
   projected_cost_reduction_pct?: number;
@@ -211,7 +213,7 @@ export type GreenHydrogenMetrics = {
   research_development_investment_usd?: number;
   facility_count?: number;
   production_scale?: "Pilot" | "Demonstration" | "Commercial" | "Industrial";
-  environmental_impact_score?: number; // 0-100;
+  environmental_impact_score?: number;
 };
 
 export type CryptocurrencyData = {
@@ -236,6 +238,85 @@ export type CryptocurrencyData = {
   prediction_explanation: string | null;
   prediction_factors: PredictionFactors | null;
   alternative_model_predictions?: AlternativeModelPrediction[];
+};
+
+export type MedicalMarketData = {
+  id: string;
+  facility_name: string;
+  facility_type: "Hospital" | "Clinic" | "Emergency" | "Specialty" | "Primary";
+  region: string;
+  total_beds: number;
+  occupied_beds: number;
+  occupancy_rate: number;
+  icu_beds: number;
+  icu_occupancy: number;
+  avg_stay_duration: number;
+  patient_volume: number;
+  er_visits: number;
+  wait_time_minutes: number;
+  service_satisfaction: number;
+  timestamp: string;
+  predicted_change: number | null;
+  prediction_timestamp: string;
+  prediction_confidence: number;
+  prediction_explanation: string | null;
+  prediction_factors: PredictionFactors | null;
+  alternative_model_predictions?: AlternativeModelPrediction[];
+  
+  mri_scanners?: number;
+  mri_utilization?: number;
+  ct_scanners?: number;
+  ct_utilization?: number;
+  ventilators?: number;
+  ventilator_utilization?: number;
+  
+  avg_treatment_cost?: number;
+  revenue_per_bed?: number;
+  operating_margin?: number;
+  
+  physician_count?: number;
+  nurse_count?: number;
+  staff_to_patient_ratio?: number;
+  
+  created_at?: string;
+};
+
+export type MedicalEquipmentData = {
+  id: string;
+  equipment_name: string;
+  equipment_type: string;
+  facility_id: string;
+  acquisition_date: string;
+  last_maintenance: string;
+  next_maintenance: string;
+  utilization_rate: number;
+  operational_status: "Active" | "Maintenance" | "Offline" | "Standby";
+  depreciation_value: number;
+  initial_cost: number;
+  current_value: number;
+  expected_lifetime: number;
+  manufacturer: string;
+  model: string;
+  timestamp: string;
+  predicted_maintenance?: string;
+  prediction_confidence?: number;
+};
+
+export type MedicalServiceData = {
+  id: string;
+  service_name: string;
+  service_category: string;
+  facility_id: string;
+  patients_served: number;
+  avg_service_time: number;
+  cost_per_service: number;
+  satisfaction_score: number;
+  revenue_generated: number;
+  staff_assigned: number;
+  availability_hours: number;
+  timestamp: string;
+  predicted_demand?: number;
+  prediction_confidence?: number;
 };
 
 export type ModelSettings = {

@@ -1,5 +1,5 @@
 
-import { Home, Leaf, Mountain, Bitcoin, Zap, LineChart } from "lucide-react";
+import { Home, Leaf, Mountain, Bitcoin, Zap, LineChart, Stethoscope } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -51,6 +51,14 @@ const industries = [
       "Monitor global financial markets, stocks, bonds and analyze investment opportunities.",
     type: "financial" as const,
     route: "/financial-market"
+  },
+  {
+    icon: Stethoscope,
+    title: "Medical Assets",
+    description:
+      "Analyze healthcare metrics, hospital capacity, and equipment utilization trends.",
+    type: "medical" as const,
+    route: "/medical-market"
   }
 ];
 

@@ -9,9 +9,11 @@ export interface MarketInsight {
   industryLabel: string;
   predictedChange?: number;
   timestamp?: string;
-  metrics?: {
-    name: string;
-    value: string | number;
-    change?: number;
-  }[];
+  metrics?: InsightMetric[];
+}
+
+export interface InsightMetric {
+  label: string;
+  value: string | number;
+  change: number | null;
 }

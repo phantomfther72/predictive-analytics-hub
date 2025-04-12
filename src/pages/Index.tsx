@@ -1,7 +1,6 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import Industries from "@/components/Industries";
@@ -43,7 +42,6 @@ const Index: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
       <Hero />
       <div id="market-data" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Market Data Tables component will handle all market data including insights */}
@@ -53,7 +51,6 @@ const Index: React.FC = () => {
       <Industries />
       <Testimonials />
       <CTA />
-      <Footer />
     </div>
   );
 };

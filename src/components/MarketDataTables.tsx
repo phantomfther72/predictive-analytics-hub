@@ -25,20 +25,23 @@ const MarketDataTables: React.FC<MarketDataTablesProps> = ({ onInsightClick }) =
   }
 
   return (
-    <div className="space-y-12 py-8">
-      <div className="grid grid-cols-1 gap-6">
-        <div>
-          <h2 className="text-3xl font-bold mb-6">Latest Market Insights</h2>
-          <div className="max-w-5xl mx-auto">
-            <MarketInsightsCarousel 
-              autoplayInterval={7000}
-              className="w-full"
-              onInsightClick={onInsightClick}
-            />
-          </div>
+    <div className="space-y-8">
+      {/* Market Insights Section */}
+      <section className="mb-10">
+        <h2 className="text-3xl font-bold mb-6 text-slate-900 dark:text-white">Latest Market Insights</h2>
+        <div className="max-w-5xl mx-auto">
+          <MarketInsightsCarousel 
+            autoplayInterval={7000}
+            className="w-full"
+            onInsightClick={onInsightClick}
+          />
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+      </section>
+      
+      {/* Market Data Grid and Alerts Section */}
+      <section>
+        <h2 className="text-3xl font-bold mb-6 text-slate-900 dark:text-white">Market Data</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <MarketDataGrid groupedMetrics={groupedMetrics} />
           
           {marketMetrics && marketMetrics.length > 0 && (
@@ -48,7 +51,7 @@ const MarketDataTables: React.FC<MarketDataTablesProps> = ({ onInsightClick }) =
             />
           )}
         </div>
-      </div>
+      </section>
     </div>
   );
 };

@@ -3,12 +3,7 @@ import React, { Suspense, lazy } from 'react';
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Features from './components/Features';
-import Hero from './components/Hero';
-import Testimonials from './components/Testimonials';
-import CTA from './components/CTA';
 import Footer from './components/Footer';
-import Industries from './components/Industries';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
 import NotFound from './pages/NotFound';
@@ -28,30 +23,60 @@ const MedicalMarket = lazy(() => import('./pages/MedicalMarket'));
 
 function App() {
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-900">
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/dashboard/*" element={<Dashboard />} />
-        <Route path="/market-data" element={<MarketDataTables />} />
-        <Route path="/pricing" element={<Pricing />} />
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route path="/market-data" element={<MarketDataTables />} />
+          <Route path="/pricing" element={<Pricing />} />
 
-        {/* Lazy-loaded market pages */}
-        <Route path="/housing-market" element={<Suspense fallback={<div>Loading...</div>}><HousingMarket /></Suspense>} />
-        <Route path="/agriculture-market" element={<Suspense fallback={<div>Loading...</div>}><AgricultureMarket /></Suspense>} />
-        <Route path="/mining-market" element={<Suspense fallback={<div>Loading...</div>}><MiningMarket /></Suspense>} />
-        <Route path="/green-hydrogen-market" element={<Suspense fallback={<div>Loading...</div>}><GreenHydrogenMarket /></Suspense>} />
-        <Route path="/financial-market" element={<Suspense fallback={<div>Loading...</div>}><FinancialMarket /></Suspense>} />
-        <Route path="/cryptocurrency-market" element={<Suspense fallback={<div>Loading...</div>}><CryptocurrencyMarket /></Suspense>} />
-        <Route path="/medical-market" element={<Suspense fallback={<div>Loading...</div>}><MedicalMarket /></Suspense>} />
+          {/* Lazy-loaded market pages */}
+          <Route path="/housing-market" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-64">Loading...</div>}>
+              <HousingMarket />
+            </Suspense>
+          } />
+          <Route path="/agriculture-market" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-64">Loading...</div>}>
+              <AgricultureMarket />
+            </Suspense>
+          } />
+          <Route path="/mining-market" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-64">Loading...</div>}>
+              <MiningMarket />
+            </Suspense>
+          } />
+          <Route path="/green-hydrogen-market" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-64">Loading...</div>}>
+              <GreenHydrogenMarket />
+            </Suspense>
+          } />
+          <Route path="/financial-market" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-64">Loading...</div>}>
+              <FinancialMarket />
+            </Suspense>
+          } />
+          <Route path="/cryptocurrency-market" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-64">Loading...</div>}>
+              <CryptocurrencyMarket />
+            </Suspense>
+          } />
+          <Route path="/medical-market" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-64">Loading...</div>}>
+              <MedicalMarket />
+            </Suspense>
+          } />
 
-        {/* Not found route */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* Not found route */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
       <Footer />
       <Toaster />
-    </>
+    </div>
   );
 }
 

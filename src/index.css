@@ -16,7 +16,7 @@
 
   /* Improved responsive typography */
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Poppins', 'Inter', system-ui, sans-serif;
   }
 
   @media (max-width: 767px) {
@@ -31,6 +31,10 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-poppins font-semibold;
   }
 }
 
@@ -96,7 +100,7 @@
   
   /* Custom focus styles for better visibility */
   .focus-visible-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-500;
   }
 
   /* Grid layout utilities */
@@ -114,6 +118,27 @@
   
   .responsive-grid-cols-4 {
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
+  }
+  
+  /* PredictivePulse specific branding colors */
+  .bg-pulse-deep-blue {
+    @apply bg-slate-900;
+  }
+  
+  .text-pulse-deep-blue {
+    @apply text-slate-900;
+  }
+  
+  .bg-pulse-teal {
+    @apply bg-teal-500;
+  }
+  
+  .text-pulse-teal {
+    @apply text-teal-500;
+  }
+  
+  .border-pulse-teal {
+    @apply border-teal-500;
   }
 }
 

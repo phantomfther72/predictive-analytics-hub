@@ -63,7 +63,7 @@ export function MarketInsightsCarousel({
   return (
     <div 
       className={cn(
-        "relative rounded-xl p-6 shadow-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full",
+        "relative rounded-xl p-6 shadow-md bg-slate-900 dark:bg-slate-800 border border-slate-800 dark:border-slate-700 w-full text-white",
         className
       )}
       onMouseEnter={() => setIsPaused(true)}
@@ -77,7 +77,7 @@ export function MarketInsightsCarousel({
             className={cn(
               "w-2 h-2 rounded-full transition-all duration-300",
               activeIndex === index 
-                ? "bg-blue-600 dark:bg-blue-400 w-4" 
+                ? "bg-teal-500 dark:bg-teal-400 w-4" 
                 : "bg-slate-300 dark:bg-slate-600"
             )}
             aria-label={`Go to insight ${index + 1}`}
@@ -121,19 +121,19 @@ export function MarketInsightsCarousel({
               )}
             </div>
             
-            <h3 className="text-lg font-semibold mb-2">{currentInsight.title}</h3>
-            <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{currentInsight.description}</p>
+            <h3 className="text-lg font-semibold mb-2 text-white">{currentInsight.title}</h3>
+            <p className="text-sm text-slate-300 dark:text-slate-300 mb-4">{currentInsight.description}</p>
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-xs text-slate-400 dark:text-slate-400">
               {currentInsight.timestamp ? new Date(currentInsight.timestamp).toLocaleString() : "Just now"}
             </span>
             
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 p-0 h-auto"
+              className="text-sm text-teal-400 hover:text-teal-300 dark:text-teal-400 p-0 h-auto"
               onClick={() => handleInsightClick(currentInsight)}
             >
               View Details →
@@ -146,7 +146,7 @@ export function MarketInsightsCarousel({
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-full bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 shadow-sm hover:bg-white dark:hover:bg-slate-700"
+          className="h-8 w-8 rounded-full bg-slate-800/80 dark:bg-slate-700/80 text-white dark:text-slate-200 shadow-sm hover:bg-slate-700 dark:hover:bg-slate-600"
           onClick={prevInsight}
           aria-label="Previous insight"
         >
@@ -158,7 +158,7 @@ export function MarketInsightsCarousel({
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-full bg-white/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 shadow-sm hover:bg-white dark:hover:bg-slate-700"
+          className="h-8 w-8 rounded-full bg-slate-800/80 dark:bg-slate-700/80 text-white dark:text-slate-200 shadow-sm hover:bg-slate-700 dark:hover:bg-slate-600"
           onClick={nextInsight}
           aria-label="Next insight"
         >

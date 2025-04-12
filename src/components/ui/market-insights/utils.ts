@@ -1,236 +1,136 @@
 
-import { MarketInsight, MarketMetric, InsightMetric } from "./types";
-import { MarketType } from "@/types/market";
+import { MarketInsight } from "./types";
+import { v4 as uuidv4 } from "uuid";
 
-// Convert database market metrics to insight format
-export function processMarketMetrics(marketMetrics: any[]): MarketInsight[] {
-  // Group metrics by market type
-  const groupedMetrics: Record<string, any[]> = {};
-  
-  marketMetrics.forEach(metric => {
-    const marketType = metric.market_type;
-    if (!groupedMetrics[marketType]) {
-      groupedMetrics[marketType] = [];
-    }
-    groupedMetrics[marketType].push(metric);
-  });
-  
-  // Generate insights from grouped metrics
-  return Object.entries(groupedMetrics).map(([marketType, metrics], index) => {
-    const title = getMarketTitle(marketType as MarketType);
-    const filteredMetrics = metrics.slice(0, 3); // Take top 3 metrics
-    
-    return {
-      id: `insight-${index}`,
-      title,
-      description: `Latest data and predictions for ${title}`,
-      industry: title,
-      industryType: marketType,
-      date: new Date().toISOString(),
-      metrics: filteredMetrics.map(m => ({
-        name: m.metric_name,
-        value: m.value,
-        change: m.predicted_change || 0,
-        isPositive: (m.predicted_change || 0) > 0,
-        unit: getMetricUnit(m.metric_name),
-        label: m.metric_name
-      }))
-    };
-  });
-}
+export const generateMockInsights = (count: number = 5): MarketInsight[] => {
+  const industries = [
+    { type: "financial", label: "Financial Markets" },
+    { type: "housing", label: "Housing Market" },
+    { type: "mining", label: "Mining Sector" },
+    { type: "agriculture", label: "Agriculture" },
+    { type: "green_hydrogen", label: "Green Hydrogen" },
+    { type: "medical", label: "Medical Services" }
+  ];
 
-// Generate demo insights when no data is available
-export function generateDemoInsights(): MarketInsight[] {
-  return [
+  const financialInsights = [
     {
-      id: "insight-housing",
-      title: "Housing Markets",
-      description: "Latest real estate data and trends",
-      industry: "Housing Markets",
-      industryType: "housing",
-      date: new Date().toISOString(),
-      metrics: [
-        {
-          name: "Average Price",
-          value: 425000,
-          change: 3.2,
-          isPositive: true,
-          unit: "USD",
-          label: "Average Price"
-        },
-        {
-          name: "Active Listings",
-          value: 5280,
-          change: -2.1,
-          isPositive: false,
-          label: "Active Listings"
-        },
-        {
-          name: "Days on Market",
-          value: 28,
-          change: -5.3,
-          isPositive: true,
-          unit: "days",
-          label: "Days on Market"
-        }
-      ]
+      title: "S&P 500 Reaches New High",
+      description: "The S&P 500 index has reached a new all-time high, driven by strong tech sector performance and positive economic indicators.",
+      predictedChange: 1.8
     },
     {
-      id: "insight-agriculture",
-      title: "Agriculture",
-      description: "Global crop and yield forecasts",
-      industry: "Agriculture",
-      industryType: "agriculture",
-      date: new Date().toISOString(),
-      metrics: [
-        {
-          name: "Crop Yield",
-          value: 4.8,
-          change: 0.5,
-          isPositive: true,
-          unit: "t/ha",
-          label: "Crop Yield"
-        },
-        {
-          name: "Market Price",
-          value: 320,
-          change: 12.5,
-          isPositive: true,
-          unit: "USD/t",
-          label: "Market Price"
-        },
-        {
-          name: "Export Volume",
-          value: 125000,
-          change: 4.2,
-          isPositive: true,
-          unit: "tons",
-          label: "Export Volume"
-        }
-      ]
-    },
-    {
-      id: "insight-mining",
-      title: "Mining",
-      description: "Resource extraction and commodity prices",
-      industry: "Mining",
-      industryType: "mining",
-      date: new Date().toISOString(),
-      metrics: [
-        {
-          name: "Copper Price",
-          value: 9320,
-          change: 5.8,
-          isPositive: true,
-          unit: "USD/ton",
-          label: "Copper Price"
-        },
-        {
-          name: "Production Volume",
-          value: 85600,
-          change: 0.9,
-          isPositive: true,
-          unit: "MT",
-          label: "Production Volume"
-        },
-        {
-          name: "Export Growth",
-          value: 3.5,
-          change: 0.2,
-          isPositive: true,
-          unit: "%",
-          label: "Export Growth"
-        }
-      ]
-    },
-    {
-      id: "insight-green_hydrogen",
-      title: "Green Hydrogen",
-      description: "Emerging clean energy market trends",
-      industry: "Green Hydrogen",
-      industryType: "green_hydrogen",
-      date: new Date().toISOString(),
-      metrics: [
-        {
-          name: "Production Capacity",
-          value: 250,
-          change: 15.3,
-          isPositive: true,
-          unit: "MW",
-          label: "Production Capacity"
-        },
-        {
-          name: "Market Demand",
-          value: 180000,
-          change: 23.8,
-          isPositive: true,
-          unit: "tons",
-          label: "Market Demand"
-        },
-        {
-          name: "Efficiency",
-          value: 68.5,
-          change: 2.1,
-          isPositive: true,
-          unit: "%",
-          label: "Efficiency"
-        }
-      ]
-    },
-    {
-      id: "insight-financial",
-      title: "Financial Markets",
-      description: "Stock, bond, and currency analysis",
-      industry: "Financial Markets",
-      industryType: "financial",
-      date: new Date().toISOString(),
-      metrics: [
-        {
-          name: "Market Index",
-          value: 4820,
-          change: 1.2,
-          isPositive: true,
-          unit: "points",
-          label: "Market Index"
-        },
-        {
-          name: "Volatility",
-          value: 18.5,
-          change: -2.3,
-          isPositive: true,
-          unit: "%",
-          label: "Volatility"
-        },
-        {
-          name: "Trading Volume",
-          value: 1250000,
-          change: 3.8,
-          isPositive: true,
-          unit: "shares",
-          label: "Trading Volume"
-        }
-      ]
+      title: "Bond Yields Show Steady Growth",
+      description: "Treasury bond yields continue to show steady growth, reflecting market confidence in economic recovery.",
+      predictedChange: 0.6
     }
   ];
-}
 
-// Helper functions
-function getMarketTitle(marketType: MarketType): string {
-  const titles: Record<string, string> = {
-    housing: "Housing Markets",
-    agriculture: "Agriculture",
-    mining: "Mining",
-    green_hydrogen: "Green Hydrogen",
-    cryptocurrency: "Cryptocurrency",
-    financial: "Financial Markets"
-  };
-  
-  return titles[marketType] || "Market Data";
-}
+  const housingInsights = [
+    {
+      title: "Housing Prices Stabilize in Q2",
+      description: "After a period of rapid growth, housing prices have begun to stabilize across major metropolitan areas.",
+      predictedChange: 0.3
+    },
+    {
+      title: "Rental Market Shows Strong Demand",
+      description: "The rental market continues to show strong demand, particularly in urban centers as workers return to offices.",
+      predictedChange: 2.4
+    }
+  ];
 
-function getMetricUnit(metricName: string): string {
-  if (metricName.toLowerCase().includes('price')) return 'USD';
-  if (metricName.toLowerCase().includes('volume')) return 'units';
-  if (metricName.toLowerCase().includes('percentage') || metricName.toLowerCase().includes('rate')) return '%';
-  return '';
-}
+  const miningInsights = [
+    {
+      title: "Gold Prices Drop Amid Rate Concerns",
+      description: "Gold prices have seen a significant drop as investors react to potential interest rate increases by central banks.",
+      predictedChange: -1.3
+    },
+    {
+      title: "Lithium Demand Surges for EV Production",
+      description: "Demand for lithium continues to surge as electric vehicle production ramps up globally.",
+      predictedChange: 4.2
+    }
+  ];
+
+  const agricultureInsights = [
+    {
+      title: "Wheat Production Exceeds Expectations",
+      description: "Global wheat production has exceeded expectations this season, potentially easing food security concerns.",
+      predictedChange: 2.1
+    },
+    {
+      title: "Sustainable Farming Practices Gain Traction",
+      description: "Adoption of sustainable farming practices is accelerating, promising long-term yields improvements.",
+      predictedChange: 1.7
+    }
+  ];
+
+  const hydrogenInsights = [
+    {
+      title: "Green Hydrogen Investment Hits Record",
+      description: "Investment in green hydrogen production has hit a new quarterly record as nations pursue clean energy transitions.",
+      predictedChange: 5.8
+    },
+    {
+      title: "New Electrolyzer Technology Breakthrough",
+      description: "A breakthrough in electrolyzer technology promises to reduce green hydrogen production costs by up to 30%.",
+      predictedChange: 3.2
+    }
+  ];
+
+  const medicalInsights = [
+    {
+      title: "Hospital Capacity Utilization Increases",
+      description: "Healthcare facilities report increased capacity utilization as elective procedures return to pre-pandemic levels.",
+      predictedChange: 1.5
+    },
+    {
+      title: "Medical Equipment Market Expansion",
+      description: "The medical equipment market shows strong expansion driven by technology upgrades and increased healthcare spending.",
+      predictedChange: 2.9
+    }
+  ];
+
+  const allInsights = [
+    ...financialInsights.map(insight => ({
+      ...insight,
+      industryType: "financial" as const,
+      industryLabel: "Financial Markets"
+    })),
+    ...housingInsights.map(insight => ({
+      ...insight,
+      industryType: "housing" as const,
+      industryLabel: "Housing Market"
+    })),
+    ...miningInsights.map(insight => ({
+      ...insight,
+      industryType: "mining" as const,
+      industryLabel: "Mining Sector"
+    })),
+    ...agricultureInsights.map(insight => ({
+      ...insight,
+      industryType: "agriculture" as const,
+      industryLabel: "Agriculture"
+    })),
+    ...hydrogenInsights.map(insight => ({
+      ...insight,
+      industryType: "green_hydrogen" as const,
+      industryLabel: "Green Hydrogen"
+    })),
+    ...medicalInsights.map(insight => ({
+      ...insight,
+      industryType: "medical" as const,
+      industryLabel: "Medical Services"
+    }))
+  ];
+
+  // Shuffle and slice the insights
+  const shuffled = [...allInsights].sort(() => 0.5 - Math.random());
+  const selected = shuffled.slice(0, count);
+
+  // Add IDs and timestamps
+  return selected.map(insight => ({
+    ...insight,
+    id: uuidv4(),
+    timestamp: new Date(Date.now() - Math.floor(Math.random() * 24 * 60 * 60 * 1000)).toISOString()
+  }));
+};

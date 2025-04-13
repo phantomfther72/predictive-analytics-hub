@@ -7,7 +7,11 @@ export type InvestmentOpportunityAssetType =
   'fund' | 
   'project' | 
   'equity' | 
-  'real_estate';
+  'real_estate' |
+  'joint_venture' |
+  'agricultural_project' |
+  'venture_capital' |
+  'business';
 
 export type InvestmentOpportunityRiskLevel = 'low' | 'medium' | 'high';
 

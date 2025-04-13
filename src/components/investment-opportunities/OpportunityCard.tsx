@@ -68,10 +68,10 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
   }, [opportunity.thumbnail_chart_data]);
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardHeader>
+    <Card className="hover:shadow-lg transition-shadow overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-950 dark:to-teal-950">
         <div className="flex justify-between items-start">
-          <CardTitle className="capitalize">{opportunity.title}</CardTitle>
+          <CardTitle className="text-lg font-bold text-blue-900 dark:text-blue-100">{opportunity.title}</CardTitle>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
@@ -83,12 +83,12 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
             </Tooltip>
           </TooltipProvider>
         </div>
-        <CardDescription className="line-clamp-2">
+        <CardDescription className="line-clamp-2 mt-1">
           {opportunity.description}
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-4">
         <div className="flex justify-between">
           <div>
             <p className="text-sm text-muted-foreground">Current Value</p>
@@ -106,20 +106,42 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
         </div>
 
         {chartData && chartData.data.length > 0 && (
-          <SparklineChart 
-            data={chartData.data}
-            labels={chartData.labels}
-            strokeColor="#14b8a6" // Teal color
-          />
+          <div className="h-20">
+            <SparklineChart 
+              data={chartData.data}
+              labels={chartData.labels}
+              strokeColor="#14b8a6" // Teal color
+            />
+          </div>
         )}
+        
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div>
+            <p className="text-muted-foreground">Min. Investment</p>
+            <p className="font-medium">${opportunity.minimum_investment.toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Time Horizon</p>
+            <p className="font-medium">{opportunity.time_horizon}</p>
+          </div>
+          {opportunity.predicted_change && (
+            <div className="col-span-2 flex items-center space-x-1">
+              <p className="text-muted-foreground">Predicted Change:</p>
+              <p className={`font-medium flex items-center ${opportunity.predicted_change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {opportunity.predicted_change > 0 ? '+' : ''}{opportunity.predicted_change}%
+                <TrendingUp className={`ml-1 h-4 w-4 ${opportunity.predicted_change > 0 ? 'text-green-600' : 'text-red-600'}`} />
+              </p>
+            </div>
+          )}
+        </div>
       </CardContent>
       
-      <CardFooter className="flex justify-between items-center">
+      <CardFooter className="flex justify-between items-center border-t bg-slate-50 dark:bg-slate-900">
         <Badge variant="outline" className="capitalize">
           {opportunity.industry_type.replace('_', ' ')}
         </Badge>
         
-        <Button size="sm" variant="outline" className="gap-1">
+        <Button size="sm" className="gap-1 bg-gradient-to-r from-blue-700 to-teal-600">
           View Details 
           <ArrowUpRight className="h-4 w-4" />
         </Button>

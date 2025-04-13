@@ -11,6 +11,7 @@ export const useInvestmentOpportunities = () => {
     queryKey: ["investmentOpportunities"],
     queryFn: async () => {
       try {
+        console.log("Fetching investment opportunities...");
         const { data, error } = await supabase
           .from("investment_opportunities")
           .select("*")
@@ -26,6 +27,8 @@ export const useInvestmentOpportunities = () => {
           throw error;
         }
 
+        console.log("Retrieved opportunities:", data?.length || 0);
+        
         // The as unknown as InvestmentOpportunity[] cast is necessary because
         // the structure from Supabase doesn't perfectly match our TypeScript interface
         return (data || []) as unknown as InvestmentOpportunity[];

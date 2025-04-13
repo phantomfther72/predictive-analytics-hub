@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InvestmentOpportunity } from "@/types/investment";
 import { useInvestmentOpportunities } from "@/hooks/useInvestmentOpportunities";
 import { OpportunityCard } from "./OpportunityCard";
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const INDUSTRIES = [
   "All Industries", 
@@ -26,14 +27,31 @@ const INDUSTRIES = [
 const RISK_LEVELS = ["All Risks", "Low", "Medium", "High"];
 
 export const OpportunitiesGrid: React.FC = () => {
-  const { data: opportunities, isLoading } = useInvestmentOpportunities();
+  const { data: opportunities, isLoading, error } = useInvestmentOpportunities();
   const [selectedIndustry, setSelectedIndustry] = useState("All Industries");
   const [selectedRiskLevel, setSelectedRiskLevel] = useState("All Risks");
   const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    if (error) {
+      console.error("Error loading opportunities:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load investment opportunities. Please try again later.",
+        variant: "destructive",
+      });
+    }
+  }, [error, toast]);
+
+  useEffect(() => {
+    console.log("Opportunities loaded:", opportunities?.length || 0);
+  }, [opportunities]);
 
   const filteredOpportunities = opportunities?.filter(opportunity => {
+    const industryName = opportunity.industry_type.replace('_', ' ');
     const matchesIndustry = selectedIndustry === "All Industries" || 
-      opportunity.industry_type.replace('_', ' ').toLowerCase() === selectedIndustry.toLowerCase().replace(' ', '_');
+      industryName.toLowerCase() === selectedIndustry.toLowerCase().replace(' ', '_');
     
     const matchesRiskLevel = selectedRiskLevel === "All Risks" || 
       opportunity.risk_level.toLowerCase() === selectedRiskLevel.toLowerCase();
@@ -96,16 +114,22 @@ export const OpportunitiesGrid: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredOpportunities.map(opportunity => (
-              <OpportunityCard 
-                key={opportunity.id} 
-                opportunity={opportunity} 
-              />
-            ))}
-          </div>
+          {opportunities && opportunities.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredOpportunities.map(opportunity => (
+                <OpportunityCard 
+                  key={opportunity.id} 
+                  opportunity={opportunity} 
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-muted-foreground py-12">
+              No investment opportunities found. Please check back later.
+            </div>
+          )}
 
-          {filteredOpportunities.length === 0 && (
+          {opportunities && opportunities.length > 0 && filteredOpportunities.length === 0 && (
             <div className="text-center text-muted-foreground py-12">
               No opportunities found matching your filters.
             </div>

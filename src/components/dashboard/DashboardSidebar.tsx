@@ -19,7 +19,8 @@ import {
   User, 
   X, 
   Home, 
-  ChevronRight
+  ChevronRight,
+  Briefcase
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,11 @@ const menuItems = [
     title: "Data Tables",
     icon: Table,
     path: "/dashboard/tables",
+  },
+  {
+    title: "Investment Opportunities",
+    icon: Briefcase,
+    path: "/dashboard/opportunities",
   },
   {
     title: "Profile",

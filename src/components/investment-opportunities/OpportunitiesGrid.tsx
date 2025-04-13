@@ -11,7 +11,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { ChevronDown } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 const INDUSTRIES = [
   "All Industries", 
@@ -44,12 +44,9 @@ export const OpportunitiesGrid: React.FC = () => {
     return matchesIndustry && matchesRiskLevel && matchesSearch;
   }) || [];
 
-  if (isLoading) {
-    return <div>Loading opportunities...</div>;
-  }
-
   return (
     <div className="space-y-6">
+      <h1 className="text-3xl font-bold mb-6">Investment Opportunities</h1>
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <Input 
           placeholder="Search opportunities..."
@@ -92,19 +89,28 @@ export const OpportunitiesGrid: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredOpportunities.map(opportunity => (
-          <OpportunityCard 
-            key={opportunity.id} 
-            opportunity={opportunity} 
-          />
-        ))}
-      </div>
-
-      {filteredOpportunities.length === 0 && (
-        <div className="text-center text-muted-foreground py-12">
-          No opportunities found matching your filters.
+      {isLoading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+          <span className="ml-3 text-lg">Loading investment opportunities...</span>
         </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredOpportunities.map(opportunity => (
+              <OpportunityCard 
+                key={opportunity.id} 
+                opportunity={opportunity} 
+              />
+            ))}
+          </div>
+
+          {filteredOpportunities.length === 0 && (
+            <div className="text-center text-muted-foreground py-12">
+              No opportunities found matching your filters.
+            </div>
+          )}
+        </>
       )}
     </div>
   );

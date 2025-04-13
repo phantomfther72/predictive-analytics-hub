@@ -8,13 +8,7 @@ import { DashboardProfile } from "./DashboardProfile";
 import { IndustryView } from "@/components/industry/IndustryView";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AnimatePresence, motion } from "framer-motion";
-import HousingMarket from "@/pages/HousingMarket";
-import AgricultureMarket from "@/pages/AgricultureMarket";
-import MiningMarket from "@/pages/MiningMarket";
-import GreenHydrogenMarket from "@/pages/GreenHydrogenMarket";
-import FinancialMarket from "@/pages/FinancialMarket";
-import CryptocurrencyMarket from "@/pages/CryptocurrencyMarket";
-import MedicalMarket from "@/pages/MedicalMarket";
+import { OpportunitiesGrid } from "@/components/investment-opportunities/OpportunitiesGrid";
 import NotFound from "@/pages/NotFound";
 import { MarketType } from "@/types/market";
 
@@ -37,6 +31,7 @@ export const DashboardContent = () => {
             <Route path="/charts" element={<DashboardCharts />} />
             <Route path="/tables" element={<DashboardTables />} />
             <Route path="/profile" element={<DashboardProfile />} />
+            <Route path="/opportunities" element={<OpportunitiesGrid />} />
             
             {/* Industry routes - consistent naming pattern */}
             <Route path="/industry/:industryType" element={<IndustryViewWrapper />} />

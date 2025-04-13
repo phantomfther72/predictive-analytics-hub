@@ -249,6 +249,75 @@ export type Database = {
         }
         Relationships: []
       }
+      investment_opportunities: {
+        Row: {
+          annual_return_percentage: number | null
+          asset_type: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          current_value: number
+          description: string
+          featured: boolean | null
+          full_details: Json | null
+          id: string
+          industry_type: string
+          minimum_investment: number
+          predicted_change: number | null
+          prediction_confidence: number | null
+          region: string
+          risk_level: string
+          thumbnail_chart_data: Json | null
+          time_horizon: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          annual_return_percentage?: number | null
+          asset_type: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          current_value: number
+          description: string
+          featured?: boolean | null
+          full_details?: Json | null
+          id?: string
+          industry_type: string
+          minimum_investment: number
+          predicted_change?: number | null
+          prediction_confidence?: number | null
+          region: string
+          risk_level: string
+          thumbnail_chart_data?: Json | null
+          time_horizon: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          annual_return_percentage?: number | null
+          asset_type?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          current_value?: number
+          description?: string
+          featured?: boolean | null
+          full_details?: Json | null
+          id?: string
+          industry_type?: string
+          minimum_investment?: number
+          predicted_change?: number | null
+          prediction_confidence?: number | null
+          region?: string
+          risk_level?: string
+          thumbnail_chart_data?: Json | null
+          time_horizon?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       market_metrics: {
         Row: {
           created_at: string | null
@@ -532,6 +601,73 @@ export type Database = {
         }
         Relationships: []
       }
+      opportunity_market_insights: {
+        Row: {
+          created_at: string | null
+          id: string
+          insight_id: string
+          opportunity_id: string
+          relevance_score: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          insight_id: string
+          opportunity_id: string
+          relevance_score?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          insight_id?: string
+          opportunity_id?: string
+          relevance_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunity_market_insights_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      opportunity_recommendations: {
+        Row: {
+          created_at: string | null
+          id: string
+          opportunity_id: string
+          reason: string | null
+          recommendation_score: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          opportunity_id: string
+          reason?: string | null
+          recommendation_score: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          opportunity_id?: string
+          reason?: string | null
+          recommendation_score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "opportunity_recommendations_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -618,6 +754,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_opportunity_interactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          interaction_type: string
+          notes: string | null
+          opportunity_id: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interaction_type: string
+          notes?: string | null
+          opportunity_id: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interaction_type?: string
+          notes?: string | null
+          opportunity_id?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_opportunity_interactions_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "investment_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -643,6 +820,10 @@ export type Database = {
           weighted_prediction: number
           model_details: Json
         }[]
+      }
+      insert_sample_investment_opportunities: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       update_predictions: {
         Args: Record<PropertyKey, never>

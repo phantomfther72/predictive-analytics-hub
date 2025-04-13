@@ -1,5 +1,6 @@
 
 import { MarketType } from "@/types/market";
+import { Json } from "@/integrations/supabase/types";
 
 export type InvestmentOpportunityAssetType = 
   'infrastructure' | 
@@ -28,5 +29,10 @@ export interface InvestmentOpportunity {
   thumbnail_chart_data?: {
     data: number[];
     labels: string[];
-  };
+  } | Json;
+  created_at?: string;
+  updated_at?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  full_details?: Json;
 }

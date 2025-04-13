@@ -26,6 +26,8 @@ export const useInvestmentOpportunities = () => {
           throw error;
         }
 
+        // The as unknown as InvestmentOpportunity[] cast is necessary because
+        // the structure from Supabase doesn't perfectly match our TypeScript interface
         return (data || []) as InvestmentOpportunity[];
       } catch (error) {
         console.error("Unexpected error in useInvestmentOpportunities:", error);

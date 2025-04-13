@@ -36,6 +36,20 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
   const RiskIcon = RISK_CONFIG[opportunity.risk_level].icon;
   const riskColor = RISK_CONFIG[opportunity.risk_level].color;
 
+  // Extract chart data safely
+  const chartData = React.useMemo(() => {
+    if (!opportunity.thumbnail_chart_data) return null;
+    
+    // Handle both potential types of thumbnail_chart_data
+    if (typeof opportunity.thumbnail_chart_data === 'object' && 'data' in opportunity.thumbnail_chart_data) {
+      return {
+        data: opportunity.thumbnail_chart_data.data || [],
+        labels: opportunity.thumbnail_chart_data.labels || []
+      };
+    }
+    return null;
+  }, [opportunity.thumbnail_chart_data]);
+
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader>
@@ -74,10 +88,10 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
           </div>
         </div>
 
-        {opportunity.thumbnail_chart_data && (
+        {chartData && (
           <SparklineChart 
-            data={opportunity.thumbnail_chart_data.data}
-            labels={opportunity.thumbnail_chart_data.labels}
+            data={chartData.data}
+            labels={chartData.labels}
             strokeColor="#14b8a6" // Teal color
           />
         )}

@@ -14,23 +14,28 @@ import {
 
 interface SparklineChartProps {
   data: number[];
+  labels?: string[];
   height?: number;
   color?: string;
+  strokeColor?: string;
   showTooltip?: boolean;
   tooltipSuffix?: string;
 }
 
 export const SparklineChart: React.FC<SparklineChartProps> = ({
   data,
+  labels,
   height = 40,
   color = "#3b82f6",
+  strokeColor,
   showTooltip = false,
   tooltipSuffix = ""
 }) => {
   // Transform the data for Recharts
   const chartData = data.map((value, index) => ({ 
     value, 
-    index 
+    index,
+    label: labels ? labels[index] : index.toString()
   }));
   
   const CustomTooltip = ({
@@ -41,6 +46,9 @@ export const SparklineChart: React.FC<SparklineChartProps> = ({
       return (
         <div className="bg-white dark:bg-slate-900 shadow-md rounded px-2 py-1 text-xs border border-slate-200 dark:border-slate-700">
           <p className="font-medium">{payload[0].value}{tooltipSuffix}</p>
+          {labels && payload[0].payload.label && (
+            <p className="text-muted-foreground">{payload[0].payload.label}</p>
+          )}
         </div>
       );
     }
@@ -53,7 +61,7 @@ export const SparklineChart: React.FC<SparklineChartProps> = ({
         <Line
           type="monotone"
           dataKey="value"
-          stroke={color}
+          stroke={strokeColor || color}
           strokeWidth={2}
           dot={false}
           animationDuration={1000}

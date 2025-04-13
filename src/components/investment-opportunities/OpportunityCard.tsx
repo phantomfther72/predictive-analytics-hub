@@ -25,6 +25,7 @@ import {
   ShieldAlert, 
   ShieldQuestion 
 } from "lucide-react";
+import { safeArray, safeObjectAccess } from "@/utils/marketDataSafety";
 
 const RISK_CONFIG = {
   low: { icon: ShieldCheck, color: "text-green-500" },
@@ -40,14 +41,30 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
   const chartData = React.useMemo(() => {
     if (!opportunity.thumbnail_chart_data) return null;
     
-    // Handle both potential types of thumbnail_chart_data
-    if (typeof opportunity.thumbnail_chart_data === 'object' && 'data' in opportunity.thumbnail_chart_data) {
-      return {
-        data: opportunity.thumbnail_chart_data.data || [],
-        labels: opportunity.thumbnail_chart_data.labels || []
-      };
+    try {
+      // Handle JSON data with appropriate type checking
+      let data: number[] = [];
+      let labels: string[] = [];
+      
+      if (typeof opportunity.thumbnail_chart_data === 'object') {
+        // Try to access data property, ensuring it's an array of numbers
+        const rawData = safeObjectAccess<any[]>(opportunity.thumbnail_chart_data, ['data'], []);
+        if (Array.isArray(rawData)) {
+          data = rawData.map(val => Number(val)).filter(val => !isNaN(val));
+        }
+        
+        // Try to access labels property, ensuring it's an array of strings
+        const rawLabels = safeObjectAccess<any[]>(opportunity.thumbnail_chart_data, ['labels'], []);
+        if (Array.isArray(rawLabels)) {
+          labels = rawLabels.map(val => String(val));
+        }
+      }
+      
+      return { data, labels };
+    } catch (error) {
+      console.error("Error parsing chart data:", error);
+      return null;
     }
-    return null;
   }, [opportunity.thumbnail_chart_data]);
 
   return (
@@ -88,7 +105,7 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
           </div>
         </div>
 
-        {chartData && (
+        {chartData && chartData.data.length > 0 && (
           <SparklineChart 
             data={chartData.data}
             labels={chartData.labels}

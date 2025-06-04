@@ -1,136 +1,117 @@
 
 import { MarketInsight } from "./types";
-import { v4 as uuidv4 } from "uuid";
 
-export const generateMockInsights = (count: number = 5): MarketInsight[] => {
-  const industries = [
-    { type: "financial", label: "Financial Markets" },
-    { type: "housing", label: "Housing Market" },
-    { type: "mining", label: "Mining Sector" },
-    { type: "agriculture", label: "Agriculture" },
-    { type: "green_hydrogen", label: "Green Hydrogen" },
-    { type: "medical", label: "Medical Services" }
-  ];
-
-  const financialInsights = [
+export const generateMockInsights = (count: number = 6): MarketInsight[] => {
+  const insights: MarketInsight[] = [
     {
-      title: "S&P 500 Reaches New High",
-      description: "The S&P 500 index has reached a new all-time high, driven by strong tech sector performance and positive economic indicators.",
-      predictedChange: 1.8
+      id: "1",
+      title: "Bitcoin Rally Continues",
+      description: "Institutional adoption driving cryptocurrency prices to new heights with strong momentum expected.",
+      industryType: "financial",
+      industryLabel: "Financial Markets",
+      marketValue: 42750.50,
+      changePercentage: 8.5,
+      changeDirection: "up",
+      confidence: 0.78,
+      timeframe: "24h",
+      source: "Market Analysis",
+      tags: ["crypto", "institutional", "rally"],
+      insights: ["Strong institutional buying", "Technical breakout pattern", "Increased trading volume"],
+      predictedChange: 12.3,
+      timestamp: new Date().toISOString(),
+      sparklineData: [100, 105, 110, 115, 108, 112, 118]
     },
     {
-      title: "Bond Yields Show Steady Growth",
-      description: "Treasury bond yields continue to show steady growth, reflecting market confidence in economic recovery.",
-      predictedChange: 0.6
+      id: "2", 
+      title: "Housing Market Resilience",
+      description: "Regional markets showing unexpected strength despite rising interest rates and economic uncertainty.",
+      industryType: "housing",
+      industryLabel: "Real Estate",
+      marketValue: 485000,
+      changePercentage: 15.2,
+      changeDirection: "up", 
+      confidence: 0.76,
+      timeframe: "Monthly",
+      source: "Real Estate Analytics",
+      tags: ["housing", "regional", "growth"],
+      insights: ["Supply constraints persist", "Tech migration continues", "Low inventory levels"],
+      predictedChange: 18.7,
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+      sparklineData: [95, 98, 102, 108, 112, 115, 118]
+    },
+    {
+      id: "3",
+      title: "Green Hydrogen Breakthrough", 
+      description: "Record investment in hydrogen infrastructure signals major shift toward clean energy solutions.",
+      industryType: "green_hydrogen",
+      industryLabel: "Green Energy",
+      marketValue: 450000000,
+      changePercentage: 28.5,
+      changeDirection: "up",
+      confidence: 0.85,
+      timeframe: "Quarterly", 
+      source: "Energy Transition Report",
+      tags: ["hydrogen", "clean energy", "investment"],
+      insights: ["European mandates accelerating adoption", "Technology costs declining", "Industrial demand growing"],
+      predictedChange: 35.2,
+      timestamp: new Date(Date.now() - 7200000).toISOString(),
+      sparklineData: [80, 85, 92, 98, 105, 112, 125]
+    },
+    {
+      id: "4",
+      title: "Copper Supply Constraints",
+      description: "Mining disruptions and renewable energy demand creating significant market opportunities.",
+      industryType: "mining", 
+      industryLabel: "Mining & Commodities",
+      marketValue: 4250000000,
+      changePercentage: 15.8,
+      changeDirection: "up",
+      confidence: 0.77,
+      timeframe: "Weekly",
+      source: "Commodities Insight", 
+      tags: ["copper", "supply", "renewable"],
+      insights: ["Green energy transition driving demand", "Supply disruptions in major mines", "Infrastructure spending increasing"],
+      predictedChange: 22.1,
+      timestamp: new Date(Date.now() - 10800000).toISOString(),
+      sparklineData: [320, 325, 335, 345, 355, 365, 380]
+    },
+    {
+      id: "5",
+      title: "Agricultural Technology Surge",
+      description: "Precision farming and climate adaptation technologies attracting unprecedented investment.",
+      industryType: "agriculture",
+      industryLabel: "Agriculture & Food",
+      marketValue: 8750000,
+      changePercentage: 25.6,
+      changeDirection: "up", 
+      confidence: 0.81,
+      timeframe: "Annual",
+      source: "AgTech Today",
+      tags: ["agtech", "precision farming", "climate"],
+      insights: ["Climate-resistant crops in demand", "IoT adoption accelerating", "Sustainability focus driving investment"],
+      predictedChange: 30.4,
+      timestamp: new Date(Date.now() - 14400000).toISOString(),
+      sparklineData: [180, 185, 195, 210, 225, 245, 265]
+    },
+    {
+      id: "6",
+      title: "Telemedicine Expansion",
+      description: "Healthcare technology platforms expanding rapidly into underserved rural markets globally.",
+      industryType: "medical",
+      industryLabel: "Healthcare Tech", 
+      marketValue: 4200000,
+      changePercentage: 38.5,
+      changeDirection: "up",
+      confidence: 0.68,
+      timeframe: "Quarterly",
+      source: "HealthTech Analytics",
+      tags: ["telemedicine", "rural health", "expansion"],
+      insights: ["Rural healthcare access improving", "Regulatory barriers reducing", "Insurance coverage expanding"],
+      predictedChange: 42.8,
+      timestamp: new Date(Date.now() - 18000000).toISOString(),
+      sparklineData: [65, 70, 78, 88, 98, 110, 125]
     }
   ];
 
-  const housingInsights = [
-    {
-      title: "Housing Prices Stabilize in Q2",
-      description: "After a period of rapid growth, housing prices have begun to stabilize across major metropolitan areas.",
-      predictedChange: 0.3
-    },
-    {
-      title: "Rental Market Shows Strong Demand",
-      description: "The rental market continues to show strong demand, particularly in urban centers as workers return to offices.",
-      predictedChange: 2.4
-    }
-  ];
-
-  const miningInsights = [
-    {
-      title: "Gold Prices Drop Amid Rate Concerns",
-      description: "Gold prices have seen a significant drop as investors react to potential interest rate increases by central banks.",
-      predictedChange: -1.3
-    },
-    {
-      title: "Lithium Demand Surges for EV Production",
-      description: "Demand for lithium continues to surge as electric vehicle production ramps up globally.",
-      predictedChange: 4.2
-    }
-  ];
-
-  const agricultureInsights = [
-    {
-      title: "Wheat Production Exceeds Expectations",
-      description: "Global wheat production has exceeded expectations this season, potentially easing food security concerns.",
-      predictedChange: 2.1
-    },
-    {
-      title: "Sustainable Farming Practices Gain Traction",
-      description: "Adoption of sustainable farming practices is accelerating, promising long-term yields improvements.",
-      predictedChange: 1.7
-    }
-  ];
-
-  const hydrogenInsights = [
-    {
-      title: "Green Hydrogen Investment Hits Record",
-      description: "Investment in green hydrogen production has hit a new quarterly record as nations pursue clean energy transitions.",
-      predictedChange: 5.8
-    },
-    {
-      title: "New Electrolyzer Technology Breakthrough",
-      description: "A breakthrough in electrolyzer technology promises to reduce green hydrogen production costs by up to 30%.",
-      predictedChange: 3.2
-    }
-  ];
-
-  const medicalInsights = [
-    {
-      title: "Hospital Capacity Utilization Increases",
-      description: "Healthcare facilities report increased capacity utilization as elective procedures return to pre-pandemic levels.",
-      predictedChange: 1.5
-    },
-    {
-      title: "Medical Equipment Market Expansion",
-      description: "The medical equipment market shows strong expansion driven by technology upgrades and increased healthcare spending.",
-      predictedChange: 2.9
-    }
-  ];
-
-  const allInsights = [
-    ...financialInsights.map(insight => ({
-      ...insight,
-      industryType: "financial" as const,
-      industryLabel: "Financial Markets"
-    })),
-    ...housingInsights.map(insight => ({
-      ...insight,
-      industryType: "housing" as const,
-      industryLabel: "Housing Market"
-    })),
-    ...miningInsights.map(insight => ({
-      ...insight,
-      industryType: "mining" as const,
-      industryLabel: "Mining Sector"
-    })),
-    ...agricultureInsights.map(insight => ({
-      ...insight,
-      industryType: "agriculture" as const,
-      industryLabel: "Agriculture"
-    })),
-    ...hydrogenInsights.map(insight => ({
-      ...insight,
-      industryType: "green_hydrogen" as const,
-      industryLabel: "Green Hydrogen"
-    })),
-    ...medicalInsights.map(insight => ({
-      ...insight,
-      industryType: "medical" as const,
-      industryLabel: "Medical Services"
-    }))
-  ];
-
-  // Shuffle and slice the insights
-  const shuffled = [...allInsights].sort(() => 0.5 - Math.random());
-  const selected = shuffled.slice(0, count);
-
-  // Add IDs and timestamps
-  return selected.map(insight => ({
-    ...insight,
-    id: uuidv4(),
-    timestamp: new Date(Date.now() - Math.floor(Math.random() * 24 * 60 * 60 * 1000)).toISOString()
-  }));
+  return insights.slice(0, count);
 };

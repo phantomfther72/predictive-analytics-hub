@@ -4,6 +4,7 @@ export interface MarketInsight {
   title: string;
   description: string;
   industryType: "housing" | "agriculture" | "mining" | "green_hydrogen" | "financial" | "medical";
+  industryLabel?: string;
   marketValue: number;
   changePercentage: number;
   changeDirection: "up" | "down";
@@ -13,4 +14,14 @@ export interface MarketInsight {
   tags: string[];
   sparklineData?: number[];
   insights: string[];
+  predictedChange?: number;
+  timestamp?: string;
+  metrics?: any;
+}
+
+export interface InsightMetric {
+  label: string;
+  value: string | number;
+  change?: string;
+  isPositive?: boolean;
 }

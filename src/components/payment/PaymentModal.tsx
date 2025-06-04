@@ -16,17 +16,36 @@ import {
 } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ENV } from "@/config/environment";
+import { checkPaymentRateLimit, rateLimiter } from "@/utils/rateLimiter";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Initialize Stripe with your publishable key
-const stripePromise = loadStripe("pk_test_51Ou5jbF8tOH0584Sh0qnkMXPQF5YD3YGKlrUa9YdS11KBQl7S37jHYEFKqkU7lsGTxUqOPP9yE7j4N41CXJg6GXE00ILRylgIp");
+// Initialize Stripe with environment variable
+const stripePromise = loadStripe(ENV.STRIPE_PUBLISHABLE_KEY);
 
 const CheckoutForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = React.useState(false);
+  const [rateLimitMessage, setRateLimitMessage] = React.useState("");
   const { toast } = useToast();
+
+  const getUserIdentifier = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session?.user?.id || 'anonymous';
+  };
+
+  const validateSession = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    if (error || !session) {
+      throw new Error("Authentication required. Please sign in and try again.");
+    }
+    
+    return session;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,9 +54,21 @@ const CheckoutForm = ({ onSuccess }: { onSuccess: () => void }) => {
       return;
     }
 
-    setLoading(true);
-
     try {
+      // Validate user session
+      await validateSession();
+      
+      // Check rate limiting
+      const userIdentifier = await getUserIdentifier();
+      if (!checkPaymentRateLimit(userIdentifier)) {
+        const remainingTime = Math.ceil(rateLimiter.getRemainingTime(userIdentifier, 'payment') / 60000);
+        setRateLimitMessage(`Too many payment attempts. Please try again in ${remainingTime} minutes.`);
+        return;
+      }
+
+      setLoading(true);
+      setRateLimitMessage("");
+
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -46,9 +77,10 @@ const CheckoutForm = ({ onSuccess }: { onSuccess: () => void }) => {
       });
 
       if (error) {
+        console.error("Payment error:", error);
         toast({
           title: "Payment failed",
-          description: error.message,
+          description: error.message || "An unexpected error occurred",
           variant: "destructive",
         });
       } else {
@@ -58,11 +90,11 @@ const CheckoutForm = ({ onSuccess }: { onSuccess: () => void }) => {
         });
         onSuccess();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment error:", error);
       toast({
         title: "Payment error",
-        description: "An unexpected error occurred",
+        description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -72,11 +104,19 @@ const CheckoutForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {rateLimitMessage && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{rateLimitMessage}</AlertDescription>
+        </Alert>
+      )}
+      
       <PaymentElement />
+      
       <Button
         type="submit"
         className="w-full"
-        disabled={!stripe || loading}
+        disabled={!stripe || loading || !!rateLimitMessage}
       >
         {loading ? (
           <>
@@ -99,37 +139,55 @@ export const PaymentModal = ({
   onOpenChange: (open: boolean) => void;
 }) => {
   const [clientSecret, setClientSecret] = React.useState<string>();
+  const [initError, setInitError] = React.useState<string>();
   const { toast } = useToast();
 
   React.useEffect(() => {
     const initializePayment = async () => {
+      if (!open) return;
+      
       try {
+        // Validate authentication before creating payment
+        const { data: { session }, error: authError } = await supabase.auth.getSession();
+        
+        if (authError || !session) {
+          throw new Error("Authentication required");
+        }
+
         const response = await supabase.functions.invoke('create-payment', {
-          body: {},
+          body: { 
+            amount: 9900, // Server-side amount validation
+            currency: 'usd'
+          },
         });
 
         if (response.error) {
-          throw new Error(response.error.message);
+          console.error("Payment initialization error:", response.error);
+          throw new Error(response.error.message || "Failed to initialize payment");
+        }
+
+        if (!response.data?.clientSecret) {
+          throw new Error("Invalid payment response");
         }
 
         setClientSecret(response.data.clientSecret);
-      } catch (error) {
+        setInitError(undefined);
+      } catch (error: any) {
         console.error('Payment initialization error:', error);
+        setInitError(error.message);
         toast({
           title: "Error",
-          description: "Failed to initialize payment. Please try again.",
+          description: error.message || "Failed to initialize payment. Please try again.",
           variant: "destructive",
         });
-        onOpenChange(false);
       }
     };
 
-    if (open) {
-      initializePayment();
-    }
-  }, [open, onOpenChange, toast]);
+    initializePayment();
+  }, [open, toast]);
 
   const handleSuccess = () => {
+    setClientSecret(undefined);
     onOpenChange(false);
   };
 
@@ -142,7 +200,13 @@ export const PaymentModal = ({
             Get unlimited access to all market analytics features and historical data.
           </DialogDescription>
         </DialogHeader>
-        {clientSecret && (
+        
+        {initError ? (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>{initError}</AlertDescription>
+          </Alert>
+        ) : clientSecret ? (
           <Elements
             stripe={stripePromise}
             options={{
@@ -154,6 +218,11 @@ export const PaymentModal = ({
           >
             <CheckoutForm onSuccess={handleSuccess} />
           </Elements>
+        ) : (
+          <div className="flex items-center justify-center p-6">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span className="ml-2">Initializing payment...</span>
+          </div>
         )}
       </DialogContent>
     </Dialog>

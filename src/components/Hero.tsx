@@ -1,6 +1,7 @@
 
 import { useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
+import { DemoModeToggle } from "./DemoModeToggle";
 
 const Hero = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -140,6 +141,11 @@ const Hero = () => {
                 Harness AI-driven analytics to stay ahead in dynamic markets.
                 Transform your market strategies with real-time data tracking.
               </p>
+            </div>
+
+            {/* Demo Mode Toggle */}
+            <div className="animate-fade-up animation-delay-500 flex justify-center">
+              <DemoModeToggle />
             </div>
 
             {/* CTA Button with improved styling */}

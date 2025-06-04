@@ -2,48 +2,31 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MarketMetric } from "@/types/market";
-import { useToast } from "@/components/ui/use-toast";
+import { useDemoMode } from "./useDemoMode";
 
 export const useMarketMetrics = () => {
-  const { toast } = useToast();
+  const { isDemoMode } = useDemoMode();
 
-  return useQuery<MarketMetric[]>({
-    queryKey: ["marketMetrics"],
-    queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from("market_metrics")
-          .select("*")
-          .order("timestamp", { ascending: false });
+  return useQuery({
+    queryKey: ["marketMetrics", isDemoMode],
+    queryFn: async (): Promise<MarketMetric[]> => {
+      console.log("Fetching market metrics...");
+      
+      const { data, error } = await supabase
+        .from("market_metrics")
+        .select("*")
+        .order("timestamp", { ascending: false })
+        .limit(50);
 
-        if (error) {
-          console.error("Error fetching market metrics:", error);
-          toast({
-            title: "Error",
-            description: "Failed to load market metrics",
-            variant: "destructive",
-          });
-          throw error;
-        }
-
-        // If no data is returned from Supabase, return an empty array
-        if (!data || data.length === 0) {
-          console.warn("No market metrics data returned from API");
-          return [];
-        }
-
-        return data as MarketMetric[];
-      } catch (error) {
-        console.error("Unexpected error in useMarketMetrics:", error);
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred while loading market data",
-          variant: "destructive",
-        });
-        // Return empty array as fallback
-        return [];
+      if (error) {
+        console.error("Error fetching market metrics:", error);
+        throw error;
       }
+
+      console.log("Retrieved market metrics:", data?.length || 0);
+      return data || [];
     },
-    refetchInterval: 60000, // Refetch every minute
+    refetchInterval: isDemoMode ? false : 30000,
+    staleTime: isDemoMode ? Infinity : 5 * 60 * 1000,
   });
 };

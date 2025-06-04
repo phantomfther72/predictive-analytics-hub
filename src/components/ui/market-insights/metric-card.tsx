@@ -29,7 +29,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({ metric }) => {
             : "text-gray-500"
         }`}
       >
-        {metric.change !== null ? (
+        {metric.change !== undefined && metric.change !== null ? (
           <>
             {metric.change > 0 ? "+" : ""}
             {metric.change.toFixed(1)}% predicted

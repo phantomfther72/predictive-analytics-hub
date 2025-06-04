@@ -22,6 +22,6 @@ export interface MarketInsight {
 export interface InsightMetric {
   label: string;
   value: string | number;
-  change?: string;
+  change?: number; // Changed from string to number
   isPositive?: boolean;
 }

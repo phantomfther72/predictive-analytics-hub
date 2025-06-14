@@ -5,6 +5,7 @@ import { useMiningSectorData } from "./useMiningSectorData";
 import { useAgricultureMarketData } from "./useAgricultureMarketData";
 import { useGreenHydrogenData } from "./useGreenHydrogenData";
 import { useCryptocurrencyData } from "./useCryptocurrencyData";
+import { sampleMarketModelData } from "@/utils/sampleMarketModelData";
 
 export const useMarketData = () => {
   const financialQuery = useFinancialMarketData();
@@ -15,11 +16,11 @@ export const useMarketData = () => {
   const cryptoQuery = useCryptocurrencyData();
 
   return {
-    financialData: financialQuery.data || [],
-    housingData: housingQuery.data || [],
-    miningData: miningQuery.data || [],
-    agricultureData: agricultureQuery.data || [],
-    hydrogenData: hydrogenQuery.data || [],
+    financialData: financialQuery.data?.length ? financialQuery.data : sampleMarketModelData.financial,
+    housingData: housingQuery.data?.length ? housingQuery.data : sampleMarketModelData.housing,
+    miningData: miningQuery.data?.length ? miningQuery.data : sampleMarketModelData.mining,
+    agricultureData: agricultureQuery.data?.length ? agricultureQuery.data : sampleMarketModelData.agriculture,
+    hydrogenData: hydrogenQuery.data?.length ? hydrogenQuery.data : sampleMarketModelData.hydrogen,
     cryptoData: cryptoQuery.data || [],
     isLoadingFinancial: financialQuery.isLoading,
     isLoadingHousing: housingQuery.isLoading,

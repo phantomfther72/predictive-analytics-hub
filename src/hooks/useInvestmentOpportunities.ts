@@ -3,38 +3,47 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { InvestmentOpportunity } from "@/types/investment";
 import { useDemoMode } from "./useDemoMode";
+import { sampleInvestmentOpportunities } from "@/utils/sampleInvestmentOpportunities";
 
+// Enhanced fetching with fallback and "smart" error handling and parsing
 export const useInvestmentOpportunities = () => {
   const { isDemoMode } = useDemoMode();
 
   return useQuery({
     queryKey: ["investmentOpportunities", isDemoMode],
     queryFn: async (): Promise<InvestmentOpportunity[]> => {
-      console.log("Fetching investment opportunities...");
-      
-      const { data, error } = await supabase
-        .from("investment_opportunities")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching opportunities:", error);
-        throw error;
+      if (isDemoMode) {
+        // Demo mode: Always return realistic sample data
+        return sampleInvestmentOpportunities;
       }
+      // Try fetch from Supabase
+      try {
+        const { data, error } = await supabase
+          .from("investment_opportunities")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      console.log("Retrieved opportunities:", data?.length || 0);
-      
-      // Process the data to ensure thumbnail_chart_data is properly parsed
-      const processedData = (data || []).map(item => ({
-        ...item,
-        thumbnail_chart_data: typeof item.thumbnail_chart_data === 'string' 
-          ? JSON.parse(item.thumbnail_chart_data) 
-          : item.thumbnail_chart_data
-      })) as InvestmentOpportunity[];
+        if (error || !data || data.length === 0) {
+          // Fall back to sample data on error or empty
+          console.warn("Falling back to sample investment opportunities due to:", error?.message || 'no data');
+          return sampleInvestmentOpportunities;
+        }
 
-      return processedData;
+        // Parse and normalize
+        return (data || []).map(item => ({
+          ...item,
+          thumbnail_chart_data:
+            typeof item.thumbnail_chart_data === "string"
+              ? JSON.parse(item.thumbnail_chart_data)
+              : item.thumbnail_chart_data,
+        })) as InvestmentOpportunity[];
+      } catch (e) {
+        // Fallback in all error scenarios
+        console.error("Investment opportunities fetch failed:", e);
+        return sampleInvestmentOpportunities;
+      }
     },
-    refetchInterval: isDemoMode ? false : 30000, // Don't auto-refresh in demo mode
-    staleTime: isDemoMode ? Infinity : 5 * 60 * 1000, // Demo data never goes stale
+    refetchInterval: isDemoMode ? false : 30000,
+    staleTime: isDemoMode ? Infinity : 5 * 60 * 1000,
   });
 };

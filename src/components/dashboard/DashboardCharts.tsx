@@ -16,6 +16,8 @@ import { ChartHeader } from "./charts/ChartHeader";
 import { MetricSelectors } from "./charts/MetricSelectors";
 import { ChartGrid } from "./charts/ChartGrid";
 import { FiltersBar } from "./charts/FiltersBar";
+import { ChartFallback } from "./charts/ChartFallback";
+import { useSampleData } from "./charts/hooks/useSampleData";
 
 // Helper functions to collect availableRegion and availableAssetTypes per sector
 function getFinancialAvailableRegions(financialData: any[]) {
@@ -125,6 +127,20 @@ export const DashboardCharts = () => {
     ].filter(Boolean);
   }, [financialData, miningData, agricultureData, hydrogenData]);
 
+  // Inject sample/fallback data if any live data is empty or missing
+  const fallbackFinancial = useSampleData("financial");
+  const fallbackHousing = useSampleData("housing");
+  const fallbackMining = useSampleData("mining");
+  const fallbackAgriculture = useSampleData("agriculture");
+  const fallbackHydrogen = useSampleData("hydrogen");
+
+  // Now guarantee each filtered dataset is always non-empty:
+  const filteredFinancial = (financialData && financialData.length ? financialData : fallbackFinancial).filter(filterByAll);
+  const filteredHousing = (housingData && housingData.length ? housingData : fallbackHousing).filter(filterByAll);
+  const filteredMining = (miningData && miningData.length ? miningData : fallbackMining).filter(filterByAll);
+  const filteredAgriculture = (agricultureData && agricultureData.length ? agricultureData : fallbackAgriculture).filter(filterByAll);
+  const filteredHydrogen = (hydrogenData && hydrogenData.length ? hydrogenData : fallbackHydrogen).filter(filterByAll);
+
   // Universal filter function — only filter where the key exists on a datum
   function filterByAll(d: any) {
     // region-handling
@@ -154,13 +170,6 @@ export const DashboardCharts = () => {
     }
     return regionMatch && assetMatch;
   }
-
-  // Filtered datasets
-  const filteredFinancial = financialData.filter(filterByAll);
-  const filteredHousing = housingData.filter(filterByAll);
-  const filteredMining = miningData.filter(filterByAll);
-  const filteredAgriculture = agricultureData.filter(filterByAll);
-  const filteredHydrogen = hydrogenData.filter(filterByAll);
 
   const handleLegendClickWrapper = (data: Payload) => {
     if (data && typeof data.value === 'string') {

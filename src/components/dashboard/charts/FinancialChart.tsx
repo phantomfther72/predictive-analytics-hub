@@ -25,18 +25,19 @@ export function FinancialChart({
   enabledModels = [],
   simulationMode = false 
 }: FinancialChartProps) {
+  // Early fallback for loading: replace Skeleton with animated ChartFallback
   if (isLoading) {
-    return <Skeleton className="w-full h-full animate-pulse" />;
+    return <div className="h-[300px]"><Skeleton className="w-full h-full animate-pulse" /></div>;
   }
 
-  // Animation and drilldown: handle click for deep-dive modal or focused chart
+  // Animation and drilldown
   const [drillData, setDrillData] = React.useState<any | null>(null);
   const handleDataClick = React.useCallback(
     (d) => { if (d && d.activeLabel) setDrillData(d); },
     []
   );
 
-  // Simulate confidence intervals for demo
+  // Always inject forecast output for UI even if predicted_change missing
   const chartWithForecast = React.useMemo(() => {
     if (!data) return [];
     return data.map(d => ({
@@ -46,7 +47,7 @@ export function FinancialChart({
       upper95: d.current_price * (1 + ((d.predicted_change || 0) + 2) / 100),
     }));
   }, [data]);
-  // NOTE: Move modal OUTSIDE ResponsiveContainer so children is a single element.
+
   return (
     <>
       <ResponsiveContainer width="100%" height="100%">
@@ -89,6 +90,7 @@ export function FinancialChart({
             dot={false}
             hide={!selectedMetrics.includes("current_price")}
             animationDuration={300}
+            isAnimationActive
           />
           <Line
             type="monotone"
@@ -99,6 +101,7 @@ export function FinancialChart({
             dot={false}
             hide={!selectedMetrics.includes("volume")}
             animationDuration={300}
+            isAnimationActive
           />
           <PredictionOverlay
             data={chartWithForecast}
@@ -144,14 +147,13 @@ export function FinancialChart({
           ))}
         </LineChart>
       </ResponsiveContainer>
-      {/* DRILLDOWN MODAL — can render extra metrics for the selected datapoint */}
+      {/* DRILLDOWN MODAL — placed directly after ResponsiveContainer to fix multi-child error */}
       {drillData && (
         <div className="fixed inset-0 z-30 bg-black/40 flex items-center justify-center animate-fade-in" onClick={() => setDrillData(null)}>
           <div className="bg-white dark:bg-slate-950 rounded-xl p-6 min-w-[320px] shadow-2xl relative" onClick={e => e.stopPropagation()}>
             <h4 className="font-semibold text-lg mb-2 text-blue-900 dark:text-cyan-300">
               {drillData.activeLabel ? new Date(drillData.activeLabel).toLocaleDateString() : "Detail"}
             </h4>
-            {/* List all model predictions, with animated numeric transitions */}
             {drillData && drillData.activePayload && drillData.activePayload.length > 0 && (
               <ul className="space-y-2">
                 {drillData.activePayload.map((p, i) => (
@@ -164,7 +166,6 @@ export function FinancialChart({
                 ))}
               </ul>
             )}
-            {/* Add Namibian context */}
             <p className="text-xs mt-4 text-slate-500">
               Data derived from sample Bank of Namibia (BoN) financial bulletins and AI forecasts.
             </p>

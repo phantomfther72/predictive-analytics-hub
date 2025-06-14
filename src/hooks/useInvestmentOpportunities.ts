@@ -5,7 +5,7 @@ import { InvestmentOpportunity } from "@/types/investment";
 import { useDemoMode } from "./useDemoMode";
 import { sampleInvestmentOpportunities } from "@/utils/sampleInvestmentOpportunities";
 
-// Enhanced fetching with fallback and "smart" error handling and parsing
+// Enhanced fetching with Namibia focus, strict fallback and typing
 export const useInvestmentOpportunities = () => {
   const { isDemoMode } = useDemoMode();
 
@@ -13,7 +13,7 @@ export const useInvestmentOpportunities = () => {
     queryKey: ["investmentOpportunities", isDemoMode],
     queryFn: async (): Promise<InvestmentOpportunity[]> => {
       if (isDemoMode) {
-        // Always use Namibian demo data
+        // Always use Namibia demo data
         return sampleInvestmentOpportunities;
       }
       try {
@@ -24,22 +24,20 @@ export const useInvestmentOpportunities = () => {
 
         if (error || !data || data.length === 0) {
           // Fall back to Namibia sample data
-          console.warn("Falling back to Namibian sample investment opportunities due to:", error?.message || 'no data');
           return sampleInvestmentOpportunities;
         }
 
-        // Map/parsing: ensure all required fields exist and Namibian focus is kept
+        // Map/parsing: strictly provide all required fields
         return (data || []).map(item => ({
           ...item,
           thumbnail_chart_data:
             typeof item.thumbnail_chart_data === "string"
               ? JSON.parse(item.thumbnail_chart_data)
               : item.thumbnail_chart_data,
-          prediction_explanation: item.prediction_explanation || "Opportunities reflect Namibia's economic strengths and sectoral trends."
+          prediction_explanation: "Opportunities reflect Namibia’s economic momentum and sectoral realities (BIPA, BoN, NSA).",
         })) as InvestmentOpportunity[];
       } catch (e) {
-        // Fallback in all error scenarios
-        console.error("Investment opportunities fetch failed:", e);
+        // Fallback for error cases
         return sampleInvestmentOpportunities;
       }
     },

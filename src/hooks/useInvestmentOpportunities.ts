@@ -13,10 +13,9 @@ export const useInvestmentOpportunities = () => {
     queryKey: ["investmentOpportunities", isDemoMode],
     queryFn: async (): Promise<InvestmentOpportunity[]> => {
       if (isDemoMode) {
-        // Demo mode: Always return realistic sample data
+        // Always use Namibian demo data
         return sampleInvestmentOpportunities;
       }
-      // Try fetch from Supabase
       try {
         const { data, error } = await supabase
           .from("investment_opportunities")
@@ -24,18 +23,19 @@ export const useInvestmentOpportunities = () => {
           .order("created_at", { ascending: false });
 
         if (error || !data || data.length === 0) {
-          // Fall back to sample data on error or empty
-          console.warn("Falling back to sample investment opportunities due to:", error?.message || 'no data');
+          // Fall back to Namibia sample data
+          console.warn("Falling back to Namibian sample investment opportunities due to:", error?.message || 'no data');
           return sampleInvestmentOpportunities;
         }
 
-        // Parse and normalize
+        // Map/parsing: ensure all required fields exist and Namibian focus is kept
         return (data || []).map(item => ({
           ...item,
           thumbnail_chart_data:
             typeof item.thumbnail_chart_data === "string"
               ? JSON.parse(item.thumbnail_chart_data)
               : item.thumbnail_chart_data,
+          prediction_explanation: item.prediction_explanation || "Opportunities reflect Namibia's economic strengths and sectoral trends."
         })) as InvestmentOpportunity[];
       } catch (e) {
         // Fallback in all error scenarios

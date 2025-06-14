@@ -1,8 +1,8 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryUtils } from "./useQueryUtils";
 import { AgricultureMarketData } from "@/types/market";
+import { sampleMarketModelData } from "@/utils/sampleMarketModelData";
 
 export const useAgricultureMarketData = () => {
   const { handleError, processAlternativeModels, parsePredictionFactors } = useQueryUtils();
@@ -16,18 +16,31 @@ export const useAgricultureMarketData = () => {
           .select("*")
           .order("timestamp", { ascending: false });
 
-        if (error) {
-          console.error("Failed to fetch agriculture market data:", error);
-          // Instead of throwing, return fallback data
-          return getFallbackData();
-        }
-
-        if (!data || data.length === 0) {
-          return getFallbackData();
+        if (error || !data || data.length === 0) {
+          // Namibia sample fallback
+          return sampleMarketModelData.agriculture.map(item => ({
+            ...item,
+            prediction_explanation: item.prediction_explanation || "Seasonal rainfall and trade trends drive crop yields in Namibia.",
+            prediction_factors: item.prediction_factors,
+            alternative_model_predictions: [
+              {
+                model: "weather-based",
+                value: (item.predicted_change ?? 0) * 1.24,
+                confidence: 0.68
+              },
+              {
+                model: "market-based",
+                value: (item.predicted_change ?? 0) * 0.81,
+                confidence: 0.77
+              }
+            ]
+          }));
         }
 
         return (data as any[]).map(item => ({
           ...item,
+          prediction_factors: parsePredictionFactors(item.prediction_factors),
+          prediction_explanation: item.prediction_explanation || "Seasonal rainfall and trade trends drive crop yields in Namibia.",
           // Ensure no null values in critical fields
           crop_type: item.crop_type || "Maize",
           region: item.region || "Namibia Central",
@@ -75,7 +88,11 @@ export const useAgricultureMarketData = () => {
         })) as AgricultureMarketData[];
       } catch (err) {
         console.error("Error in agriculture market data query:", err);
-        return getFallbackData();
+        return sampleMarketModelData.agriculture.map(item => ({
+          ...item,
+          prediction_explanation: item.prediction_explanation || "Seasonal rainfall and trade trends drive crop yields in Namibia.",
+          prediction_factors: item.prediction_factors
+        }));
       }
     },
   });

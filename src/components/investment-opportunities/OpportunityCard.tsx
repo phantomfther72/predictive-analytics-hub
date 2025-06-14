@@ -1,4 +1,3 @@
-
 import React from "react";
 import { InvestmentOpportunity } from "@/types/investment";
 import {
@@ -91,6 +90,7 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
 
     return (
       <Card className="group h-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+        {/* Header */}
         <CardHeader className="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 pb-4">
           <div className="flex justify-between items-start gap-3">
             <div className="flex-1 min-w-0">
@@ -116,6 +116,7 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
           </div>
         </CardHeader>
         <CardContent className="p-6 space-y-4 flex-1">
+          {/* Metrics Cards */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
@@ -161,6 +162,7 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
               />
             </div>
           )}
+          {/* Min investment and horizon */}
           <div className="grid grid-cols-2 gap-4 pt-2">
             <div className="space-y-1">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
@@ -179,6 +181,7 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
               </p>
             </div>
           </div>
+          {/* Predicted Change block */}
           {opportunity.predicted_change !== undefined && (
             <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
               <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
@@ -199,6 +202,13 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
                   <TrendingDown className="h-4 w-4" />
                 )}
               </div>
+            </div>
+          )}
+          {/* Namibian explanation annotation */}
+          {opportunity.prediction_explanation && (
+            <div className="bg-slate-100 dark:bg-slate-900/40 mt-2 p-2 rounded text-xs text-slate-500 dark:text-slate-400 italic">
+              <Info className="inline h-3 w-3 mr-1 align-text-top" />
+              {opportunity.prediction_explanation}
             </div>
           )}
         </CardContent>

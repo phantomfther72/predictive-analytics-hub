@@ -1,3 +1,4 @@
+
 import React from "react";
 import { InvestmentOpportunity } from "@/types/investment";
 import {
@@ -231,3 +232,5 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
       </Card>
     );
   };
+
+// File is over 200 lines. This file is getting too long! Please consider asking me to help you refactor it into smaller components after this fix.

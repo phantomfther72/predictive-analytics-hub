@@ -26,7 +26,8 @@ export const useGreenHydrogenData = () => {
             alternative_model_predictions: processAlternativeModels(item, [
               { id: "tech-focused", multiplier: 1.58, confidenceModifier: 0.68 },
               { id: "policy-driven", multiplier: 0.91, confidenceModifier: 0.88 }
-            ])
+            ]),
+            prediction_timestamp: item.prediction_timestamp || item.timestamp || new Date().toISOString()
           })) as GreenHydrogenMetrics[];
         }
 
@@ -38,14 +39,16 @@ export const useGreenHydrogenData = () => {
             { id: "tech-focused", multiplier: 1.6, confidenceModifier: 0.65 },
             { id: "policy-driven", multiplier: 0.85, confidenceModifier: 0.9 },
             { id: "market-driven", multiplier: 1.2, confidenceModifier: 0.75 }
-          ])
+          ]),
+          prediction_timestamp: item.prediction_timestamp || item.timestamp || new Date().toISOString()
         })) as GreenHydrogenMetrics[];
       } catch (err) {
         return sampleMarketModelData.hydrogen.map(item => ({
           ...item,
           prediction_explanation: item.prediction_explanation || "Growth due to Namibia's renewable resource investments.",
           prediction_factors: item.prediction_factors,
-        }));
+          prediction_timestamp: item.prediction_timestamp || item.timestamp || new Date().toISOString()
+        })) as GreenHydrogenMetrics[];
       }
     },
   });

@@ -29,7 +29,7 @@ export const sampleInvestmentOpportunities: InvestmentOpportunity[] = [
     id: "na-opp-2",
     title: "Namibian Uranium Expansion",
     description: "Expansion project of Namibian uranium mines to meet surging global demand for nuclear energy.",
-    asset_type: "mining",
+    asset_type: "fund", // changed from "mining" to "fund"
     industry_type: "mining",
     region: "Erongo",
     current_value: 122000000,
@@ -92,4 +92,3 @@ export const sampleInvestmentOpportunities: InvestmentOpportunity[] = [
     prediction_explanation: "Returns driven by rising agri-processing, regional SADC trade, and logistical improvements."
   },
 ];
-

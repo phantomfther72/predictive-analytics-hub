@@ -39,4 +39,6 @@ export interface InvestmentOpportunity {
   contact_email?: string;
   contact_phone?: string;
   full_details?: Json;
+  prediction_explanation?: string; // <-- add this line
 }
+

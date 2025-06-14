@@ -17,7 +17,7 @@ export const useAgricultureMarketData = () => {
           .order("timestamp", { ascending: false });
 
         if (error || !data || data.length === 0) {
-          // Namibia sample fallback
+          // Namibia sample fallback -- provide all required fields, remove duplicate keys
           return sampleMarketModelData.agriculture.map(item => ({
             ...item,
             prediction_explanation: item.prediction_explanation || "Seasonal rainfall and trade trends drive crop yields in Namibia.",
@@ -33,8 +33,9 @@ export const useAgricultureMarketData = () => {
                 value: (item.predicted_change ?? 0) * 0.81,
                 confidence: 0.77
               }
-            ]
-          }));
+            ],
+            prediction_timestamp: item.prediction_timestamp || item.timestamp || new Date().toISOString()
+          })) as AgricultureMarketData[];
         }
 
         return (data as any[]).map(item => ({
@@ -56,10 +57,7 @@ export const useAgricultureMarketData = () => {
           predicted_change: item.predicted_change !== null && item.predicted_change !== undefined ? item.predicted_change : 0,
           prediction_confidence: item.prediction_confidence !== null && item.prediction_confidence !== undefined ? item.prediction_confidence : 0.7,
           prediction_timestamp: item.prediction_timestamp || item.timestamp || new Date().toISOString(),
-          prediction_explanation: item.prediction_explanation || "Based on market trends",
-          prediction_factors: parsePredictionFactors(item.prediction_factors),
-          
-          // Add enhanced metrics for agriculture if they exist in the database
+          // Enhanced fields
           soil_health_index: item.soil_health_index || null,
           nutrient_efficiency_pct: item.nutrient_efficiency_pct || null,
           pest_resistance_score: item.pest_resistance_score || null,
@@ -73,7 +71,6 @@ export const useAgricultureMarketData = () => {
           local_market_share_pct: item.local_market_share_pct || null,
           organic_certification: item.organic_certification || false,
           sustainability_score: item.sustainability_score || null,
-          
           alternative_model_predictions: processAlternativeModels(
             {
               predicted_change: item.predicted_change !== null && item.predicted_change !== undefined ? item.predicted_change : 0,
@@ -91,8 +88,9 @@ export const useAgricultureMarketData = () => {
         return sampleMarketModelData.agriculture.map(item => ({
           ...item,
           prediction_explanation: item.prediction_explanation || "Seasonal rainfall and trade trends drive crop yields in Namibia.",
-          prediction_factors: item.prediction_factors
-        }));
+          prediction_factors: item.prediction_factors,
+          prediction_timestamp: item.prediction_timestamp || item.timestamp || new Date().toISOString()
+        })) as AgricultureMarketData[];
       }
     },
   });

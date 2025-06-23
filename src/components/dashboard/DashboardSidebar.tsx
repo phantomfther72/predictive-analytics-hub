@@ -1,157 +1,160 @@
 
 import React from "react";
-import { useLocation, Link } from "react-router-dom";
-import {
-  Sidebar,
-  SidebarContent as SidebarContentWrapper,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { 
-  LayoutDashboard, 
-  LineChart, 
+  Home, 
+  BarChart3, 
   Table, 
   User, 
-  X, 
-  Home, 
-  ChevronRight,
-  Briefcase
+  TrendingUp,
+  Building2,
+  Pickaxe,
+  Wheat,
+  Droplets,
+  DollarSign,
+  Briefcase,
+  Globe,
+  Target,
+  Zap
 } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-const menuItems = [
-  {
-    title: "Overview",
-    icon: LayoutDashboard,
-    path: "/dashboard",
-  },
-  {
-    title: "Interactive Charts",
-    icon: LineChart,
-    path: "/dashboard/charts",
-  },
-  {
-    title: "Data Tables",
-    icon: Table,
-    path: "/dashboard/tables",
-  },
-  {
-    title: "Investment Opportunities",
-    icon: Briefcase,
-    path: "/dashboard/opportunities",
-  },
-  {
-    title: "Profile",
-    icon: User,
-    path: "/dashboard/profile",
-  },
-];
-
-const SidebarContentComponent = () => {
+export const DashboardSidebar = () => {
   const location = useLocation();
-  const { setOpenMobile } = useSidebar();
-  const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  
+  const menuItems = [
+    { icon: Home, label: "Overview", path: "/dashboard" },
+    { icon: BarChart3, label: "Charts", path: "/dashboard/charts" },
+    { icon: Table, label: "Tables", path: "/dashboard/tables" },
+    { icon: Briefcase, label: "Opportunities", path: "/dashboard/opportunities" },
+    { 
+      icon: Globe, 
+      label: "Global Equity", 
+      path: "/global-equity",
+      isNew: true,
+      description: "AI-powered global markets"
+    },
+  ];
 
-  const handleNavigate = () => {
-    if (isMobile) {
-      setOpenMobile(false);
+  const industryItems = [
+    { icon: TrendingUp, label: "Financial", path: "/dashboard/industry/financial" },
+    { icon: Building2, label: "Housing", path: "/dashboard/industry/housing" },
+    { icon: Pickaxe, label: "Mining", path: "/dashboard/industry/mining" },
+    { icon: Wheat, label: "Agriculture", path: "/dashboard/industry/agriculture" },
+    { icon: Droplets, label: "Green Hydrogen", path: "/dashboard/industry/green_hydrogen" },
+  ];
+
+  const isActive = (path: string) => {
+    if (path === "/dashboard") {
+      return location.pathname === "/dashboard" || location.pathname === "/dashboard/";
     }
+    return location.pathname.startsWith(path);
   };
 
   return (
-    <div className="flex h-full flex-col">
-      {isMobile && (
-        <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-white dark:bg-slate-900 border-b">
-          <div className="font-display font-semibold text-slate-900 dark:text-white">
-            <span className="bg-gradient-to-r from-blue-700 to-teal-500 bg-clip-text text-transparent">
-              Predictive Pulse
-            </span>
+    <aside className="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col">
+      <div className="p-6">
+        <div className="flex items-center gap-2 mb-8">
+          <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-teal-600 rounded-lg flex items-center justify-center">
+            <Target className="h-4 w-4 text-white" />
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setOpenMobile(false)}
-            aria-label="Close mobile menu"
-            className="touch-target mobile-interactive"
-          >
-            <X className="h-5 w-5" />
-          </Button>
+          <div>
+            <h2 className="font-bold text-lg">PredictivePulse</h2>
+            <p className="text-xs text-muted-foreground">AI Investment Platform</p>
+          </div>
         </div>
-      )}
-      <SidebarGroup>
-        <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                onClick={handleNavigate}
-              >
-                <Link to="/" className={cn(
-                  "flex items-center gap-2 mobile-menu-item", 
-                  "touch-feedback focus-visible-ring"
-                )}>
-                  <Home className="h-4 w-4" />
-                  <span>Home</span>
-                  {isMobile && <ChevronRight className="h-4 w-4 ml-auto" />}
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            {menuItems.map((item) => (
-              <SidebarMenuItem key={item.path}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={location.pathname === item.path}
-                  onClick={handleNavigate}
+
+        <nav className="space-y-6">
+          {/* Main Navigation */}
+          <div>
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              Dashboard
+            </h3>
+            <div className="space-y-1">
+              {menuItems.map((item) => (
+                <Button
+                  key={item.path}
+                  variant={isActive(item.path) ? "secondary" : "ghost"}
+                  className={cn(
+                    "w-full justify-start gap-3 h-10",
+                    isActive(item.path) && "bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                  )}
+                  onClick={() => navigate(item.path)}
                 >
-                  <Link to={item.path} className={cn(
-                    "flex items-center gap-2 mobile-menu-item",
-                    "touch-feedback focus-visible-ring",
-                    isMobile && "justify-between"
-                  )}>
-                    <div className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </div>
-                    {isMobile && <ChevronRight className="h-4 w-4" />}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-    </div>
-  );
-};
+                  <item.icon className="h-4 w-4" />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {item.isNew && (
+                    <span className="bg-gradient-to-r from-blue-600 to-teal-600 text-white text-xs px-2 py-0.5 rounded-full">
+                      NEW
+                    </span>
+                  )}
+                </Button>
+              ))}
+            </div>
+          </div>
 
-export const DashboardSidebar = () => {
-  const isMobile = useIsMobile();
-  const { openMobile, setOpenMobile } = useSidebar();
+          {/* Industry Navigation */}
+          <div>
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              Industries
+            </h3>
+            <div className="space-y-1">
+              {industryItems.map((item) => (
+                <Button
+                  key={item.path}
+                  variant={isActive(item.path) ? "secondary" : "ghost"}
+                  className={cn(
+                    "w-full justify-start gap-3 h-10",
+                    isActive(item.path) && "bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300"
+                  )}
+                  onClick={() => navigate(item.path)}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </Button>
+              ))}
+            </div>
+          </div>
 
-  if (isMobile) {
-    return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
-        <SheetContent side="left" className="w-[280px] p-0 border-r shadow-lg">
-          <SidebarContentComponent />
-        </SheetContent>
-      </Sheet>
-    );
-  }
+          {/* Quick Actions */}
+          <div>
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              Quick Actions
+            </h3>
+            <div className="space-y-1">
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 h-10"
+                onClick={() => navigate("/global-equity")}
+              >
+                <Zap className="h-4 w-4" />
+                Create Fund
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 h-10"
+              >
+                <DollarSign className="h-4 w-4" />
+                View Portfolio
+              </Button>
+            </div>
+          </div>
+        </nav>
+      </div>
 
-  return (
-    <Sidebar className="hidden md:flex border-r shadow-sm">
-      <SidebarContentWrapper>
-        <SidebarContentComponent />
-      </SidebarContentWrapper>
-    </Sidebar>
+      {/* User Profile */}
+      <div className="mt-auto p-6 border-t border-slate-200 dark:border-slate-700">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 h-10"
+          onClick={() => navigate("/dashboard/profile")}
+        >
+          <User className="h-4 w-4" />
+          Profile & Settings
+        </Button>
+      </div>
+    </aside>
   );
 };

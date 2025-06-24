@@ -2,6 +2,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Hero from "@/components/Hero";
+import InteractiveOverview from "@/components/InteractiveOverview";
+import ComparisonSection from "@/components/ComparisonSection";
+import FundBuilderTeaser from "@/components/FundBuilderTeaser";
+import NamibiaFirst from "@/components/NamibiaFirst";
+import TrustLayer from "@/components/TrustLayer";
+import FinalCTA from "@/components/FinalCTA";
 import Features from "@/components/Features";
 import Industries from "@/components/Industries";
 import Testimonials from "@/components/Testimonials";
@@ -43,18 +49,25 @@ const Index: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black">
+      {/* New Bold Sections */}
       <Hero />
+      <InteractiveOverview />
+      <ComparisonSection />
+      <FundBuilderTeaser />
+      <NamibiaFirst />
+      <TrustLayer />
+      <FinalCTA />
       
-      {/* Market Data Section with improved spacing and layout */}
-      <section id="market-data" className="bg-slate-50 dark:bg-slate-900/50">
+      {/* Legacy Market Data Section - Kept for compatibility */}
+      <section id="market-data" className="bg-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
           {/* Section Header */}
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Live Market Data & Insights
             </h2>
-            <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
               Real-time analytics and AI-driven predictions across multiple industries
             </p>
           </div>
@@ -64,7 +77,7 @@ const Index: React.FC = () => {
             <Button 
               onClick={() => navigate('/dashboard/opportunities')} 
               size="lg"
-              className="bg-gradient-to-r from-blue-700 to-teal-600 hover:from-blue-800 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              className="bg-gradient-to-r from-green-400 to-emerald-300 hover:from-green-300 hover:to-emerald-200 text-black shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
               <Briefcase className="h-5 w-5 mr-2" />
               Explore Investment Opportunities
@@ -72,16 +85,13 @@ const Index: React.FC = () => {
           </div>
 
           {/* Market Data Tables with improved container */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="bg-slate-800 rounded-2xl shadow-xl border border-slate-700 overflow-hidden">
             <MarketDataTables onInsightClick={handleInsightClick} />
           </div>
         </div>
       </section>
 
-      <Features />
-      <Industries />
-      <Testimonials />
-      <CTA />
+      <Footer />
     </div>
   );
 };

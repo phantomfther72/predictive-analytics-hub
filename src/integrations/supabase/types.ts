@@ -72,6 +72,163 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_queries: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          industry_context: string | null
+          query_text: string
+          region_context: string | null
+          response_text: string
+          user_id: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          industry_context?: string | null
+          query_text: string
+          region_context?: string | null
+          response_text: string
+          user_id?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          industry_context?: string | null
+          query_text?: string
+          region_context?: string | null
+          response_text?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      alerts: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          id: string
+          industry_id: string | null
+          is_read: boolean | null
+          message: string
+          metadata: Json | null
+          severity: Database["public"]["Enums"]["risk_level"]
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          id?: string
+          industry_id?: string | null
+          is_read?: boolean | null
+          message: string
+          metadata?: Json | null
+          severity: Database["public"]["Enums"]["risk_level"]
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          id?: string
+          industry_id?: string | null
+          is_read?: boolean | null
+          message?: string
+          metadata?: Json | null
+          severity?: Database["public"]["Enums"]["risk_level"]
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_industry_id_fkey"
+            columns: ["industry_id"]
+            isOneToOne: false
+            referencedRelation: "predictive_industries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      api_usage: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          id: string
+          method: string
+          response_time_ms: number | null
+          status_code: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          method: string
+          response_time_ms?: number | null
+          status_code?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          method?: string
+          response_time_ms?: number | null
+          status_code?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      data_points: {
+        Row: {
+          created_at: string | null
+          id: string
+          industry_id: string | null
+          metadata: Json | null
+          metric_name: string
+          region: string
+          source: string | null
+          timestamp: string
+          unit: string
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          industry_id?: string | null
+          metadata?: Json | null
+          metric_name: string
+          region: string
+          source?: string | null
+          timestamp: string
+          unit: string
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          industry_id?: string | null
+          metadata?: Json | null
+          metric_name?: string
+          region?: string
+          source?: string | null
+          timestamp?: string
+          unit?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_points_industry_id_fkey"
+            columns: ["industry_id"]
+            isOneToOne: false
+            referencedRelation: "predictive_industries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financial_market_metrics: {
         Row: {
           asset: string
@@ -116,6 +273,56 @@ export type Database = {
           volume?: number
         }
         Relationships: []
+      }
+      forecasts: {
+        Row: {
+          confidence_interval: number | null
+          created_at: string | null
+          factors: Json | null
+          forecast_date: string
+          id: string
+          industry_id: string | null
+          metric_name: string
+          model_used: Database["public"]["Enums"]["forecast_model"]
+          prediction: number
+          prediction_range: Json | null
+          region: string
+        }
+        Insert: {
+          confidence_interval?: number | null
+          created_at?: string | null
+          factors?: Json | null
+          forecast_date: string
+          id?: string
+          industry_id?: string | null
+          metric_name: string
+          model_used: Database["public"]["Enums"]["forecast_model"]
+          prediction: number
+          prediction_range?: Json | null
+          region: string
+        }
+        Update: {
+          confidence_interval?: number | null
+          created_at?: string | null
+          factors?: Json | null
+          forecast_date?: string
+          id?: string
+          industry_id?: string | null
+          metric_name?: string
+          model_used?: Database["public"]["Enums"]["forecast_model"]
+          prediction?: number
+          prediction_range?: Json | null
+          region?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forecasts_industry_id_fkey"
+            columns: ["industry_id"]
+            isOneToOne: false
+            referencedRelation: "predictive_industries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       green_hydrogen_metrics: {
         Row: {
@@ -167,6 +374,50 @@ export type Database = {
           timestamp?: string
         }
         Relationships: []
+      }
+      heatmaps: {
+        Row: {
+          created_at: string | null
+          geojson_data: Json
+          id: string
+          industry_id: string | null
+          metrics: Json | null
+          region: string
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          risk_score: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          geojson_data: Json
+          id?: string
+          industry_id?: string | null
+          metrics?: Json | null
+          region: string
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          risk_score?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          geojson_data?: Json
+          id?: string
+          industry_id?: string | null
+          metrics?: Json | null
+          region?: string
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          risk_score?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "heatmaps_industry_id_fkey"
+            columns: ["industry_id"]
+            isOneToOne: false
+            referencedRelation: "predictive_industries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       housing_market_data: {
         Row: {
@@ -712,6 +963,39 @@ export type Database = {
           },
         ]
       }
+      predictive_industries: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -795,6 +1079,39 @@ export type Database = {
           },
         ]
       }
+      user_preferences: {
+        Row: {
+          created_at: string | null
+          favorite_industries: string[] | null
+          id: string
+          notification_settings: Json | null
+          preferred_language: string | null
+          preferred_regions: string[] | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          favorite_industries?: string[] | null
+          id?: string
+          notification_settings?: Json | null
+          preferred_language?: string | null
+          preferred_regions?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          favorite_industries?: string[] | null
+          id?: string
+          notification_settings?: Json | null
+          preferred_language?: string | null
+          preferred_regions?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -831,6 +1148,7 @@ export type Database = {
       }
     }
     Enums: {
+      forecast_model: "linear" | "arima" | "neural_network" | "ensemble"
       industry_type: "housing" | "agriculture" | "mining" | "cryptocurrency"
       market_type:
         | "housing"
@@ -839,7 +1157,9 @@ export type Database = {
         | "cryptocurrency"
         | "green_hydrogen"
       payment_status: "pending" | "success" | "failed"
+      risk_level: "low" | "medium" | "high" | "critical"
       subscription_tier: "free" | "premium"
+      user_role: "public" | "analyst" | "partner" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -955,6 +1275,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      forecast_model: ["linear", "arima", "neural_network", "ensemble"],
       industry_type: ["housing", "agriculture", "mining", "cryptocurrency"],
       market_type: [
         "housing",
@@ -964,7 +1285,9 @@ export const Constants = {
         "green_hydrogen",
       ],
       payment_status: ["pending", "success", "failed"],
+      risk_level: ["low", "medium", "high", "critical"],
       subscription_tier: ["free", "premium"],
+      user_role: ["public", "analyst", "partner", "admin"],
     },
   },
 } as const

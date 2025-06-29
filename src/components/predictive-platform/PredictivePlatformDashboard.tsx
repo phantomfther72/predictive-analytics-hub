@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, TrendingUp, AlertTriangle, Globe, Zap, MessageSquare } from 'lucide-react';
+import { MapPin, TrendingUp, AlertTriangle, Globe, Zap, MessageSquare, Loader2 } from 'lucide-react';
 import { NamibianHeatmap } from './NamibianHeatmap';
 import { MiningDashboard } from './industry-dashboards/MiningDashboard';
 import { HousingDashboard } from './industry-dashboards/HousingDashboard';
@@ -14,19 +14,42 @@ import { GreenHydrogenDashboard } from './industry-dashboards/GreenHydrogenDashb
 import { FinancialDashboard } from './industry-dashboards/FinancialDashboard';
 import { ForecastingService } from './ForecastingService';
 import { LanguageToggle } from './LanguageToggle';
+import { IndustrySelector } from './IndustrySelector';
+import { RegionSelector } from './RegionSelector';
+import { MetricCard } from './MetricCard';
+import { AIAssistant } from './AIAssistant';
+import { useIndustries, useDataPoints, useForecasts } from '@/hooks/usePredictiveData';
 
 export const PredictivePlatformDashboard = () => {
   const [selectedIndustry, setSelectedIndustry] = useState('overview');
+  const [selectedRegion, setSelectedRegion] = useState('');
   const [language, setLanguage] = useState<'en' | 'oshiwambo'>('en');
 
-  const industries = [
-    { id: 'mining', name: 'Mining', icon: '⛏️', risk: 'medium', growth: '+12.4%' },
-    { id: 'housing', name: 'Housing', icon: '🏠', risk: 'low', growth: '+8.7%' },
-    { id: 'agriculture', name: 'Agriculture', icon: '🌾', risk: 'high', growth: '+3.2%' },
-    { id: 'medical', name: 'Medical', icon: '🧬', risk: 'medium', growth: '+15.1%' },
-    { id: 'hydrogen', name: 'Green Hydrogen', icon: '🧪', risk: 'low', growth: '+24.8%' },
-    { id: 'financial', name: 'Financial', icon: '💸', risk: 'medium', growth: '+6.9%' }
-  ];
+  const { data: industries = [], isLoading: industriesLoading } = useIndustries();
+  const { data: dataPoints = [], isLoading: dataLoading } = useDataPoints();
+  const { data: forecasts = [], isLoading: forecastsLoading } = useForecasts();
+
+  const industryCards = industries.map(industry => {
+    const industryData = dataPoints.filter(dp => dp.industry_id === industry.id);
+    const industryForecasts = forecasts.filter(f => f.industry_id === industry.id);
+    
+    const avgGrowth = industryForecasts.length > 0 
+      ? industryForecasts.reduce((sum, f) => sum + f.prediction, 0) / industryForecasts.length
+      : 0;
+    
+    const getRiskLevel = (growth: number) => {
+      if (growth > 10) return 'low';
+      if (growth > 0) return 'medium';
+      return 'high';
+    };
+    
+    return {
+      ...industry,
+      growth: avgGrowth,
+      risk: getRiskLevel(avgGrowth),
+      dataCount: industryData.length
+    };
+  });
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -36,6 +59,27 @@ export const PredictivePlatformDashboard = () => {
       default: return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
     }
   };
+
+  // Get recent data points for overview
+  const recentDataPoints = dataPoints
+    .slice(0, 8)
+    .map(dp => {
+      const relatedForecast = forecasts.find(f => 
+        f.industry_id === dp.industry_id && f.metric_name === dp.metric_name
+      );
+      return { dataPoint: dp, forecast: relatedForecast };
+    });
+
+  if (industriesLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black flex items-center justify-center">
+        <div className="flex items-center space-x-2 text-white">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Loading Predictive Pulse...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black">
@@ -53,6 +97,11 @@ export const PredictivePlatformDashboard = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <RegionSelector 
+                selectedRegion={selectedRegion}
+                onRegionSelect={setSelectedRegion}
+                className="w-48"
+              />
               <LanguageToggle language={language} onLanguageChange={setLanguage} />
               <Button size="sm" className="bg-green-500/20 text-green-400 border-green-500/30">
                 <MessageSquare className="h-4 w-4 mr-2" />
@@ -65,33 +114,23 @@ export const PredictivePlatformDashboard = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={selectedIndustry} onValueChange={setSelectedIndustry}>
-          <TabsList className="grid grid-cols-4 lg:grid-cols-7 gap-2 bg-slate-800/50 p-2">
-            <TabsTrigger 
-              value="overview" 
-              className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400"
-            >
-              Overview
-            </TabsTrigger>
-            {industries.map((industry) => (
-              <TabsTrigger 
-                key={industry.id}
-                value={industry.id}
-                className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-400"
-              >
-                <span className="mr-2">{industry.icon}</span>
-                <span className="hidden sm:inline">{industry.name}</span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="mb-6">
+            <IndustrySelector
+              industries={industries}
+              selectedIndustry={selectedIndustry === 'overview' ? '' : selectedIndustry}
+              onIndustrySelect={(industry) => setSelectedIndustry(industry || 'overview')}
+              className="mb-4"
+            />
+          </div>
 
-          <TabsContent value="overview" className="space-y-8 mt-8">
-            {/* Overview Grid */}
+          <TabsContent value="overview" className="space-y-8">
+            {/* Industry Overview Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {industries.map((industry) => (
+              {industryCards.map((industry) => (
                 <Card 
                   key={industry.id}
                   className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300 cursor-pointer"
-                  onClick={() => setSelectedIndustry(industry.id)}
+                  onClick={() => setSelectedIndustry(industry.type)}
                 >
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -99,7 +138,7 @@ export const PredictivePlatformDashboard = () => {
                         <div className="text-2xl">{industry.icon}</div>
                         <div>
                           <CardTitle className="text-white">{industry.name}</CardTitle>
-                          <CardDescription>Sector Forecast</CardDescription>
+                          <CardDescription>{industry.dataCount} active metrics</CardDescription>
                         </div>
                       </div>
                       <Badge className={getRiskColor(industry.risk)}>
@@ -111,13 +150,35 @@ export const PredictivePlatformDashboard = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <TrendingUp className="h-4 w-4 text-green-400" />
-                        <span className="text-green-400 font-bold">{industry.growth}</span>
+                        <span className="text-green-400 font-bold">
+                          {industry.growth > 0 ? '+' : ''}{industry.growth.toFixed(1)}%
+                        </span>
                       </div>
                       <div className="text-xs text-slate-400">12M Forecast</div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+
+            {/* Key Metrics Grid */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white">Key Metrics Overview</h2>
+                <Badge variant="outline" className="text-slate-400">
+                  {dataLoading ? 'Loading...' : `${dataPoints.length} total metrics`}
+                </Badge>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {recentDataPoints.map(({ dataPoint, forecast }) => (
+                  <MetricCard
+                    key={dataPoint.id}
+                    dataPoint={dataPoint}
+                    forecast={forecast}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Namibian Heatmap */}
@@ -152,6 +213,9 @@ export const PredictivePlatformDashboard = () => {
               </CardContent>
             </Card>
 
+            {/* AI Assistant */}
+            <AIAssistant />
+
             {/* Forecasting as a Service */}
             <ForecastingService />
           </TabsContent>
@@ -160,7 +224,7 @@ export const PredictivePlatformDashboard = () => {
           <TabsContent value="housing"><HousingDashboard language={language} /></TabsContent>
           <TabsContent value="agriculture"><AgricultureDashboard language={language} /></TabsContent>
           <TabsContent value="medical"><MedicalDashboard language={language} /></TabsContent>
-          <TabsContent value="hydrogen"><GreenHydrogenDashboard language={language} /></TabsContent>
+          <TabsContent value="green_hydrogen"><GreenHydrogenDashboard language={language} /></TabsContent>
           <TabsContent value="financial"><FinancialDashboard language={language} /></TabsContent>
         </Tabs>
       </div>

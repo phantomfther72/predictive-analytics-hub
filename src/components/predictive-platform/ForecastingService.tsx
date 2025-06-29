@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Upload, Zap, BarChart3, Download, Api } from 'lucide-react';
+import { Upload, Zap, BarChart3, Download, Code } from 'lucide-react';
 
 export const ForecastingService = () => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -118,7 +118,7 @@ export const ForecastingService = () => {
       <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-white flex items-center">
-            <Api className="h-5 w-5 mr-2 text-green-400" />
+            <Code className="h-5 w-5 mr-2 text-green-400" />
             API Integration Hub
           </CardTitle>
           <CardDescription>

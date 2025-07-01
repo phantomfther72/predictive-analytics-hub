@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,7 +16,8 @@ import { LanguageToggle } from './LanguageToggle';
 import { IndustrySelector } from './IndustrySelector';
 import { RegionSelector } from './RegionSelector';
 import { MetricCard } from './MetricCard';
-import { AIAssistant } from './AIAssistant';
+import { AIChat } from './AIChat';
+import { WhatsAppBot } from './WhatsAppBot';
 import { useIndustries, useDataPoints, useForecasts } from '@/hooks/usePredictiveData';
 
 export const PredictivePlatformDashboard = () => {
@@ -103,7 +103,11 @@ export const PredictivePlatformDashboard = () => {
                 className="w-48"
               />
               <LanguageToggle language={language} onLanguageChange={setLanguage} />
-              <Button size="sm" className="bg-green-500/20 text-green-400 border-green-500/30">
+              <Button 
+                size="sm" 
+                className="bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30"
+                onClick={() => setSelectedIndustry('whatsapp')}
+              >
                 <MessageSquare className="h-4 w-4 mr-2" />
                 WhatsApp Bot
               </Button>
@@ -116,7 +120,16 @@ export const PredictivePlatformDashboard = () => {
         <Tabs value={selectedIndustry} onValueChange={setSelectedIndustry}>
           <div className="mb-6">
             <IndustrySelector
-              industries={industries}
+              industries={[
+                ...industries,
+                { 
+                  id: 'whatsapp', 
+                  name: 'WhatsApp Bot', 
+                  type: 'whatsapp', 
+                  icon: '💬',
+                  description: 'AI Assistant Integration'
+                }
+              ]}
               selectedIndustry={selectedIndustry === 'overview' ? '' : selectedIndustry}
               onIndustrySelect={(industry) => setSelectedIndustry(industry || 'overview')}
               className="mb-4"
@@ -181,6 +194,73 @@ export const PredictivePlatformDashboard = () => {
               </div>
             </div>
 
+            {/* Enhanced AI Assistant Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <AIChat 
+                language={language}
+                selectedIndustry={selectedIndustry !== 'overview' ? selectedIndustry : undefined}
+                selectedRegion={selectedRegion}
+              />
+              
+              <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center">
+                    <Zap className="h-5 w-5 mr-2 text-green-400" />
+                    {language === 'en' ? 'AI Insights Dashboard' : 'AI Omakusululo Dashboard'}
+                  </CardTitle>
+                  <CardDescription>
+                    {language === 'en' 
+                      ? 'Recent AI analysis and market intelligence'
+                      : 'AI omakusululo nomakundelo gomakete'
+                    }
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Recent AI Insights */}
+                  <div className="space-y-3">
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Badge className="bg-green-500/20 text-green-400">High Confidence</Badge>
+                        <span className="text-xs text-slate-400">2 minutes ago</span>
+                      </div>
+                      <p className="text-sm text-slate-200">
+                        Uranium mining sector showing strong bullish signals with 94% confidence based on global supply constraints.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Badge className="bg-blue-500/20 text-blue-400">Medium Confidence</Badge>
+                        <span className="text-xs text-slate-400">15 minutes ago</span>
+                      </div>
+                      <p className="text-sm text-slate-200">
+                        Windhoek housing market may experience seasonal correction in Q2 2025.
+                      </p>
+                    </div>
+                    
+                    <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Badge className="bg-purple-500/20 text-purple-400">Trending</Badge>
+                        <span className="text-xs text-slate-400">1 hour ago</span>
+                      </div>
+                      <p className="text-sm text-slate-200">
+                        Green hydrogen investments accelerating - 38% growth predicted for 2025.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-green-500/30 text-green-400"
+                    onClick={() => setSelectedIndustry('whatsapp')}
+                  >
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Connect WhatsApp Bot
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Namibian Heatmap */}
             <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
               <CardHeader>
@@ -213,9 +293,6 @@ export const PredictivePlatformDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* AI Assistant */}
-            <AIAssistant />
-
             {/* Forecasting as a Service */}
             <ForecastingService />
           </TabsContent>
@@ -226,6 +303,9 @@ export const PredictivePlatformDashboard = () => {
           <TabsContent value="medical"><MedicalDashboard language={language} /></TabsContent>
           <TabsContent value="green_hydrogen"><GreenHydrogenDashboard language={language} /></TabsContent>
           <TabsContent value="financial"><FinancialDashboard language={language} /></TabsContent>
+          <TabsContent value="whatsapp">
+            <WhatsAppBot language={language} />
+          </TabsContent>
         </Tabs>
       </div>
     </div>

@@ -265,35 +265,28 @@ export const PredictivePlatformDashboard = () => {
               </Card>
             </div>
 
-            {/* Namibian Heatmap */}
+            {/* Enhanced Interactive Namibian Heatmap */}
             <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-white flex items-center">
                       <MapPin className="h-5 w-5 mr-2 text-green-400" />
-                      Namibian Economic Heatmap
+                      Interactive Namibian Economic Heatmap
                     </CardTitle>
-                    <CardDescription>Regional risk levels and investment flows</CardDescription>
+                    <CardDescription>
+                      Real-time regional analytics with multi-dimensional data views
+                    </CardDescription>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-xs text-slate-400">Low Risk</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                      <span className="text-xs text-slate-400">Medium Risk</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span className="text-xs text-slate-400">High Risk</span>
-                    </div>
-                  </div>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                    Phase 6: Enhanced
+                  </Badge>
                 </div>
               </CardHeader>
               <CardContent>
-                <NamibianHeatmap />
+                <NamibianHeatmap 
+                  selectedIndustry={selectedIndustry !== 'overview' ? selectedIndustry : undefined}
+                />
               </CardContent>
             </Card>
 

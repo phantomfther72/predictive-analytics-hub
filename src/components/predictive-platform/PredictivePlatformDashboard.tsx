@@ -18,7 +18,7 @@ import { RegionSelector } from './RegionSelector';
 import { MetricCard } from './MetricCard';
 import { AIChat } from './AIChat';
 import { WhatsAppBot } from './WhatsAppBot';
-import { useIndustries, useDataPoints, useForecasts } from '@/hooks/usePredictiveData';
+import { useIndustries, useDataPoints, useForecasts, type Industry } from '@/hooks/usePredictiveData';
 
 export const PredictivePlatformDashboard = () => {
   const [selectedIndustry, setSelectedIndustry] = useState('overview');
@@ -28,6 +28,16 @@ export const PredictivePlatformDashboard = () => {
   const { data: industries = [], isLoading: industriesLoading } = useIndustries();
   const { data: dataPoints = [], isLoading: dataLoading } = useDataPoints();
   const { data: forecasts = [], isLoading: forecastsLoading } = useForecasts();
+
+  // WhatsApp bot as a proper Industry object
+  const whatsAppBotIndustry: Industry = {
+    id: 'whatsapp',
+    name: 'WhatsApp Bot',
+    type: 'whatsapp',
+    icon: '💬',
+    description: 'AI Assistant Integration',
+    color: '#25D366'
+  };
 
   const industryCards = industries.map(industry => {
     const industryData = dataPoints.filter(dp => dp.industry_id === industry.id);
@@ -122,14 +132,7 @@ export const PredictivePlatformDashboard = () => {
             <IndustrySelector
               industries={[
                 ...industries,
-                { 
-                  id: 'whatsapp', 
-                  name: 'WhatsApp Bot', 
-                  type: 'whatsapp', 
-                  icon: '💬',
-                  description: 'AI Assistant Integration',
-                  color: '#25D366'
-                }
+                whatsAppBotIndustry
               ]}
               selectedIndustry={selectedIndustry === 'overview' ? '' : selectedIndustry}
               onIndustrySelect={(industry) => setSelectedIndustry(industry || 'overview')}

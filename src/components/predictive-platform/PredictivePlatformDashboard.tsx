@@ -127,7 +127,8 @@ export const PredictivePlatformDashboard = () => {
                   name: 'WhatsApp Bot', 
                   type: 'whatsapp', 
                   icon: '💬',
-                  description: 'AI Assistant Integration'
+                  description: 'AI Assistant Integration',
+                  color: '#25D366'
                 }
               ]}
               selectedIndustry={selectedIndustry === 'overview' ? '' : selectedIndustry}

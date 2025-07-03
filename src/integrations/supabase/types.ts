@@ -229,6 +229,39 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          id: string
+          message: string
+          status: string | null
+          subject: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          message: string
+          status?: string | null
+          subject: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          message?: string
+          status?: string | null
+          subject?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       financial_market_metrics: {
         Row: {
           asset: string
@@ -1038,6 +1071,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pulse_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          execution_time_ms: number | null
+          id: string
+          status: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          execution_time_ms?: number | null
+          id?: string
+          status: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          execution_time_ms?: number | null
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       user_opportunity_interactions: {
         Row: {
           created_at: string | null
@@ -1112,6 +1172,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1138,6 +1222,17 @@ export type Database = {
           model_details: Json
         }[]
       }
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
       insert_sample_investment_opportunities: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -1148,6 +1243,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "admin" | "analyst" | "guest"
       forecast_model: "linear" | "arima" | "neural_network" | "ensemble"
       industry_type: "housing" | "agriculture" | "mining" | "cryptocurrency"
       market_type:
@@ -1275,6 +1371,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "analyst", "guest"],
       forecast_model: ["linear", "arima", "neural_network", "ensemble"],
       industry_type: ["housing", "agriculture", "mining", "cryptocurrency"],
       market_type: [

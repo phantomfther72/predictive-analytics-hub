@@ -1,9 +1,9 @@
 
 import React from "react";
-import { LiveDashboard } from "@/components/dashboard/LiveDashboard";
+import { EnhancedLiveDashboard } from "@/components/dashboard/EnhancedLiveDashboard";
 
 const Dashboard = () => {
-  return <LiveDashboard />;
+  return <EnhancedLiveDashboard />;
 };
 
 export default Dashboard;

@@ -21,6 +21,9 @@ import { MetricCard } from './MetricCard';
 import { AIChat } from './AIChat';
 import { WhatsAppBot } from './WhatsAppBot';
 import { useIndustries, useDataPoints, useForecasts, type Industry } from '@/hooks/usePredictiveData';
+import { IndustryCard } from '@/components/ui/IndustryCard';
+import { PredictionMetric } from '@/components/ui/PredictionMetric';
+import { PulseAlert } from '@/components/ui/PulseAlert';
 
 export const PredictivePlatformDashboard = () => {
   const [selectedIndustry, setSelectedIndustry] = useState('overview');
@@ -142,37 +145,11 @@ export const PredictivePlatformDashboard = () => {
             {/* Industry Overview Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {industryCards.map((industry) => (
-                <Card 
+                <IndustryCard
                   key={industry.id}
-                  className="bg-slate-800/50 border-slate-700 backdrop-blur-sm hover:bg-slate-800/70 transition-all duration-300 cursor-pointer"
+                  industry={industry}
                   onClick={() => setSelectedIndustry(industry.type)}
-                >
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="text-2xl">{industry.icon}</div>
-                        <div>
-                          <CardTitle className="text-white">{industry.name}</CardTitle>
-                          <CardDescription>{industry.dataCount} active metrics</CardDescription>
-                        </div>
-                      </div>
-                      <Badge className={getRiskColor(industry.risk)}>
-                        {industry.risk.toUpperCase()}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <TrendingUp className="h-4 w-4 text-green-400" />
-                        <span className="text-green-400 font-bold">
-                          {industry.growth > 0 ? '+' : ''}{industry.growth.toFixed(1)}%
-                        </span>
-                      </div>
-                      <div className="text-xs text-slate-400">12M Forecast</div>
-                    </div>
-                  </CardContent>
-                </Card>
+                />
               ))}
             </div>
 
@@ -187,10 +164,15 @@ export const PredictivePlatformDashboard = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {recentDataPoints.map(({ dataPoint, forecast }) => (
-                  <MetricCard
+                  <PredictionMetric
                     key={dataPoint.id}
-                    dataPoint={dataPoint}
-                    forecast={forecast}
+                    title={dataPoint.metric_name}
+                    value={dataPoint.value}
+                    unit={dataPoint.unit}
+                    prediction={forecast?.prediction}
+                    confidence={forecast?.confidence_interval}
+                    region={dataPoint.region}
+                    timestamp={dataPoint.timestamp}
                   />
                 ))}
               </div>
@@ -220,35 +202,32 @@ export const PredictivePlatformDashboard = () => {
                 <CardContent className="space-y-4">
                   {/* Recent AI Insights */}
                   <div className="space-y-3">
-                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Badge className="bg-green-500/20 text-green-400">High Confidence</Badge>
-                        <span className="text-xs text-slate-400">2 minutes ago</span>
-                      </div>
-                      <p className="text-sm text-slate-200">
-                        Uranium mining sector showing strong bullish signals with 94% confidence based on global supply constraints.
-                      </p>
-                    </div>
+                    <PulseAlert
+                      title="Uranium Mining Outlook"
+                      message="Uranium mining sector showing strong bullish signals based on global supply constraints."
+                      severity="low"
+                      type="prediction"
+                      confidence={0.94}
+                      timestamp={new Date(Date.now() - 2 * 60 * 1000).toISOString()}
+                    />
                     
-                    <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Badge className="bg-blue-500/20 text-blue-400">Medium Confidence</Badge>
-                        <span className="text-xs text-slate-400">15 minutes ago</span>
-                      </div>
-                      <p className="text-sm text-slate-200">
-                        Windhoek housing market may experience seasonal correction in Q2 2025.
-                      </p>
-                    </div>
+                    <PulseAlert
+                      title="Housing Market Alert"
+                      message="Windhoek housing market may experience seasonal correction in Q2 2025."
+                      severity="medium"
+                      type="market"
+                      confidence={0.72}
+                      timestamp={new Date(Date.now() - 15 * 60 * 1000).toISOString()}
+                    />
                     
-                    <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-3">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Badge className="bg-purple-500/20 text-purple-400">Trending</Badge>
-                        <span className="text-xs text-slate-400">1 hour ago</span>
-                      </div>
-                      <p className="text-sm text-slate-200">
-                        Green hydrogen investments accelerating - 38% growth predicted for 2025.
-                      </p>
-                    </div>
+                    <PulseAlert
+                      title="Green Hydrogen Trend"
+                      message="Green hydrogen investments accelerating - 38% growth predicted for 2025."
+                      severity="low"
+                      type="trend"
+                      confidence={0.85}
+                      timestamp={new Date(Date.now() - 60 * 60 * 1000).toISOString()}
+                    />
                   </div>
                   
                   <Button 

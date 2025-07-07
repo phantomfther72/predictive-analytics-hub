@@ -36,7 +36,7 @@ const App = () => {
               <Route path="/auth" element={<Auth />} />
               <Route path="/pricing" element={<Pricing />} />
               
-              {/* App layout pages */}
+              {/* App layout pages - Protected Routes */}
               <Route path="/dashboard/*" element={<AppLayout />}>
                 <Route index element={<Dashboard />} />
                 <Route path="industries" element={<Dashboard />} />
@@ -44,6 +44,11 @@ const App = () => {
                 <Route path="analytics" element={<Dashboard />} />
                 <Route path="settings" element={<Dashboard />} />
                 <Route path="feedback" element={<Dashboard />} />
+              </Route>
+              
+              {/* Predictive Platform - Main App */}
+              <Route path="/predictive-platform" element={<AppLayout />}>
+                <Route index element={<PredictivePlatform />} />
               </Route>
               
               {/* Industry pages with app layout */}
@@ -67,11 +72,6 @@ const App = () => {
               </Route>
               <Route path="/cryptocurrency-market" element={<AppLayout />}>
                 <Route index element={<CryptocurrencyMarket />} />
-              </Route>
-              
-              {/* Other pages with app layout */}
-              <Route path="/predictive-platform" element={<AppLayout />}>
-                <Route index element={<PredictivePlatform />} />
               </Route>
               <Route path="/global-equity" element={<AppLayout />}>
                 <Route index element={<GlobalEquityPage />} />

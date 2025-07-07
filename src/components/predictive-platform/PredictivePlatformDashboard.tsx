@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MapPin, TrendingUp, AlertTriangle, Globe, Zap, MessageSquare, Loader2 } from 'lucide-react';
+import { FilterControls } from '@/components/dashboard/FilterControls';
+import { DateRange } from 'react-day-picker';
 import { NamibianHeatmap } from './NamibianHeatmap';
 import { MiningDashboard } from './industry-dashboards/MiningDashboard';
 import { HousingDashboard } from './industry-dashboards/HousingDashboard';
@@ -22,12 +24,20 @@ import { useIndustries, useDataPoints, useForecasts, type Industry } from '@/hoo
 
 export const PredictivePlatformDashboard = () => {
   const [selectedIndustry, setSelectedIndustry] = useState('overview');
-  const [selectedRegion, setSelectedRegion] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState('all');
   const [language, setLanguage] = useState<'en' | 'oshiwambo'>('en');
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: industries = [], isLoading: industriesLoading } = useIndustries();
-  const { data: dataPoints = [], isLoading: dataLoading } = useDataPoints();
-  const { data: forecasts = [], isLoading: forecastsLoading } = useForecasts();
+  const { data: dataPoints = [], isLoading: dataLoading } = useDataPoints(
+    selectedIndustry !== 'overview' && selectedIndustry !== 'all' ? selectedIndustry : undefined,
+    selectedRegion !== 'all' ? selectedRegion : undefined
+  );
+  const { data: forecasts = [], isLoading: forecastsLoading } = useForecasts(
+    selectedIndustry !== 'overview' && selectedIndustry !== 'all' ? selectedIndustry : undefined,
+    selectedRegion !== 'all' ? selectedRegion : undefined
+  );
 
   // WhatsApp bot as a proper Industry object
   const whatsAppBotIndustry: Industry = {
@@ -80,6 +90,15 @@ export const PredictivePlatformDashboard = () => {
       return { dataPoint: dp, forecast: relatedForecast };
     });
 
+  const handleRefreshData = async () => {
+    setIsRefreshing(true);
+    // Simulate API call delay
+    setTimeout(() => {
+      setIsRefreshing(false);
+      // In real implementation, this would trigger the edge function
+    }, 2000);
+  };
+
   if (industriesLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black flex items-center justify-center">
@@ -92,41 +111,20 @@ export const PredictivePlatformDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black">
-      {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-green-500/20 rounded-xl">
-                <Globe className="h-8 w-8 text-green-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-white">Predictive Pulse</h1>
-                <p className="text-slate-400">Namibian Economic Intelligence Platform</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <RegionSelector 
-                selectedRegion={selectedRegion}
-                onRegionSelect={setSelectedRegion}
-                className="w-48"
-              />
-              <LanguageToggle language={language} onLanguageChange={setLanguage} />
-              <Button 
-                size="sm" 
-                className="bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30"
-                onClick={() => setSelectedIndustry('whatsapp')}
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                WhatsApp Bot
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6">
+      {/* Enhanced Filter Controls */}
+      <FilterControls
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
+        selectedRegion={selectedRegion}
+        onRegionChange={setSelectedRegion}
+        selectedIndustry={selectedIndustry}
+        onIndustryChange={setSelectedIndustry}
+        onRefreshData={handleRefreshData}
+        isRefreshing={isRefreshing}
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="space-y-8">
         <Tabs value={selectedIndustry} onValueChange={setSelectedIndustry}>
           <div className="mb-6">
             <IndustrySelector

@@ -50,7 +50,7 @@ const Index: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-background">
       <Navbar />
       
       {/* Hero & Core Sections */}
@@ -75,24 +75,24 @@ const Index: React.FC = () => {
             </p>
           </div>
 
-          {/* Call-to-Action Buttons */}
+      {/* Call-to-Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
-              onClick={() => navigate('/dashboard')} 
+              onClick={() => navigate('/predictive-platform')} 
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-500 hover:to-teal-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 group"
+              className="bg-gradient-to-r from-primary to-primary-variant hover:from-primary/90 hover:to-primary-variant/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 group"
             >
               <ArrowRight className="h-5 w-5 mr-2 group-hover:translate-x-1 transition-transform" />
               Launch Platform
             </Button>
             <Button 
-              onClick={() => navigate('/opportunities')} 
+              onClick={() => navigate('/auth')} 
               size="lg"
               variant="outline"
-              className="border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-300"
+              className="border-border text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300"
             >
               <Briefcase className="h-5 w-5 mr-2" />
-              Investment Opportunities
+              Get Started
             </Button>
           </div>
 

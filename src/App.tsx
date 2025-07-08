@@ -18,6 +18,8 @@ import MedicalMarket from "./pages/MedicalMarket";
 import CryptocurrencyMarket from "./pages/CryptocurrencyMarket";
 import Auth from "./pages/Auth";
 import Pricing from "./pages/Pricing";
+import ThankYou from "./pages/ThankYou";
+import Settings from "./pages/Settings";
 import OpportunitiesPage from "./pages/OpportunitiesPage";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +37,7 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/thank-you" element={<ThankYou />} />
               
               {/* App layout pages - Protected Routes */}
               <Route path="/dashboard/*" element={<AppLayout />}>
@@ -42,7 +45,7 @@ const App = () => {
                 <Route path="industries" element={<Dashboard />} />
                 <Route path="predictions" element={<Dashboard />} />
                 <Route path="analytics" element={<Dashboard />} />
-                <Route path="settings" element={<Dashboard />} />
+                <Route path="settings" element={<Settings />} />
                 <Route path="feedback" element={<Dashboard />} />
               </Route>
               

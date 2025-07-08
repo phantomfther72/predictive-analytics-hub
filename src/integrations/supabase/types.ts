@@ -1001,6 +1001,45 @@ export type Database = {
           },
         ]
       }
+      paystack_payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string | null
+          customer_email: string
+          id: string
+          metadata: Json | null
+          paystack_reference: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string | null
+          customer_email: string
+          id?: string
+          metadata?: Json | null
+          paystack_reference: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string | null
+          customer_email?: string
+          id?: string
+          metadata?: Json | null
+          paystack_reference?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       predictive_industries: {
         Row: {
           color: string | null
@@ -1040,9 +1079,13 @@ export type Database = {
           email: string
           id: string
           last_payment_status: string | null
+          next_billing_date: string | null
+          paystack_customer_code: string | null
+          role: string | null
           stripe_customer_id: string | null
           subscription_end_date: string | null
           subscription_start_date: string | null
+          subscription_status: string | null
           subscription_tier:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
@@ -1053,9 +1096,13 @@ export type Database = {
           email: string
           id: string
           last_payment_status?: string | null
+          next_billing_date?: string | null
+          paystack_customer_code?: string | null
+          role?: string | null
           stripe_customer_id?: string | null
           subscription_end_date?: string | null
           subscription_start_date?: string | null
+          subscription_status?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null
@@ -1066,9 +1113,13 @@ export type Database = {
           email?: string
           id?: string
           last_payment_status?: string | null
+          next_billing_date?: string | null
+          paystack_customer_code?: string | null
+          role?: string | null
           stripe_customer_id?: string | null
           subscription_end_date?: string | null
           subscription_start_date?: string | null
+          subscription_status?: string | null
           subscription_tier?:
             | Database["public"]["Enums"]["subscription_tier"]
             | null

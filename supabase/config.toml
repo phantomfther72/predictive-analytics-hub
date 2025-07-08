@@ -4,5 +4,11 @@ project_id = "nlqnfmhekpnewbueodum"
 [functions.create-payment]
 verify_jwt = true
 
+[functions.create-paystack-payment]
+verify_jwt = true
+
+[functions.paystack-webhook]
+verify_jwt = false
+
 [functions.update-market-data]
 verify_jwt = true

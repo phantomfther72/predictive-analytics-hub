@@ -33,9 +33,28 @@ export default function Settings() {
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'pro': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'pro': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'investor': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
       case 'guest': return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
       default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    }
+  };
+
+  const getPlanName = (role: string) => {
+    switch (role) {
+      case 'pro': return 'Pro Plan';
+      case 'investor': return 'Investor Plan';
+      case 'guest': return 'Free Plan';
+      default: return 'Free Plan';
+    }
+  };
+
+  const getPlanDescription = (role: string) => {
+    switch (role) {
+      case 'pro': return 'Full access to all features';
+      case 'investor': return 'Institutional-grade analytics and priority support';
+      case 'guest': return 'Basic access with limited features';
+      default: return 'Basic access with limited features';
     }
   };
 
@@ -110,13 +129,10 @@ export default function Settings() {
                   <Crown className="h-6 w-6 text-yellow-500" />
                   <div>
                     <h3 className="font-semibold">
-                      {profile?.role === 'pro' ? 'Pro Plan' : 'Guest Plan'}
+                      {getPlanName(profile?.role || 'guest')}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {profile?.role === 'pro' 
-                        ? 'Full access to all features' 
-                        : 'Basic access with limited features'
-                      }
+                      {getPlanDescription(profile?.role || 'guest')}
                     </p>
                   </div>
                 </div>
@@ -125,7 +141,7 @@ export default function Settings() {
                 </Badge>
               </div>
               
-              {profile?.role === 'pro' && (
+              {(profile?.role === 'pro' || profile?.role === 'investor') && (
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Next billing date:</span>
@@ -133,7 +149,9 @@ export default function Settings() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Monthly charge:</span>
-                    <span>₦19,900</span>
+                    <span>
+                      {profile?.role === 'pro' ? 'NAD 199' : 'Custom pricing'}
+                    </span>
                   </div>
                 </div>
               )}
@@ -142,7 +160,7 @@ export default function Settings() {
                 {profile?.role === 'guest' ? (
                   <Button onClick={() => navigate('/pricing')} className="flex-1">
                     <Crown className="h-4 w-4 mr-2" />
-                    Upgrade to Pro
+                    Upgrade Plan
                   </Button>
                 ) : (
                   <Button variant="outline" onClick={() => navigate('/pricing')} className="flex-1">

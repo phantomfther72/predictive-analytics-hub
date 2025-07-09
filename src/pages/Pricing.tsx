@@ -1,11 +1,13 @@
 
 import React from "react";
 import { PricingCard } from "@/components/pricing/PricingCard";
+import { RequestAccessModal } from "@/components/modals/RequestAccessModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
 
 const Pricing = () => {
   const { user } = useAuth();
@@ -44,10 +46,10 @@ const Pricing = () => {
       return;
     }
 
-    if (profile?.role === 'pro') {
+    if (profile?.role === 'pro' || profile?.role === 'investor') {
       toast({
         title: "Already subscribed",
-        description: "You are already on the Pro plan.",
+        description: `You are already on the ${profile.role === 'pro' ? 'Pro' : 'Investor'} plan.`,
       });
       return;
     }
@@ -83,7 +85,7 @@ const Pricing = () => {
 
   const plans = [
     {
-      title: "Guest",
+      title: "Free",
       price: "Free",
       description: "Perfect for exploring our platform",
       features: [
@@ -92,11 +94,12 @@ const Pricing = () => {
         "7-day historical data",
         "Community support"
       ],
-      buttonText: "Current Plan"
+      buttonText: "Current Plan",
+      planType: "guest"
     },
     {
       title: "Pro",
-      price: "₦19,900",
+      price: "NAD 199",
       description: "Unlock the full power of PredictivePulse",
       features: [
         "Unlimited market insights",
@@ -108,7 +111,26 @@ const Pricing = () => {
         "API access"
       ],
       isPopular: true,
-      buttonText: "Choose Plan"
+      buttonText: "Choose Plan",
+      planType: "pro"
+    },
+    {
+      title: "Investor",
+      price: "Custom",
+      description: "Institutional-grade analytics for serious investors",
+      features: [
+        "Everything in Pro",
+        "Institutional-grade analytics",
+        "Custom investment strategies",
+        "Dedicated account manager",
+        "Exclusive market reports",
+        "24/7 priority support",
+        "White-label solutions",
+        "API access with higher limits"
+      ],
+      buttonText: "Request Access",
+      planType: "investor",
+      isInvestor: true
     }
   ];
 
@@ -137,30 +159,47 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
-            <PricingCard
-              key={index}
-              title={plan.title}
-              price={plan.price}
-              description={plan.description}
-              features={plan.features}
-              isPopular={plan.isPopular}
-              buttonText={plan.buttonText}
-              isCurrentPlan={
-                (plan.title === 'Guest' && (!profile || profile.role === 'guest')) ||
-                (plan.title === 'Pro' && profile?.role === 'pro')
-              }
-              onSelect={() => {
-                if (plan.title === 'Guest') {
-                  if (!user) {
-                    navigate('/auth');
-                  }
-                  return;
+            plan.isInvestor ? (
+              <RequestAccessModal key={index}>
+                <div className="w-full">
+                  <PricingCard
+                    title={plan.title}
+                    price={plan.price}
+                    description={plan.description}
+                    features={plan.features}
+                    isPopular={plan.isPopular}
+                    buttonText={plan.buttonText}
+                    isCurrentPlan={profile?.role === 'investor'}
+                    onSelect={() => {}}
+                  />
+                </div>
+              </RequestAccessModal>
+            ) : (
+              <PricingCard
+                key={index}
+                title={plan.title}
+                price={plan.price}
+                description={plan.description}
+                features={plan.features}
+                isPopular={plan.isPopular}
+                buttonText={plan.buttonText}
+                isCurrentPlan={
+                  (plan.planType === 'guest' && (!profile || profile.role === 'guest')) ||
+                  (plan.planType === 'pro' && profile?.role === 'pro')
                 }
-                handleSelectPlan(plan.title, 19900);
-              }}
-            />
+                onSelect={() => {
+                  if (plan.planType === 'guest') {
+                    if (!user) {
+                      navigate('/auth');
+                    }
+                    return;
+                  }
+                  handleSelectPlan(plan.title, 19900); // Convert NAD 199 to kobo equivalent
+                }}
+              />
+            )
           ))}
         </div>
         

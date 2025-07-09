@@ -37,10 +37,20 @@ export default function ThankYou() {
 
   useEffect(() => {
     // Stop refetching once we detect the role has been updated
-    if (profile?.role === 'pro') {
+    if (profile?.role === 'pro' || profile?.role === 'investor') {
       refetch();
     }
   }, [profile, refetch]);
+
+  const handleContinue = () => {
+    if (profile?.role === 'investor') {
+      navigate('/investor-hub');
+    } else if (profile?.role === 'pro') {
+      navigate('/dashboard');
+    } else {
+      navigate('/dashboard');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -67,22 +77,22 @@ export default function ThankYou() {
         <CardContent className="space-y-6">
           <div className="text-center">
             <p className="text-muted-foreground mb-4">
-              Thank you for upgrading to PredictivePulse Pro! Your payment has been processed successfully.
+              Thank you for upgrading to PredictivePulse {profile?.role === 'investor' ? 'Investor' : 'Pro'}! Your payment has been processed successfully.
             </p>
             
-            {profile?.role === 'pro' ? (
+            {(profile?.role === 'pro' || profile?.role === 'investor') ? (
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg mb-6">
                 <p className="text-green-700 dark:text-green-300 font-medium">
-                  ✅ Your account has been upgraded to Pro
+                  ✅ Your account has been upgraded to {profile?.role === 'investor' ? 'Investor' : 'Pro'}
                 </p>
                 <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                  You now have access to all Pro features!
+                  You now have access to all {profile?.role === 'investor' ? 'Investor' : 'Pro'} features!
                 </p>
               </div>
             ) : (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg mb-6">
                 <p className="text-yellow-700 dark:text-yellow-300 font-medium">
-                  ⏳ Activating your Pro account...
+                  ⏳ Activating your {profile?.role === 'investor' ? 'Investor' : 'Pro'} account...
                 </p>
                 <p className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
                   This usually takes a few moments.
@@ -92,24 +102,36 @@ export default function ThankYou() {
           </div>
 
           <div className="space-y-3">
-            <h3 className="font-semibold">What's included in your Pro plan:</h3>
+            <h3 className="font-semibold">What's included in your {profile?.role === 'investor' ? 'Investor' : 'Pro'} plan:</h3>
             <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Unlimited market insights</li>
-              <li>• Advanced predictive analytics</li>
-              <li>• Export capabilities</li>
-              <li>• Real-time alerts</li>
-              <li>• Priority support</li>
+              {profile?.role === 'investor' ? (
+                <>
+                  <li>• Institutional-grade analytics</li>
+                  <li>• Custom investment strategies</li>
+                  <li>• Dedicated account manager</li>
+                  <li>• Exclusive market reports</li>
+                  <li>• 24/7 priority support</li>
+                </>
+              ) : (
+                <>
+                  <li>• Unlimited market insights</li>
+                  <li>• Advanced predictive analytics</li>
+                  <li>• Export capabilities</li>
+                  <li>• Real-time alerts</li>
+                  <li>• Priority support</li>
+                </>
+              )}
             </ul>
           </div>
 
           <div className="flex gap-3">
             <Button 
-              onClick={() => navigate('/dashboard')} 
+              onClick={handleContinue} 
               className="flex-1"
-              disabled={profile?.role !== 'pro'}
+              disabled={!profile?.role || (profile?.role !== 'pro' && profile?.role !== 'investor')}
             >
               <ArrowRight className="h-4 w-4 mr-2" />
-              Explore Dashboard
+              {profile?.role === 'investor' ? 'Explore Investor Hub' : 'Explore Dashboard'}
             </Button>
             <Button 
               onClick={() => navigate('/pricing')} 

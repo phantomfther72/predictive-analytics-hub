@@ -22,6 +22,7 @@ import ThankYou from "./pages/ThankYou";
 import Settings from "./pages/Settings";
 import OpportunitiesPage from "./pages/OpportunitiesPage";
 import NotFound from "./pages/NotFound";
+import InvestorHub from "./pages/InvestorHub";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,9 @@ const App = () => {
               </Route>
               <Route path="/opportunities" element={<AppLayout />}>
                 <Route index element={<OpportunitiesPage />} />
+              </Route>
+              <Route path="/investor-hub" element={<AppLayout />}>
+                <Route index element={<InvestorHub />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />

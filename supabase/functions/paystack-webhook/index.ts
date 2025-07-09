@@ -89,11 +89,15 @@ Deno.serve(async (req) => {
         return new Response('No user_id in metadata', { status: 400, headers: corsHeaders });
       }
 
-      // Upgrade user to pro
+      // Determine role based on plan name or amount
+      const planName = metadata?.plan_name || 'Pro';
+      const role = planName.toLowerCase() === 'investor' ? 'investor' : 'pro';
+
+      // Upgrade user role
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          role: 'pro',
+          role: role,
           paystack_customer_code: customer?.customer_code,
           subscription_status: 'active',
           next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
@@ -106,7 +110,7 @@ Deno.serve(async (req) => {
         return new Response('Error updating profile', { status: 500, headers: corsHeaders });
       }
 
-      console.log('User upgraded to pro successfully:', userId);
+      console.log(`User upgraded to ${role} successfully:`, userId);
     }
 
     return new Response('OK', { status: 200, headers: corsHeaders });

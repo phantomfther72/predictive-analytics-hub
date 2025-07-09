@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface RoleGateProps {
   children: React.ReactNode;
-  requiredRole?: 'guest' | 'pro' | 'admin';
+  requiredRole?: 'guest' | 'pro' | 'investor' | 'admin';
   fallback?: React.ReactNode;
 }
 
@@ -44,7 +44,8 @@ export const RoleGate: React.FC<RoleGateProps> = ({
     const roleHierarchy = {
       guest: 0,
       pro: 1,
-      admin: 2
+      investor: 2,
+      admin: 3
     };
     
     const userLevel = roleHierarchy[profile.role as keyof typeof roleHierarchy] || 0;
@@ -89,10 +90,10 @@ export const RoleGate: React.FC<RoleGateProps> = ({
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">
-            This feature requires a {requiredRole === 'pro' ? 'Pro' : 'Premium'} subscription.
+            This feature requires a {requiredRole === 'pro' ? 'Pro' : requiredRole === 'investor' ? 'Investor' : 'Premium'} subscription.
           </p>
           <Button onClick={() => navigate('/pricing')} className="w-full">
-            Upgrade to {requiredRole === 'pro' ? 'Pro' : 'Premium'}
+            Upgrade to {requiredRole === 'pro' ? 'Pro' : requiredRole === 'investor' ? 'Investor' : 'Premium'}
           </Button>
         </CardContent>
       </Card>

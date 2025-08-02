@@ -23,6 +23,7 @@ import Settings from "./pages/Settings";
 import OpportunitiesPage from "./pages/OpportunitiesPage";
 import NotFound from "./pages/NotFound";
 import InvestorHub from "./pages/InvestorHub";
+import Terminal from "./pages/Terminal";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,9 @@ const App = () => {
               </Route>
               <Route path="/investor-hub" element={<AppLayout />}>
                 <Route index element={<InvestorHub />} />
+              </Route>
+              <Route path="/terminal" element={<AppLayout />}>
+                <Route index element={<Terminal />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />

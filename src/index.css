@@ -114,6 +114,36 @@
     --chart-5: 0 84% 60%;
   }
 
+  /* Terminal Theme - Bloomberg inspired */
+  .terminal {
+    /* Terminal background - matte black */
+    --terminal-bg: 0 0% 8%;
+    --terminal-card: 0 0% 12%;
+    --terminal-border: 0 0% 18%;
+    
+    /* Pulse orange accents */
+    --pulse-orange: 18 95% 55%;
+    --pulse-orange-glow: 18 100% 65%;
+    
+    /* Electric blue accents */
+    --electric-blue: 200 100% 55%;
+    --electric-blue-glow: 200 100% 65%;
+    
+    /* Terminal text */
+    --terminal-text: 0 0% 95%;
+    --terminal-text-dim: 0 0% 70%;
+    --terminal-text-bright: 0 0% 100%;
+    
+    /* Success/Warning/Error for terminal */
+    --terminal-success: 120 60% 50%;
+    --terminal-warning: 45 100% 60%;
+    --terminal-error: 0 80% 60%;
+    
+    /* Terminal specific gradients */
+    --terminal-gradient: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 12%));
+    --terminal-accent-gradient: linear-gradient(90deg, hsl(18 95% 55%), hsl(200 100% 55%));
+  }
+
   /* Improved responsive typography */
   html {
     font-family: 'Poppins', 'Inter', system-ui, sans-serif;
@@ -367,6 +397,20 @@
   border-radius: 3px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* Terminal slider styling */
+  .slider-terminal [data-radix-slider-thumb] {
+    background: hsl(var(--pulse-orange));
+    border: 2px solid hsl(var(--pulse-orange));
+  }
+  
+  .slider-terminal [data-radix-slider-track] {
+    background: hsl(var(--terminal-border));
+  }
+  
+  .slider-terminal [data-radix-slider-range] {
+    background: hsl(var(--pulse-orange));
+  }

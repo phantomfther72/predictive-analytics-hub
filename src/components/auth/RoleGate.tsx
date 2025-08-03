@@ -4,8 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Lock, Crown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Lock, Crown, Code } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useDemoMode } from '@/hooks/useDemoMode';
 
 interface RoleGateProps {
   children: React.ReactNode;
@@ -19,6 +21,7 @@ export const RoleGate: React.FC<RoleGateProps> = ({
   fallback 
 }) => {
   const { user } = useAuth();
+  const { isDevMode } = useDemoMode();
   const navigate = useNavigate();
 
   const { data: profile } = useQuery({
@@ -39,6 +42,9 @@ export const RoleGate: React.FC<RoleGateProps> = ({
   });
 
   const hasAccess = () => {
+    // Dev mode bypasses all role checks
+    if (isDevMode) return true;
+    
     if (!profile) return false;
     
     const roleHierarchy = {
@@ -100,5 +106,18 @@ export const RoleGate: React.FC<RoleGateProps> = ({
     );
   }
 
-  return <>{children}</>;
+  // Show dev mode indicator when active
+  return (
+    <>
+      {isDevMode && (
+        <div className="mb-4">
+          <Badge variant="outline" className="gap-2 bg-terminal-orange/10 text-terminal-orange border-terminal-orange/30">
+            <Code className="h-3 w-3" />
+            Dev Preview Mode
+          </Badge>
+        </div>
+      )}
+      {children}
+    </>
+  );
 };

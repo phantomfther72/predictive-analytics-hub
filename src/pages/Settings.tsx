@@ -1,17 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, CreditCard, Settings as SettingsIcon, Crown } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
+import { BackButton } from '@/components/layout/BackButton';
+import { 
+  User, 
+  CreditCard, 
+  Settings as SettingsIcon, 
+  Crown, 
+  Bell, 
+  Palette, 
+  Zap, 
+  Shield,
+  Globe,
+  Clock
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Settings() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [notifications, setNotifications] = useState({
+    email: true,
+    alerts: true,
+    signalDrops: false,
+    marketUpdates: true
+  });
+  const [preferences, setPreferences] = useState({
+    theme: 'dark',
+    refreshRate: '30s',
+    alertSensitivity: 'medium',
+    preferredRegions: ['africa', 'global'],
+    favoriteIndustries: ['mining', 'agriculture']
+  });
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profile', user?.id],
@@ -68,16 +99,22 @@ export default function Settings() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <SettingsIcon className="h-6 w-6" />
-        <h1 className="text-2xl font-bold">Settings</h1>
+      <Breadcrumbs />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <BackButton to="/dashboard" />
+          <SettingsIcon className="h-6 w-6" />
+          <h1 className="text-2xl font-bold">Settings & Account</h1>
+        </div>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="billing">Billing & Plan</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="preferences">Preferences</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
         </TabsList>
         
         <TabsContent value="profile" className="space-y-4">
@@ -172,15 +209,205 @@ export default function Settings() {
           </Card>
         </TabsContent>
         
+        <TabsContent value="notifications" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Notification Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-base">Email Notifications</Label>
+                    <p className="text-sm text-muted-foreground">Receive updates via email</p>
+                  </div>
+                  <Switch 
+                    checked={notifications.email}
+                    onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, email: checked }))}
+                  />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-base">Terminal Alerts</Label>
+                    <p className="text-sm text-muted-foreground">Real-time market alerts in Terminal</p>
+                  </div>
+                  <Switch 
+                    checked={notifications.alerts}
+                    onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, alerts: checked }))}
+                  />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-base">Signal Drops</Label>
+                    <p className="text-sm text-muted-foreground">Weekly expert insights digest</p>
+                  </div>
+                  <Switch 
+                    checked={notifications.signalDrops}
+                    onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, signalDrops: checked }))}
+                  />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-base">Market Updates</Label>
+                    <p className="text-sm text-muted-foreground">Daily market summary notifications</p>
+                  </div>
+                  <Switch 
+                    checked={notifications.marketUpdates}
+                    onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, marketUpdates: checked }))}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="preferences" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Preferences</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Display & Interface
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Preference settings will be available in a future update.
-              </p>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label>Theme</Label>
+                <Select value={preferences.theme} onValueChange={(value) => setPreferences(prev => ({ ...prev, theme: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light</SelectItem>
+                    <SelectItem value="dark">Dark</SelectItem>
+                    <SelectItem value="terminal">Terminal (Dark Blue)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Data Refresh Rate</Label>
+                <Select value={preferences.refreshRate} onValueChange={(value) => setPreferences(prev => ({ ...prev, refreshRate: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5s">5 seconds</SelectItem>
+                    <SelectItem value="15s">15 seconds</SelectItem>
+                    <SelectItem value="30s">30 seconds</SelectItem>
+                    <SelectItem value="1m">1 minute</SelectItem>
+                    <SelectItem value="5m">5 minutes</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Alert Sensitivity</Label>
+                <Select value={preferences.alertSensitivity} onValueChange={(value) => setPreferences(prev => ({ ...prev, alertSensitivity: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low - Major changes only</SelectItem>
+                    <SelectItem value="medium">Medium - Balanced alerts</SelectItem>
+                    <SelectItem value="high">High - All market movements</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                Regional & Industry Focus
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Preferred Regions</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {['Africa', 'Global', 'Europe', 'Asia', 'Americas'].map((region) => (
+                    <div key={region} className="flex items-center space-x-2">
+                      <Switch 
+                        checked={preferences.preferredRegions.includes(region.toLowerCase())}
+                        onCheckedChange={(checked) => {
+                          setPreferences(prev => ({
+                            ...prev,
+                            preferredRegions: checked 
+                              ? [...prev.preferredRegions, region.toLowerCase()]
+                              : prev.preferredRegions.filter(r => r !== region.toLowerCase())
+                          }));
+                        }}
+                      />
+                      <Label>{region}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Favorite Industries</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {['Mining', 'Agriculture', 'Housing', 'Financial', 'Green Hydrogen', 'Medical'].map((industry) => (
+                    <div key={industry} className="flex items-center space-x-2">
+                      <Switch 
+                        checked={preferences.favoriteIndustries.includes(industry.toLowerCase())}
+                        onCheckedChange={(checked) => {
+                          setPreferences(prev => ({
+                            ...prev,
+                            favoriteIndustries: checked 
+                              ? [...prev.favoriteIndustries, industry.toLowerCase()]
+                              : prev.favoriteIndustries.filter(i => i !== industry.toLowerCase())
+                          }));
+                        }}
+                      />
+                      <Label>{industry}</Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="security" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Security & Privacy
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-base">Change Password</Label>
+                  <p className="text-sm text-muted-foreground mb-2">Update your account password</p>
+                  <Button variant="outline">Change Password</Button>
+                </div>
+                <Separator />
+                <div>
+                  <Label className="text-base">Two-Factor Authentication</Label>
+                  <p className="text-sm text-muted-foreground mb-2">Add an extra layer of security</p>
+                  <Button variant="outline">Enable 2FA</Button>
+                </div>
+                <Separator />
+                <div>
+                  <Label className="text-base">Data Export</Label>
+                  <p className="text-sm text-muted-foreground mb-2">Download your data and insights</p>
+                  <Button variant="outline">Export Data</Button>
+                </div>
+                <Separator />
+                <div>
+                  <Label className="text-base text-destructive">Delete Account</Label>
+                  <p className="text-sm text-muted-foreground mb-2">Permanently delete your account and all data</p>
+                  <Button variant="destructive" size="sm">Delete Account</Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

@@ -1,6 +1,8 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,12 +13,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Settings, LogOut, User, RefreshCw } from 'lucide-react';
+import { Bell, Settings, LogOut, User, RefreshCw, Code, Terminal } from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
+import { useDemoMode } from '@/hooks/useDemoMode';
 
 export const AppNavbar: React.FC = () => {
   const { user, userRole, signOut, hasRole } = useAuth();
   const { toggleSidebar } = useSidebar();
+  const { isDevMode, toggleDevMode } = useDemoMode();
+  const navigate = useNavigate();
 
   const getUserInitials = (email: string) => {
     return email.split('@')[0].slice(0, 2).toUpperCase();
@@ -40,12 +45,21 @@ export const AppNavbar: React.FC = () => {
     <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
       <div className="h-full px-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-semibold bg-gradient-to-r from-primary to-primary-variant bg-clip-text text-transparent">
+          <h1 
+            className="text-xl font-semibold bg-gradient-to-r from-primary to-primary-variant bg-clip-text text-transparent cursor-pointer"
+            onClick={() => navigate('/')}
+          >
             PredictivePulse
           </h1>
           <Badge variant="outline" className="text-xs">
             Intelligence Platform
           </Badge>
+          {isDevMode && (
+            <Badge variant="outline" className="text-xs bg-terminal-orange/10 text-terminal-orange border-terminal-orange/30">
+              <Code className="h-3 w-3 mr-1" />
+              Dev Mode
+            </Badge>
+          )}
         </div>
         
         <div className="flex items-center gap-3">
@@ -60,6 +74,16 @@ export const AppNavbar: React.FC = () => {
               Refresh Data
             </Button>
           )}
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/terminal')}
+            className="gap-2"
+          >
+            <Terminal className="h-4 w-4" />
+            Terminal
+          </Button>
           
           <Button variant="ghost" size="sm" className="relative">
             <Bell className="h-4 w-4" />
@@ -93,14 +117,29 @@ export const AppNavbar: React.FC = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/settings')}>
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/settings')}>
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
+              {user?.email === 'dev@predictivepulse.com' && (
+                <>
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-1.5 flex items-center justify-between">
+                    <span className="text-sm flex items-center gap-2">
+                      <Code className="h-4 w-4" />
+                      Dev Mode
+                    </span>
+                    <Switch 
+                      checked={isDevMode} 
+                      onCheckedChange={toggleDevMode}
+                    />
+                  </div>
+                </>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={signOut}

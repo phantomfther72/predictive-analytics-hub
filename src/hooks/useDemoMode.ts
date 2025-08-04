@@ -9,6 +9,7 @@ interface DemoModeState {
   setDemoMode: (enabled: boolean) => void;
   toggleDevMode: () => void;
   setDevMode: (enabled: boolean) => void;
+  activateDevMode: () => void;
 }
 
 export const useDemoMode = create<DemoModeState>()(
@@ -20,6 +21,7 @@ export const useDemoMode = create<DemoModeState>()(
       setDemoMode: (enabled: boolean) => set({ isDemoMode: enabled }),
       toggleDevMode: () => set((state) => ({ isDevMode: !state.isDevMode })),
       setDevMode: (enabled: boolean) => set({ isDevMode: enabled }),
+      activateDevMode: () => set({ isDevMode: true }),
     }),
     {
       name: 'predictive-pulse-demo-mode',

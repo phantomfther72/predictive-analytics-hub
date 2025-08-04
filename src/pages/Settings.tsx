@@ -41,7 +41,15 @@ export default function Settings() {
     refreshRate: '30s',
     alertSensitivity: 'medium',
     preferredRegions: ['africa', 'global'],
-    favoriteIndustries: ['mining', 'agriculture']
+    favoriteIndustries: ['mining', 'agriculture'],
+    startupScreen: 'dashboard',
+    dataSource: 'mixed',
+    sectorAlertThresholds: {
+      housing: 'medium',
+      mining: 'medium',
+      agriculture: 'medium',
+      financial: 'medium'
+    }
   });
 
   const { data: profile, isLoading } = useQuery({
@@ -145,7 +153,12 @@ export default function Settings() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Subscription Status</label>
-                  <p className="text-sm capitalize">{profile?.subscription_status || 'inactive'}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-sm capitalize">{profile?.subscription_status || 'inactive'}</p>
+                    <Badge className={getRoleBadgeColor(profile?.role || 'guest')}>
+                      {profile?.role?.toUpperCase() || 'GUEST'}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -204,6 +217,9 @@ export default function Settings() {
                     Manage Subscription
                   </Button>
                 )}
+                <Button variant="outline" size="sm">
+                  View Billing History
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -305,6 +321,20 @@ export default function Settings() {
                 </Select>
               </div>
               <div className="space-y-2">
+                <Label>Startup Screen</Label>
+                <Select value={preferences.startupScreen || 'dashboard'} onValueChange={(value) => setPreferences(prev => ({ ...prev, startupScreen: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dashboard">Dashboard</SelectItem>
+                    <SelectItem value="terminal">Terminal (InsightOS)</SelectItem>
+                    <SelectItem value="forecast">Forecast Center</SelectItem>
+                    <SelectItem value="opportunities">Investment Hub</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label>Alert Sensitivity</Label>
                 <Select value={preferences.alertSensitivity} onValueChange={(value) => setPreferences(prev => ({ ...prev, alertSensitivity: value }))}>
                   <SelectTrigger>
@@ -372,6 +402,55 @@ export default function Settings() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                Data Sources & AI Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Preferred Data Sources</Label>
+                <Select value={preferences.dataSource} onValueChange={(value) => setPreferences(prev => ({ ...prev, dataSource: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="mixed">Mixed Sources (Recommended)</SelectItem>
+                    <SelectItem value="government">Government Data Only</SelectItem>
+                    <SelectItem value="private">Private Feeds Only</SelectItem>
+                    <SelectItem value="verified">Verified Sources Only</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-3">
+                <Label>AI Alert Thresholds by Sector</Label>
+                {Object.entries(preferences.sectorAlertThresholds).map(([sector, threshold]) => (
+                  <div key={sector} className="flex items-center justify-between">
+                    <Label className="capitalize">{sector}</Label>
+                    <Select 
+                      value={threshold} 
+                      onValueChange={(value) => setPreferences(prev => ({
+                        ...prev,
+                        sectorAlertThresholds: { ...prev.sectorAlertThresholds, [sector]: value }
+                      }))}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="security" className="space-y-4">
@@ -394,6 +473,13 @@ export default function Settings() {
                   <Label className="text-base">Two-Factor Authentication</Label>
                   <p className="text-sm text-muted-foreground mb-2">Add an extra layer of security</p>
                   <Button variant="outline">Enable 2FA</Button>
+                </div>
+                <Separator />
+                <div>
+                  <Label className="text-base">Secondary Email</Label>
+                  <p className="text-sm text-muted-foreground mb-2">Add backup login method</p>
+                  <Input placeholder="backup@email.com" className="mb-2" />
+                  <Button variant="outline" size="sm">Add Secondary Email</Button>
                 </div>
                 <Separator />
                 <div>

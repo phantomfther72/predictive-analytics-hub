@@ -16,12 +16,16 @@ import { Badge } from '@/components/ui/badge';
 import { Bell, Settings, LogOut, User, RefreshCw, Code, Terminal } from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useDemoMode } from '@/hooks/useDemoMode';
+import { useDevModeShortcut } from '@/hooks/useDevModeShortcut';
 
 export const AppNavbar: React.FC = () => {
   const { user, userRole, signOut, hasRole } = useAuth();
   const { toggleSidebar } = useSidebar();
   const { isDevMode, toggleDevMode } = useDemoMode();
   const navigate = useNavigate();
+  
+  // Activate dev mode shortcut
+  useDevModeShortcut();
 
   const getUserInitials = (email: string) => {
     return email.split('@')[0].slice(0, 2).toUpperCase();
@@ -125,21 +129,17 @@ export const AppNavbar: React.FC = () => {
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </DropdownMenuItem>
-              {user?.email === 'dev@predictivepulse.com' && (
-                <>
-                  <DropdownMenuSeparator />
-                  <div className="px-2 py-1.5 flex items-center justify-between">
-                    <span className="text-sm flex items-center gap-2">
-                      <Code className="h-4 w-4" />
-                      Dev Mode
-                    </span>
-                    <Switch 
-                      checked={isDevMode} 
-                      onCheckedChange={toggleDevMode}
-                    />
-                  </div>
-                </>
-              )}
+              <DropdownMenuSeparator />
+              <div className="px-2 py-1.5 flex items-center justify-between">
+                <span className="text-sm flex items-center gap-2">
+                  <Code className="h-4 w-4" />
+                  Dev Mode {!isDevMode && <span className="text-xs text-muted-foreground">(Ctrl+Alt+D)</span>}
+                </span>
+                <Switch 
+                  checked={isDevMode} 
+                  onCheckedChange={toggleDevMode}
+                />
+              </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={signOut}

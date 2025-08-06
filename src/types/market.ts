@@ -1,6 +1,6 @@
 export type TimeRange = "1D" | "7D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "ALL";
 
-export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen" | "financial" | "medical";
+export type MarketType = "housing" | "agriculture" | "mining" | "cryptocurrency" | "green_hydrogen" | "financial" | "medical" | "tourism" | "education" | "infrastructure";
 
 export type PredictionFactors = {
   market_trend: number;
@@ -21,6 +21,14 @@ export type PredictionFactors = {
   healthcare_policy?: number;
   equipment_utilization?: number;
   staffing_levels?: number;
+  tourism_arrivals?: number;
+  seasonal_trends?: number;
+  accommodation_capacity?: number;
+  enrollment_rates?: number;
+  education_funding?: number;
+  infrastructure_quality?: number;
+  project_completion?: number;
+  investment_flow?: number;
 };
 
 export type AlternativeModelPrediction = {
@@ -317,6 +325,89 @@ export type MedicalServiceData = {
   timestamp: string;
   predicted_demand?: number;
   prediction_confidence?: number;
+};
+
+// Tourism sector data types
+export type TourismMarketData = {
+  id: string;
+  region: string;
+  visitor_arrivals: number;
+  tourism_revenue_usd: number;
+  occupancy_rate: number;
+  average_length_stay: number;
+  seasonal_variation: number;
+  timestamp: string;
+  predicted_change: number | null;
+  prediction_timestamp: string;
+  prediction_confidence: number;
+  prediction_explanation: string | null;
+  prediction_factors: PredictionFactors | null;
+  alternative_model_predictions?: AlternativeModelPrediction[];
+  
+  gdp_contribution?: number;
+  employment_created?: number;
+  attraction_popularity?: number;
+  international_visitors?: number;
+  domestic_visitors?: number;
+  adventure_tourism_share?: number;
+  business_travel_share?: number;
+  created_at?: string;
+};
+
+// Education sector data types
+export type EducationMarketData = {
+  id: string;
+  region: string;
+  student_enrollment: number;
+  literacy_rate: number;
+  teacher_student_ratio: number;
+  education_spending_per_capita: number;
+  graduation_rate: number;
+  timestamp: string;
+  predicted_change: number | null;
+  prediction_timestamp: string;
+  prediction_confidence: number;
+  prediction_explanation: string | null;
+  prediction_factors: PredictionFactors | null;
+  alternative_model_predictions?: AlternativeModelPrediction[];
+  
+  infrastructure_quality?: number;
+  digital_access?: number;
+  skills_development_index?: number;
+  primary_enrollment?: number;
+  secondary_enrollment?: number;
+  tertiary_enrollment?: number;
+  dropout_rate?: number;
+  teacher_qualification_rate?: number;
+  created_at?: string;
+};
+
+// Infrastructure sector data types
+export type InfrastructureMarketData = {
+  id: string;
+  region: string;
+  project_value_usd: number;
+  completion_rate: number;
+  road_quality_index: number;
+  power_generation_mw: number;
+  water_infrastructure_coverage: number;
+  timestamp: string;
+  predicted_change: number | null;
+  prediction_timestamp: string;
+  prediction_confidence: number;
+  prediction_explanation: string | null;
+  prediction_factors: PredictionFactors | null;
+  alternative_model_predictions?: AlternativeModelPrediction[];
+  
+  digital_infrastructure_index?: number;
+  maintenance_investment?: number;
+  public_private_ratio?: number;
+  transport_connectivity?: number;
+  energy_access_rate?: number;
+  telecommunication_coverage?: number;
+  waste_management_efficiency?: number;
+  urban_planning_index?: number;
+  created_at?: string;
 };
 
 export type ModelSettings = {

@@ -64,3 +64,39 @@ export const GREEN_HYDROGEN_METRICS: Metric[] = [
   { key: "transport_efficiency_pct", name: "Transport Efficiency", color: "#EC4899", unit: "%" },
   { key: "environmental_impact_score", name: "Environmental Impact", color: "#22C55E", unit: "score" }
 ];
+
+// Tourism sector metrics
+export const TOURISM_METRICS: Metric[] = [
+  { key: "visitor_arrivals", name: "Visitor Arrivals", color: "#0EA5E9", unit: "visitors" },
+  { key: "tourism_revenue_usd", name: "Tourism Revenue", color: "#10B981", unit: "USD" },
+  { key: "occupancy_rate", name: "Hotel Occupancy", color: "#8B5CF6", unit: "%" },
+  { key: "average_length_stay", name: "Average Stay Length", color: "#F59E0B", unit: "days" },
+  { key: "seasonal_variation", name: "Seasonal Variation", color: "#EC4899", unit: "%" },
+  { key: "gdp_contribution", name: "GDP Contribution", color: "#14B8A6", unit: "%" },
+  { key: "employment_created", name: "Employment Created", color: "#F43F5E", unit: "jobs" },
+  { key: "attraction_popularity", name: "Attraction Popularity", color: "#64748B", unit: "score" }
+];
+
+// Education sector metrics  
+export const EDUCATION_METRICS: Metric[] = [
+  { key: "student_enrollment", name: "Student Enrollment", color: "#0EA5E9", unit: "students" },
+  { key: "literacy_rate", name: "Literacy Rate", color: "#10B981", unit: "%" },
+  { key: "teacher_student_ratio", name: "Teacher-Student Ratio", color: "#8B5CF6", unit: "ratio" },
+  { key: "education_spending_per_capita", name: "Education Spending", color: "#F59E0B", unit: "USD" },
+  { key: "graduation_rate", name: "Graduation Rate", color: "#EC4899", unit: "%" },
+  { key: "infrastructure_quality", name: "Infrastructure Quality", color: "#14B8A6", unit: "score" },
+  { key: "digital_access", name: "Digital Access", color: "#F43F5E", unit: "%" },
+  { key: "skills_development_index", name: "Skills Development", color: "#64748B", unit: "score" }
+];
+
+// Infrastructure sector metrics
+export const INFRASTRUCTURE_METRICS: Metric[] = [
+  { key: "project_value_usd", name: "Project Value", color: "#0EA5E9", unit: "USD" },
+  { key: "completion_rate", name: "Completion Rate", color: "#10B981", unit: "%" },
+  { key: "road_quality_index", name: "Road Quality", color: "#8B5CF6", unit: "score" },
+  { key: "power_generation_mw", name: "Power Generation", color: "#F59E0B", unit: "MW" },
+  { key: "water_infrastructure_coverage", name: "Water Coverage", color: "#EC4899", unit: "%" },
+  { key: "digital_infrastructure_index", name: "Digital Infrastructure", color: "#14B8A6", unit: "score" },
+  { key: "maintenance_investment", name: "Maintenance Investment", color: "#F43F5E", unit: "USD" },
+  { key: "public_private_ratio", name: "Public-Private Ratio", color: "#64748B", unit: "%" }
+];

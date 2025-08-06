@@ -43,6 +43,15 @@ const Index: React.FC = () => {
       case "medical":
         navigate("/medical-market");
         break;
+      case "tourism":
+        navigate("/tourism");
+        break;
+      case "education":
+        navigate("/education");
+        break;
+      case "infrastructure":
+        navigate("/infrastructure");
+        break;
       default:
         // For any other type, go to dashboard with industry view
         navigate(`/dashboard/industry/${insight.industryType}`);

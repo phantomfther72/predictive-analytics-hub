@@ -25,6 +25,9 @@ import NotFound from "./pages/NotFound";
 import InvestorHub from "./pages/InvestorHub";
 import Terminal from "./pages/Terminal";
 import Profile from "./pages/Profile";
+import Tourism from "./pages/Tourism";
+import Education from "./pages/Education";
+import Infrastructure from "./pages/Infrastructure";
 
 const queryClient = new QueryClient();
 
@@ -96,6 +99,15 @@ const App = () => {
               </Route>
               <Route path="/settings" element={<AppLayout />}>
                 <Route index element={<Settings />} />
+              </Route>
+              <Route path="/tourism" element={<AppLayout />}>
+                <Route index element={<Tourism />} />
+              </Route>
+              <Route path="/education" element={<AppLayout />}>
+                <Route index element={<Education />} />
+              </Route>
+              <Route path="/infrastructure" element={<AppLayout />}>
+                <Route index element={<Infrastructure />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />

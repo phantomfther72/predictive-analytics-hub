@@ -28,6 +28,15 @@ const MarketDataGrid: React.FC<MarketDataGridProps> = ({ groupedMetrics }) => {
       case 'cryptocurrency':
         navigate('/financial-market');
         break;
+      case 'tourism':
+        navigate('/tourism');
+        break;
+      case 'education':
+        navigate('/education');
+        break;
+      case 'infrastructure':
+        navigate('/infrastructure');
+        break;
       default:
         console.log(`No route defined for ${marketType}`);
     }

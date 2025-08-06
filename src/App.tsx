@@ -24,6 +24,7 @@ import OpportunitiesPage from "./pages/OpportunitiesPage";
 import NotFound from "./pages/NotFound";
 import InvestorHub from "./pages/InvestorHub";
 import Terminal from "./pages/Terminal";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,12 @@ const App = () => {
               </Route>
               <Route path="/terminal" element={<AppLayout />}>
                 <Route index element={<Terminal />} />
+              </Route>
+              <Route path="/profile" element={<AppLayout />}>
+                <Route index element={<Profile />} />
+              </Route>
+              <Route path="/settings" element={<AppLayout />}>
+                <Route index element={<Settings />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />

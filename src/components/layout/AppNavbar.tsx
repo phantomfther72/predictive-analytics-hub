@@ -121,7 +121,7 @@ export const AppNavbar: React.FC = () => {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/settings')}>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/profile')}>
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>

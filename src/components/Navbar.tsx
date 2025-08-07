@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -76,6 +77,28 @@ const Navbar = () => {
             >
               Industries
             </a>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center gap-1">
+                Sectors <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
+                  <Link to="/tourism">Tourism</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/education">Education</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/infrastructure">Infrastructure</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Link
+              to="/opportunities"
+              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Opportunities
+            </Link>
             <a
               href="#testimonials"
               className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -167,7 +190,67 @@ const Navbar = () => {
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.45 }}
+                className="w-full"
+              >
+                <Link
+                  to="/opportunities"
+                  className="flex w-full items-center px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors touch-target"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span className="font-medium">Opportunities</span>
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
+                className="w-full"
+              >
+                <Link
+                  to="/tourism"
+                  className="flex w-full items-center px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors touch-target"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span className="font-medium">Tourism</span>
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.55 }}
+                className="w-full"
+              >
+                <Link
+                  to="/education"
+                  className="flex w-full items-center px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors touch-target"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span className="font-medium">Education</span>
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="w-full"
+              >
+                <Link
+                  to="/infrastructure"
+                  className="flex w-full items-center px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors touch-target"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span className="font-medium">Infrastructure</span>
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.65 }}
                 className="w-full"
               >
                 <Link

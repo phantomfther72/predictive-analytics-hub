@@ -1,5 +1,5 @@
 
-import { Home, Leaf, Mountain, Bitcoin, Zap, LineChart, Stethoscope } from "lucide-react";
+import { Home, Leaf, Mountain, Bitcoin, Zap, LineChart, Stethoscope, Landmark, GraduationCap, Wrench } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -59,6 +59,30 @@ const industries = [
       "Analyze healthcare metrics, hospital capacity, and equipment utilization trends.",
     type: "medical" as const,
     route: "/medical-market"
+  },
+  {
+    icon: Landmark,
+    title: "Tourism",
+    description:
+      "Track arrivals, bookings, and seasonal demand patterns with geospatial overlays.",
+    type: "tourism" as const,
+    route: "/tourism"
+  },
+  {
+    icon: GraduationCap,
+    title: "Education",
+    description:
+      "Analyze enrollment trends, regional infrastructure and literacy rates over time.",
+    type: "education" as const,
+    route: "/education"
+  },
+  {
+    icon: Wrench,
+    title: "Infrastructure",
+    description:
+      "Monitor project pipelines, investment flows, and development progress by region.",
+    type: "infrastructure" as const,
+    route: "/infrastructure"
   }
 ];
 

@@ -29,7 +29,10 @@ import {
   Globe,
   Zap,
   TrendingUp,
-  Settings
+  Settings,
+  Landmark,
+  GraduationCap,
+  Wrench
 } from 'lucide-react';
 
 const mainMenuItems = [
@@ -61,6 +64,9 @@ const industryItems = [
   { icon: Pickaxe, label: "Mining", path: "/mining-market", roles: ['guest', 'pro', 'investor', 'admin'] },
   { icon: Wheat, label: "Agriculture", path: "/agriculture-market", roles: ['guest', 'pro', 'investor', 'admin'] },
   { icon: Droplets, label: "Green Hydrogen", path: "/green-hydrogen-market", roles: ['guest', 'pro', 'investor', 'admin'] },
+  { icon: Landmark, label: "Tourism", path: "/tourism", roles: ['guest', 'pro', 'investor', 'admin'] },
+  { icon: GraduationCap, label: "Education", path: "/education", roles: ['guest', 'pro', 'investor', 'admin'] },
+  { icon: Wrench, label: "Infrastructure", path: "/infrastructure", roles: ['guest', 'pro', 'investor', 'admin'] },
 ];
 
 export const DashboardSidebar: React.FC = () => {

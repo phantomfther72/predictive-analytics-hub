@@ -26,7 +26,10 @@ import {
   TrendingUp,
   Settings,
   MessageSquare,
-  Target
+  Target,
+  Landmark,
+  GraduationCap,
+  Wrench
 } from 'lucide-react';
 
 const navigationItems = [
@@ -92,6 +95,24 @@ const industryItems = [
     url: '/medical-market',
     icon: Stethoscope,
     color: 'text-purple-500'
+  },
+  {
+    title: 'Tourism',
+    url: '/tourism',
+    icon: Landmark,
+    color: 'text-pink-500'
+  },
+  {
+    title: 'Education',
+    url: '/education',
+    icon: GraduationCap,
+    color: 'text-indigo-500'
+  },
+  {
+    title: 'Infrastructure',
+    url: '/infrastructure',
+    icon: Wrench,
+    color: 'text-slate-500'
   }
 ];
 

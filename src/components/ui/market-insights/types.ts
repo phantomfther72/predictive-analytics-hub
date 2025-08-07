@@ -3,7 +3,7 @@ export interface MarketInsight {
   id: string;
   title: string;
   description: string;
-  industryType: "housing" | "agriculture" | "mining" | "green_hydrogen" | "financial" | "medical";
+  industryType: "housing" | "agriculture" | "mining" | "green_hydrogen" | "financial" | "medical" | "tourism" | "education" | "infrastructure";
   industryLabel?: string;
   marketValue: number;
   changePercentage: number;

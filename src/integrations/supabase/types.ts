@@ -542,68 +542,89 @@ export type Database = {
         Row: {
           annual_return_percentage: number | null
           asset_type: string
+          capital_max: number | null
+          capital_min: number | null
           contact_email: string | null
+          contact_name: string | null
           contact_phone: string | null
           created_at: string | null
           current_value: number
           description: string
+          documents: Json | null
           featured: boolean | null
           full_details: Json | null
           id: string
           industry_type: string
           minimum_investment: number
+          organization: string | null
           predicted_change: number | null
           prediction_confidence: number | null
           region: string
           risk_level: string
+          stage: string | null
           thumbnail_chart_data: Json | null
           time_horizon: string
           title: string
           updated_at: string | null
+          website_url: string | null
         }
         Insert: {
           annual_return_percentage?: number | null
           asset_type: string
+          capital_max?: number | null
+          capital_min?: number | null
           contact_email?: string | null
+          contact_name?: string | null
           contact_phone?: string | null
           created_at?: string | null
           current_value: number
           description: string
+          documents?: Json | null
           featured?: boolean | null
           full_details?: Json | null
           id?: string
           industry_type: string
           minimum_investment: number
+          organization?: string | null
           predicted_change?: number | null
           prediction_confidence?: number | null
           region: string
           risk_level: string
+          stage?: string | null
           thumbnail_chart_data?: Json | null
           time_horizon: string
           title: string
           updated_at?: string | null
+          website_url?: string | null
         }
         Update: {
           annual_return_percentage?: number | null
           asset_type?: string
+          capital_max?: number | null
+          capital_min?: number | null
           contact_email?: string | null
+          contact_name?: string | null
           contact_phone?: string | null
           created_at?: string | null
           current_value?: number
           description?: string
+          documents?: Json | null
           featured?: boolean | null
           full_details?: Json | null
           id?: string
           industry_type?: string
           minimum_investment?: number
+          organization?: string | null
           predicted_change?: number | null
           prediction_confidence?: number | null
           region?: string
           risk_level?: string
+          stage?: string | null
           thumbnail_chart_data?: Json | null
           time_horizon?: string
           title?: string
           updated_at?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }

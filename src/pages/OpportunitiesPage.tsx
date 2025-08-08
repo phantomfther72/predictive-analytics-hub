@@ -9,7 +9,7 @@ const OpportunitiesPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header with Demo Toggle */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4" role="heading" aria-level={1}>
             Investment Opportunities
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-6">

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { InvestmentOpportunity } from "@/types/investment";
 import { useInvestmentOpportunities } from "@/hooks/useInvestmentOpportunities";
 import { OpportunityCard } from "./OpportunityCard";
@@ -30,6 +30,8 @@ export const OpportunitiesGrid: React.FC = () => {
   const { data: opportunities, isLoading, error } = useInvestmentOpportunities();
   const [selectedIndustry, setSelectedIndustry] = useState("All Industries");
   const [selectedRiskLevel, setSelectedRiskLevel] = useState("All Risks");
+  const [selectedRegion, setSelectedRegion] = useState("All Regions");
+  const [selectedAsset, setSelectedAsset] = useState("All Asset Types");
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   
@@ -48,18 +50,35 @@ export const OpportunitiesGrid: React.FC = () => {
     console.log("Opportunities loaded:", opportunities?.length || 0);
   }, [opportunities]);
 
+  const regionOptions = useMemo(() => {
+    const unique = Array.from(new Set((opportunities || []).map(o => o.region)));
+    return ["All Regions", ...unique.sort()];
+  }, [opportunities]);
+
+  const assetOptions = useMemo(() => {
+    const unique = Array.from(new Set((opportunities || []).map(o => o.asset_type.replace('_', ' '))));
+    return ["All Asset Types", ...unique.sort()];
+  }, [opportunities]);
+
   const filteredOpportunities = opportunities?.filter(opportunity => {
     const industryName = opportunity.industry_type.replace('_', ' ');
     const matchesIndustry = selectedIndustry === "All Industries" || 
-      industryName.toLowerCase() === selectedIndustry.toLowerCase().replace(' ', '_');
+      industryName.toLowerCase() === selectedIndustry.toLowerCase();
     
     const matchesRiskLevel = selectedRiskLevel === "All Risks" || 
       opportunity.risk_level.toLowerCase() === selectedRiskLevel.toLowerCase();
+
+    const matchesRegion = selectedRegion === "All Regions" || 
+      opportunity.region === selectedRegion;
+
+    const assetName = opportunity.asset_type.replace('_', ' ');
+    const matchesAsset = selectedAsset === "All Asset Types" ||
+      assetName.toLowerCase() === selectedAsset.toLowerCase();
     
     const matchesSearch = opportunity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       opportunity.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesIndustry && matchesRiskLevel && matchesSearch;
+    return matchesIndustry && matchesRiskLevel && matchesRegion && matchesAsset && matchesSearch;
   }) || [];
 
   return (
@@ -115,6 +134,32 @@ export const OpportunitiesGrid: React.FC = () => {
                   {RISK_LEVELS.map(level => (
                     <SelectItem key={level} value={level}>
                       {level}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                <SelectTrigger className="w-full sm:w-40 h-12 border-slate-300 dark:border-slate-600">
+                  <SelectValue placeholder="Region" />
+                </SelectTrigger>
+                <SelectContent>
+                  {regionOptions.map(region => (
+                    <SelectItem key={region} value={region}>
+                      {region}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={selectedAsset} onValueChange={setSelectedAsset}>
+                <SelectTrigger className="w-full sm:w-48 h-12 border-slate-300 dark:border-slate-600">
+                  <SelectValue placeholder="Asset Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {assetOptions.map(asset => (
+                    <SelectItem key={asset} value={asset}>
+                      {asset}
                     </SelectItem>
                   ))}
                 </SelectContent>

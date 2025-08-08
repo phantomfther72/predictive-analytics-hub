@@ -99,6 +99,12 @@ const Navbar = () => {
             >
               Opportunities
             </Link>
+            <Link
+              to="/terminal"
+              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              Terminal
+            </Link>
             <a
               href="#testimonials"
               className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -244,6 +250,21 @@ const Navbar = () => {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <span className="font-medium">Infrastructure</span>
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.65 }}
+                className="w-full"
+              >
+                <Link
+                  to="/terminal"
+                  className="flex w-full items-center px-4 py-3 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors touch-target"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span className="font-medium">Terminal</span>
                 </Link>
               </motion.div>
 

@@ -28,6 +28,8 @@ import {
   Info,
 } from "lucide-react";
 import { safeArray, safeObjectAccess } from "@/utils/marketDataSafety";
+import { RoleGate } from "@/components/auth/RoleGate";
+import { useNavigate } from "react-router-dom";
 
 const RISK_CONFIG = {
   low: {
@@ -56,6 +58,8 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
     const riskColor = RISK_CONFIG[opportunity.risk_level]?.color;
     const riskBgColor = RISK_CONFIG[opportunity.risk_level]?.bgColor;
     const riskLabel = RISK_CONFIG[opportunity.risk_level]?.label;
+
+    const navigate = useNavigate();
 
     // Parse chart data safely
     const chartData = React.useMemo(() => {
@@ -220,14 +224,29 @@ export const OpportunityCard: React.FC<{ opportunity: InvestmentOpportunity }> =
           >
             {opportunity.region}
           </Badge>
-          <Button
-            size="sm"
-            className="bg-gradient-to-r from-blue-700 to-teal-600 hover:from-blue-800 hover:to-teal-700 text-white shadow-md hover:shadow-lg transition-all duration-300 group-hover:scale-105"
-            onClick={() => window.alert("Request Details Coming Soon!")}
+          <RoleGate
+            requiredRole="investor"
+            fallback={
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300"
+                onClick={() => navigate('/pricing')}
+              >
+                Upgrade to access
+                <ArrowUpRight className="h-4 w-4 ml-1" />
+              </Button>
+            }
           >
-            Suggested Action
-            <ArrowUpRight className="h-4 w-4 ml-1" />
-          </Button>
+            <Button
+              size="sm"
+              className="bg-gradient-to-r from-blue-700 to-teal-600 hover:from-blue-800 hover:to-teal-700 text-white shadow-md hover:shadow-lg transition-all duration-300 group-hover:scale-105"
+              onClick={() => window.alert("Request Details Coming Soon!")}
+            >
+              Suggested Action
+              <ArrowUpRight className="h-4 w-4 ml-1" />
+            </Button>
+          </RoleGate>
         </CardFooter>
       </Card>
     );

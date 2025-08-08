@@ -1310,7 +1310,7 @@ export type Database = {
         | "green_hydrogen"
       payment_status: "pending" | "success" | "failed"
       risk_level: "low" | "medium" | "high" | "critical"
-      subscription_tier: "free" | "premium"
+      subscription_tier: "free" | "premium" | "investor"
       user_role: "public" | "analyst" | "partner" | "admin"
     }
     CompositeTypes: {
@@ -1451,7 +1451,7 @@ export const Constants = {
       ],
       payment_status: ["pending", "success", "failed"],
       risk_level: ["low", "medium", "high", "critical"],
-      subscription_tier: ["free", "premium"],
+      subscription_tier: ["free", "premium", "investor"],
       user_role: ["public", "analyst", "partner", "admin"],
     },
   },

@@ -1,11 +1,15 @@
 
 import { useState, useEffect } from "react";
-import { Menu, X, Home, ChevronDown } from "lucide-react";
+import { Menu, X, Home, ChevronDown, Code, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useDemoMode } from "@/hooks/useDemoMode";
+import { useDevModeShortcut } from "@/hooks/useDevModeShortcut";
+import { Badge } from "@/components/ui/badge";
+import { DemoModeToggle } from "@/components/DemoModeToggle";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -14,6 +18,10 @@ const Navbar = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const isSmall = useBreakpoint('sm');
+  const { isDevMode, isDemoMode } = useDemoMode();
+  
+  // Enable dev mode shortcut
+  useDevModeShortcut();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,6 +63,13 @@ const Navbar = () => {
                 Predictive Pulse
               </span>
             </Link>
+            {/* Dev Mode Indicator */}
+            {isDevMode && (
+              <Badge className="ml-2 gap-1 bg-terminal-orange text-slate-900 font-bold">
+                <Code className="h-3 w-3" />
+                DEV
+              </Badge>
+            )}
           </div>
           
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">

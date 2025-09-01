@@ -13,7 +13,9 @@ import {
   Globe,
   Settings,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Briefcase,
+  Eye
 } from 'lucide-react';
 import { LiveMarketFeed } from './components/LiveMarketFeed';
 import { ForecastVisualizer } from './components/ForecastVisualizer';
@@ -21,6 +23,8 @@ import { PredictiveModelsPlayground } from './components/PredictiveModelsPlaygro
 import { AIAlertEngine } from './components/AIAlertEngine';
 import { InsiderDropsFeed } from './components/InsiderDropsFeed';
 import { TerminalHeader } from './components/TerminalHeader';
+import { OpportunitiesGrid } from '@/components/investment-opportunities/OpportunitiesGrid';
+import { useDemoMode } from '@/hooks/useDemoMode';
 
 interface TerminalWidget {
   id: string;
@@ -32,7 +36,16 @@ interface TerminalWidget {
 }
 
 export const TerminalDashboard: React.FC = () => {
+  const { isDevMode } = useDemoMode();
+  
   const [widgets, setWidgets] = useState<TerminalWidget[]>([
+    {
+      id: 'opportunities',
+      title: 'Investment Opportunities',
+      icon: <Briefcase className="h-4 w-4" />,
+      component: <OpportunitiesGrid />,
+      size: 'large'
+    },
     {
       id: 'live-feed',
       title: 'Live Market Fusion Feed',
@@ -97,12 +110,26 @@ export const TerminalDashboard: React.FC = () => {
               <span className="text-sm" style={{ color: 'hsl(var(--terminal-text-dim))' }}>
                 InsightOS v2.1.0
               </span>
+              {isDevMode && (
+                <Badge className="bg-terminal-orange text-slate-900">
+                  <Eye className="h-3 w-3 mr-1" />
+                  ALL FEATURES VISIBLE
+                </Badge>
+              )}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-[hsl(var(--terminal-success))] animate-pulse" />
-              <span className="text-xs" style={{ color: 'hsl(var(--terminal-text-dim))' }}>
-                Live Data Feed
-              </span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-[hsl(var(--terminal-success))] animate-pulse" />
+                <span className="text-xs" style={{ color: 'hsl(var(--terminal-text-dim))' }}>
+                  Live Data Feed
+                </span>
+              </div>
+              <Badge variant="outline" className="text-terminal-cyan border-terminal-cyan/30 text-xs">
+                ✓ Opportunities Active
+              </Badge>
+              <Badge variant="outline" className="text-terminal-green border-terminal-green/30 text-xs">
+                ✓ Suggested Actions
+              </Badge>
             </div>
           </div>
         </div>

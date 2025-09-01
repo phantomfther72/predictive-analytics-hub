@@ -10,6 +10,7 @@ import { HelpSystem } from './HelpSystem';
 import { OnboardingTour } from './OnboardingTour';
 import { UpgradeBanner } from './UpgradeBanner';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { DevModeIndicator } from '@/components/DevModeIndicator';
 
 export const AppLayout: React.FC = () => {
   const { user } = useAuth();
@@ -70,6 +71,7 @@ export const AppLayout: React.FC = () => {
         </div>
 
         {/* Floating Elements */}
+        <DevModeIndicator />
         <FeedbackButton />
         <HelpSystem />
         

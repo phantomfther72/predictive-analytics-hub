@@ -29,7 +29,8 @@ import {
   Target,
   Landmark,
   GraduationCap,
-  Wrench
+  Wrench,
+  Film
 } from 'lucide-react';
 
 const navigationItems = [
@@ -113,6 +114,12 @@ const industryItems = [
     url: '/infrastructure',
     icon: Wrench,
     color: 'text-slate-500'
+  },
+  {
+    title: 'Media & Ent.',
+    url: '/media-entertainment',
+    icon: Film,
+    color: 'text-rose-500'
   }
 ];
 

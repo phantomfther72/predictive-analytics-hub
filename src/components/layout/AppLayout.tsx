@@ -11,6 +11,7 @@ import { OnboardingTour } from './OnboardingTour';
 import { UpgradeBanner } from './UpgradeBanner';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DevModeIndicator } from '@/components/DevModeIndicator';
+import { ContinuousWatchMonitor } from '@/components/ContinuousWatchMonitor';
 
 export const AppLayout: React.FC = () => {
   const { user } = useAuth();
@@ -72,6 +73,7 @@ export const AppLayout: React.FC = () => {
 
         {/* Floating Elements */}
         <DevModeIndicator />
+        <ContinuousWatchMonitor />
         <FeedbackButton />
         <HelpSystem />
         

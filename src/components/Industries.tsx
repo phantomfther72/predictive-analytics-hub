@@ -1,5 +1,5 @@
 
-import { Home, Leaf, Mountain, Bitcoin, Zap, LineChart, Stethoscope, Landmark, GraduationCap, Wrench } from "lucide-react";
+import { Home, Leaf, Mountain, Bitcoin, Zap, LineChart, Stethoscope, Landmark, GraduationCap, Wrench, Film } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -83,6 +83,14 @@ const industries = [
       "Monitor project pipelines, investment flows, and development progress by region.",
     type: "infrastructure" as const,
     route: "/infrastructure"
+  },
+  {
+    icon: Film,
+    title: "Media & Entertainment",
+    description:
+      "Track box office, streaming growth, content production, and gaming industry trends.",
+    type: "media_entertainment" as const,
+    route: "/media-entertainment"
   }
 ];
 

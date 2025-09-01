@@ -28,6 +28,7 @@ import Profile from "./pages/Profile";
 import Tourism from "./pages/Tourism";
 import Education from "./pages/Education";
 import Infrastructure from "./pages/Infrastructure";
+import MediaEntertainment from "./pages/MediaEntertainment";
 
 const queryClient = new QueryClient();
 
@@ -109,7 +110,10 @@ const App = () => {
               <Route path="/infrastructure" element={<AppLayout />}>
                 <Route index element={<Infrastructure />} />
               </Route>
-              
+              <Route path="/media-entertainment" element={<AppLayout />}>
+                <Route index element={<MediaEntertainment />} />
+              </Route>
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

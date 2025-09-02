@@ -86,7 +86,7 @@ export const ContinuousWatchMonitor: React.FC = () => {
         {/* Quick Stats */}
         {watchReport && (
           <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-            <span>Pages: {watchReport.metrics.totalPages}</span>
+            <span>Critical Paths: {watchReport.metrics.criticalPathsHealthy ? '✓' : '✗'}</span>
             <span>•</span>
             <span>Issues: {watchReport.issues.length}</span>
             <span>•</span>
@@ -126,20 +126,20 @@ export const ContinuousWatchMonitor: React.FC = () => {
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 gap-2">
                   <div className="bg-muted/50 rounded p-2">
-                    <div className="text-xs text-muted-foreground">Broken Routes</div>
-                    <div className="text-lg font-bold">{watchReport.metrics.brokenRoutes}</div>
+                    <div className="text-xs text-muted-foreground">Auth Flow</div>
+                    <div className="text-lg font-bold">{watchReport.issues.filter(i => i.type === 'auth').length === 0 ? '✓' : '✗'}</div>
                   </div>
                   <div className="bg-muted/50 rounded p-2">
-                    <div className="text-xs text-muted-foreground">Data Errors</div>
-                    <div className="text-lg font-bold">{watchReport.metrics.dataErrors}</div>
+                    <div className="text-xs text-muted-foreground">Payment</div>
+                    <div className="text-lg font-bold">{watchReport.issues.filter(i => i.type === 'payment').length === 0 ? '✓' : '✗'}</div>
                   </div>
                   <div className="bg-muted/50 rounded p-2">
-                    <div className="text-xs text-muted-foreground">UI Issues</div>
-                    <div className="text-lg font-bold">{watchReport.metrics.uiIssues}</div>
+                    <div className="text-xs text-muted-foreground">Dashboards</div>
+                    <div className="text-lg font-bold">{watchReport.issues.filter(i => i.type === 'dashboard').length === 0 ? '✓' : '✗'}</div>
                   </div>
                   <div className="bg-muted/50 rounded p-2">
-                    <div className="text-xs text-muted-foreground">Total Pages</div>
-                    <div className="text-lg font-bold">{watchReport.metrics.totalPages}</div>
+                    <div className="text-xs text-muted-foreground">Routing</div>
+                    <div className="text-lg font-bold">{watchReport.issues.filter(i => i.type === 'route').length === 0 ? '✓' : '✗'}</div>
                   </div>
                 </div>
 

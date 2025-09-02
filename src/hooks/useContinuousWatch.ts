@@ -7,20 +7,28 @@ export interface WatchReport {
   timestamp: string;
   status: 'healthy' | 'warning' | 'error';
   issues: Array<{
-    type: 'route' | 'component' | 'data' | 'navigation' | 'ui';
+    type: 'auth' | 'payment' | 'route' | 'dashboard';
     severity: 'low' | 'medium' | 'high' | 'critical';
     description: string;
     location?: string;
     suggestion?: string;
   }>;
   metrics: {
-    totalPages: number;
-    brokenRoutes: number;
-    dataErrors: number;
-    uiIssues: number;
+    criticalPathsHealthy: boolean;
     lastCheck: string;
   };
 }
+
+// Lean monitoring - only critical paths
+const CRITICAL_PATHS = [
+  '/auth',
+  '/pricing',
+  '/dashboard',
+  '/housing-market',
+  '/mining-market',
+  '/agriculture-market',
+  '/financial-market'
+];
 
 export const useContinuousWatch = () => {
   const location = useLocation();
@@ -30,101 +38,69 @@ export const useContinuousWatch = () => {
   const [isWatching, setIsWatching] = useState(true);
   const checkIntervalRef = useRef<NodeJS.Timeout>();
 
-  // Route validation
-  const validRoutes = [
-    '/',
-    '/auth',
-    '/pricing',
-    '/thank-you',
-    '/dashboard',
-    '/dashboard/industries',
-    '/dashboard/predictions',
-    '/dashboard/analytics',
-    '/dashboard/settings',
-    '/dashboard/feedback',
-    '/predictive-platform',
-    '/housing-market',
-    '/agriculture-market',
-    '/mining-market',
-    '/green-hydrogen-market',
-    '/financial-market',
-    '/medical-market',
-    '/cryptocurrency-market',
-    '/global-equity',
-    '/opportunities',
-    '/investor-hub',
-    '/terminal',
-    '/profile',
-    '/settings',
-    '/tourism',
-    '/education',
-    '/infrastructure',
-    '/media-entertainment',
-  ];
-
   const performHealthCheck = () => {
     const issues: WatchReport['issues'] = [];
     const currentPath = location.pathname;
 
-    // Check if current route is valid
-    if (!validRoutes.includes(currentPath) && !currentPath.startsWith('/dashboard/')) {
-      issues.push({
-        type: 'route',
-        severity: 'high',
-        description: `Invalid route detected: ${currentPath}`,
-        location: currentPath,
-        suggestion: 'This route may not be properly configured in the routing system'
-      });
+    // Only monitor critical paths
+    if (!CRITICAL_PATHS.includes(currentPath)) {
+      return;
     }
 
-    // Check for UI rendering issues
-    const mainContent = document.querySelector('main');
-    if (!mainContent || mainContent.children.length === 0) {
-      issues.push({
-        type: 'ui',
-        severity: 'critical',
-        description: 'Main content area is empty',
-        location: currentPath,
-        suggestion: 'Check if components are properly rendered'
-      });
+    // Check auth elements on auth page
+    if (currentPath === '/auth') {
+      const signInButton = document.querySelector('button[type="submit"]');
+      if (!signInButton) {
+        issues.push({
+          type: 'auth',
+          severity: 'critical',
+          description: 'Login button not found',
+          location: currentPath,
+          suggestion: 'Auth form may not be rendering correctly'
+        });
+      }
     }
 
-    // Check for navigation elements
+    // Check pricing elements
+    if (currentPath === '/pricing') {
+      const pricingCards = document.querySelectorAll('[data-pricing-card]');
+      if (pricingCards.length === 0) {
+        issues.push({
+          type: 'payment',
+          severity: 'high',
+          description: 'Pricing cards not found',
+          location: currentPath,
+          suggestion: 'Payment flow may be broken'
+        });
+      }
+    }
+
+    // Check dashboard rendering
+    if (currentPath.includes('dashboard') || CRITICAL_PATHS.slice(3).includes(currentPath)) {
+      const mainContent = document.querySelector('main');
+      if (!mainContent || mainContent.children.length === 0) {
+        issues.push({
+          type: 'dashboard',
+          severity: 'high',
+          description: 'Dashboard content not rendering',
+          location: currentPath,
+          suggestion: 'Check data loading and component mounting'
+        });
+      }
+    }
+
+    // Check navbar presence
     const navbar = document.querySelector('nav');
     if (!navbar) {
       issues.push({
-        type: 'navigation',
-        severity: 'high',
-        description: 'Navigation bar not found',
-        suggestion: 'Ensure navbar component is properly mounted'
+        type: 'route',
+        severity: 'medium',
+        description: 'Navigation not found',
+        suggestion: 'Navigation component may not be mounted'
       });
     }
 
-    // Check for error boundaries
-    const errorElements = document.querySelectorAll('[data-error], .error-boundary');
-    errorElements.forEach(el => {
-      issues.push({
-        type: 'component',
-        severity: 'medium',
-        description: 'Error boundary triggered',
-        location: el.getAttribute('data-location') || 'Unknown',
-        suggestion: 'Check component for rendering errors'
-      });
-    });
-
-    // Check data loading states
-    const loadingElements = document.querySelectorAll('[data-loading="error"]');
-    loadingElements.forEach(el => {
-      issues.push({
-        type: 'data',
-        severity: 'medium',
-        description: 'Data loading error detected',
-        location: el.getAttribute('data-source') || 'Unknown',
-        suggestion: 'Check API endpoints and data fetching logic'
-      });
-    });
-
-    // Generate report
+    // Generate lean report
     const report: WatchReport = {
       timestamp: new Date().toISOString(),
       status: issues.length === 0 ? 'healthy' : 
@@ -132,20 +108,17 @@ export const useContinuousWatch = () => {
               issues.some(i => i.severity === 'high') ? 'warning' : 'healthy',
       issues,
       metrics: {
-        totalPages: validRoutes.length,
-        brokenRoutes: issues.filter(i => i.type === 'route').length,
-        dataErrors: issues.filter(i => i.type === 'data').length,
-        uiIssues: issues.filter(i => i.type === 'ui').length,
+        criticalPathsHealthy: issues.filter(i => i.severity === 'critical' || i.severity === 'high').length === 0,
         lastCheck: new Date().toLocaleTimeString()
       }
     };
 
     setWatchReport(report);
 
-    // Show toast for critical issues in dev mode
+    // Only alert on critical issues in critical paths
     if (isDevMode && issues.some(i => i.severity === 'critical')) {
       toast({
-        title: '⚠️ Critical Issue Detected',
+        title: '⚠️ Critical Issue in Core Flow',
         description: issues.find(i => i.severity === 'critical')?.description,
         variant: 'destructive'
       });
@@ -154,19 +127,21 @@ export const useContinuousWatch = () => {
     return report;
   };
 
-  // Run health check on route change
+  // Only check critical paths on route change
   useEffect(() => {
-    if (isWatching) {
+    if (isWatching && CRITICAL_PATHS.includes(location.pathname)) {
       performHealthCheck();
     }
   }, [location.pathname, isWatching]);
 
-  // Periodic health checks in dev mode
+  // Less frequent checks in dev mode - every 60 seconds
   useEffect(() => {
     if (isDevMode && isWatching) {
       checkIntervalRef.current = setInterval(() => {
-        performHealthCheck();
-      }, 30000); // Check every 30 seconds
+        if (CRITICAL_PATHS.includes(location.pathname)) {
+          performHealthCheck();
+        }
+      }, 60000); // Check every minute instead of 30 seconds
 
       return () => {
         if (checkIntervalRef.current) {
@@ -174,7 +149,7 @@ export const useContinuousWatch = () => {
         }
       };
     }
-  }, [isDevMode, isWatching]);
+  }, [isDevMode, isWatching, location.pathname]);
 
   return {
     watchReport,

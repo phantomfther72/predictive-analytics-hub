@@ -5,152 +5,26 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Music, Film, Palette, User, Gamepad2, TrendingUp, 
   DollarSign, Users, Globe, Star, MessageSquare, Calendar,
-  Play, ShoppingBag, Award, Briefcase 
+  Play, ShoppingBag, Award, Briefcase, Info, Smartphone 
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import PredictionBadge from '@/components/market-data/PredictionBadge';
-
-// Mock artist profiles data
-const artistProfiles = [
-  {
-    id: 1,
-    name: "Sophia Rivers",
-    category: "musician",
-    avatar: "/api/placeholder/100/100",
-    verified: true,
-    followers: 2340000,
-    monthlyListeners: 1850000,
-    rating: 4.8,
-    revenue: {
-      streaming: 125000,
-      events: 450000,
-      merchandise: 85000,
-      licensing: 95000
-    },
-    performance: [
-      { month: 'Jan', streams: 1.2, revenue: 45 },
-      { month: 'Feb', streams: 1.4, revenue: 52 },
-      { month: 'Mar', streams: 1.8, revenue: 68 },
-      { month: 'Apr', streams: 2.1, revenue: 78 },
-      { month: 'May', streams: 2.5, revenue: 92 },
-      { month: 'Jun', streams: 2.8, revenue: 105 },
-    ],
-    socials: {
-      instagram: 850000,
-      tiktok: 1200000,
-      youtube: 450000,
-      twitter: 320000
-    },
-    growthRate: 28.5,
-    bookingRate: "$25,000 - $45,000"
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    category: "filmmaker",
-    avatar: "/api/placeholder/100/100",
-    verified: true,
-    followers: 890000,
-    boxOffice: 8500000,
-    rating: 4.6,
-    revenue: {
-      theatrical: 4200000,
-      streaming: 2800000,
-      international: 1500000,
-      merchandise: 350000
-    },
-    performance: [
-      { month: 'Jan', views: 0.8, revenue: 120 },
-      { month: 'Feb', views: 1.1, revenue: 180 },
-      { month: 'Mar', views: 1.5, revenue: 250 },
-      { month: 'Apr', views: 2.2, revenue: 380 },
-      { month: 'May', views: 2.8, revenue: 420 },
-      { month: 'Jun', views: 3.2, revenue: 480 },
-    ],
-    socials: {
-      instagram: 450000,
-      linkedin: 125000,
-      youtube: 680000,
-      twitter: 220000
-    },
-    growthRate: 35.2,
-    projectBudget: "$2M - $10M"
-  },
-  {
-    id: 3,
-    name: "Luna Fashion House",
-    category: "fashion",
-    avatar: "/api/placeholder/100/100",
-    verified: true,
-    followers: 1560000,
-    collections: 12,
-    rating: 4.9,
-    revenue: {
-      retail: 3200000,
-      online: 1800000,
-      licensing: 650000,
-      collaborations: 450000
-    },
-    performance: [
-      { month: 'Jan', sales: 280, revenue: 320 },
-      { month: 'Feb', sales: 320, revenue: 380 },
-      { month: 'Mar', sales: 450, revenue: 520 },
-      { month: 'Apr', sales: 520, revenue: 680 },
-      { month: 'May', sales: 680, revenue: 820 },
-      { month: 'Jun', sales: 750, revenue: 920 },
-    ],
-    socials: {
-      instagram: 1200000,
-      pinterest: 450000,
-      tiktok: 890000,
-      facebook: 320000
-    },
-    growthRate: 42.8,
-    partnershipDeals: "5 Active"
-  },
-  {
-    id: 4,
-    name: "GameStorm Studios",
-    category: "gaming",
-    avatar: "/api/placeholder/100/100",
-    verified: true,
-    followers: 3450000,
-    activeUsers: 1250000,
-    rating: 4.7,
-    revenue: {
-      gamesSales: 5800000,
-      inApp: 3200000,
-      sponsorships: 1200000,
-      esports: 850000
-    },
-    performance: [
-      { month: 'Jan', users: 0.9, revenue: 680 },
-      { month: 'Feb', users: 1.0, revenue: 750 },
-      { month: 'Mar', users: 1.1, revenue: 820 },
-      { month: 'Apr', users: 1.2, revenue: 920 },
-      { month: 'May', users: 1.25, revenue: 1050 },
-      { month: 'Jun', users: 1.3, revenue: 1150 },
-    ],
-    socials: {
-      twitch: 890000,
-      youtube: 2100000,
-      discord: 450000,
-      twitter: 680000
-    },
-    growthRate: 58.3,
-    fundingRound: "Series B - $25M"
-  }
-];
+import { namibianCreators, dataDisclaimer, CreatorProfile } from '@/data/namibianCreatorsData';
+import { useToast } from '@/components/ui/use-toast';
+import { useDemoMode } from '@/hooks/useDemoMode';
 
 const categoryIcons = {
   musician: Music,
   filmmaker: Film,
   fashion: Palette,
   gaming: Gamepad2,
+  digital: Smartphone,
   actor: User,
+  producer: Music
 };
 
 const categoryColors = {
@@ -158,24 +32,58 @@ const categoryColors = {
   filmmaker: "bg-blue-500",
   fashion: "bg-pink-500",
   gaming: "bg-green-500",
+  digital: "bg-cyan-500",
   actor: "bg-orange-500",
+  producer: "bg-indigo-500"
 };
 
 export const ArtistProfiles: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedArtist, setSelectedArtist] = useState<typeof artistProfiles[0] | null>(null);
+  const [selectedArtist, setSelectedArtist] = useState<CreatorProfile | null>(null);
+  const { isDemoMode } = useDemoMode();
+  const { toast } = useToast();
 
   const filteredProfiles = selectedCategory === 'all' 
-    ? artistProfiles 
-    : artistProfiles.filter(p => p.category === selectedCategory);
+    ? namibianCreators 
+    : namibianCreators.filter(p => p.category === selectedCategory);
 
-  const handleContactArtist = (artist: typeof artistProfiles[0]) => {
-    // Integration with PredictivePulse contact system
-    console.log('Contacting artist:', artist.name);
+  const handleContactArtist = (artist: CreatorProfile) => {
+    if (isDemoMode) {
+      toast({
+        title: "Demo Mode",
+        description: `Contact request for ${artist.name} would be sent in production mode.`,
+      });
+    } else {
+      toast({
+        title: "Contact Request Sent",
+        description: `Your request to contact ${artist.name} has been submitted.`,
+      });
+    }
+  };
+
+  // Generate chart data from metrics
+  const generateChartData = (artist: CreatorProfile) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    const baseStreaming = artist.metrics.streaming.monthly / 6;
+    const baseRevenue = (artist.metrics.events.annualRevenue + artist.metrics.merchandise.revenue) / 12;
+    
+    return months.map((month, index) => ({
+      month,
+      streaming: Math.round(baseStreaming * (0.8 + Math.random() * 0.4) * (1 + index * 0.1)),
+      revenue: Math.round(baseRevenue * (0.7 + Math.random() * 0.6) * (1 + index * 0.08) / 1000)
+    }));
   };
 
   return (
     <div className="space-y-6">
+      {/* Data Disclaimer */}
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          {dataDisclaimer}
+        </AlertDescription>
+      </Alert>
+
       {/* Category Filter */}
       <div className="flex gap-2 flex-wrap">
         <Button
@@ -210,12 +118,20 @@ export const ArtistProfiles: React.FC = () => {
           Fashion
         </Button>
         <Button
-          variant={selectedCategory === 'gaming' ? 'default' : 'outline'}
-          onClick={() => setSelectedCategory('gaming')}
+          variant={selectedCategory === 'digital' ? 'default' : 'outline'}
+          onClick={() => setSelectedCategory('digital')}
           size="sm"
         >
-          <Gamepad2 className="mr-1 h-4 w-4" />
-          Gaming
+          <Smartphone className="mr-1 h-4 w-4" />
+          Digital
+        </Button>
+        <Button
+          variant={selectedCategory === 'actor' ? 'default' : 'outline'}
+          onClick={() => setSelectedCategory('actor')}
+          size="sm"
+        >
+          <User className="mr-1 h-4 w-4" />
+          Actors
         </Button>
       </div>
 
@@ -235,7 +151,7 @@ export const ArtistProfiles: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-12 w-12">
-                      <AvatarImage src={artist.avatar} />
+                      <AvatarImage src={artist.profileImage} />
                       <AvatarFallback className={colorClass}>
                         <Icon className="h-6 w-6 text-white" />
                       </AvatarFallback>
@@ -243,10 +159,10 @@ export const ArtistProfiles: React.FC = () => {
                     <div>
                       <CardTitle className="text-base flex items-center gap-1">
                         {artist.name}
-                        {artist.verified && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
+                        {artist.status === 'legend' && <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />}
                       </CardTitle>
                       <CardDescription className="text-xs capitalize">
-                        {artist.category}
+                        {artist.category} • {artist.status}
                       </CardDescription>
                     </div>
                   </div>
@@ -256,24 +172,28 @@ export const ArtistProfiles: React.FC = () => {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Followers</span>
                   <span className="font-semibold">
-                    {(artist.followers / 1000000).toFixed(1)}M
+                    {artist.metrics.social.followers >= 1000000 
+                      ? `${(artist.metrics.social.followers / 1000000).toFixed(1)}M`
+                      : `${Math.round(artist.metrics.social.followers / 1000)}K`}
                   </span>
                 </div>
                 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Growth Rate</span>
+                  <span className="text-muted-foreground">Growth</span>
                   <Badge variant="default" className="text-xs">
                     <TrendingUp className="mr-1 h-3 w-3" />
-                    {artist.growthRate}%
+                    {artist.metrics.streaming.growth}%
                   </Badge>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Rating</span>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
-                    <span className="font-semibold">{artist.rating}</span>
-                  </div>
+                  <span className="text-muted-foreground">Potential</span>
+                  <Badge 
+                    variant={artist.investmentPotential === 'high' ? 'default' : 'secondary'}
+                    className="text-xs capitalize"
+                  >
+                    {artist.investmentPotential}
+                  </Badge>
                 </div>
 
                 <Button 
@@ -300,7 +220,7 @@ export const ArtistProfiles: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Avatar className="h-16 w-16">
-                  <AvatarImage src={selectedArtist.avatar} />
+                  <AvatarImage src={selectedArtist.profileImage} />
                   <AvatarFallback>
                     {selectedArtist.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
@@ -308,11 +228,18 @@ export const ArtistProfiles: React.FC = () => {
                 <div>
                   <CardTitle className="text-2xl flex items-center gap-2">
                     {selectedArtist.name}
-                    {selectedArtist.verified && <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />}
+                    {selectedArtist.status === 'legend' && <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />}
                   </CardTitle>
                   <CardDescription className="capitalize">
-                    {selectedArtist.category} • {(selectedArtist.followers / 1000000).toFixed(1)}M followers
+                    {selectedArtist.description}
                   </CardDescription>
+                  <div className="flex gap-2 mt-2">
+                    {selectedArtist.achievements.slice(0, 3).map((achievement, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">
+                        {achievement}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </div>
               <Button onClick={() => setSelectedArtist(null)} variant="ghost" size="sm">
@@ -330,8 +257,11 @@ export const ArtistProfiles: React.FC = () => {
               </TabsList>
               
               <TabsContent value="performance" className="space-y-4">
+                <div className="text-sm text-muted-foreground mb-2">
+                  * Sample data for illustrative purposes
+                </div>
                 <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={selectedArtist.performance}>
+                  <LineChart data={generateChartData(selectedArtist)}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
                     <YAxis />
@@ -341,40 +271,103 @@ export const ArtistProfiles: React.FC = () => {
                       dataKey="revenue" 
                       stroke="hsl(var(--primary))" 
                       strokeWidth={2} 
-                      name="Revenue ($K)" 
+                      name="Revenue (NAD K)" 
                     />
+                    {selectedArtist.metrics.streaming.monthly > 0 && (
+                      <Line 
+                        type="monotone" 
+                        dataKey="streaming" 
+                        stroke="hsl(var(--secondary))" 
+                        strokeWidth={2} 
+                        name="Streams (K)" 
+                      />
+                    )}
                   </LineChart>
                 </ResponsiveContainer>
               </TabsContent>
 
               <TabsContent value="revenue" className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  {Object.entries(selectedArtist.revenue).map(([key, value]) => (
-                    <div key={key} className="p-3 border rounded-lg">
-                      <div className="text-sm text-muted-foreground capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                  {selectedArtist.metrics.streaming.monthly > 0 && (
+                    <div className="p-3 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">
+                        Monthly Streaming
                       </div>
                       <div className="text-xl font-bold mt-1">
-                        ${(value / 1000000).toFixed(2)}M
+                        {selectedArtist.metrics.streaming.monthly.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        plays/month
                       </div>
                     </div>
-                  ))}
+                  )}
+                  <div className="p-3 border rounded-lg">
+                    <div className="text-sm text-muted-foreground">
+                      Events Revenue
+                    </div>
+                    <div className="text-xl font-bold mt-1">
+                      NAD {(selectedArtist.metrics.events.annualRevenue / 1000).toFixed(0)}K
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {selectedArtist.metrics.events.bookings} bookings/year
+                    </div>
+                  </div>
+                  <div className="p-3 border rounded-lg">
+                    <div className="text-sm text-muted-foreground">
+                      Merchandise
+                    </div>
+                    <div className="text-xl font-bold mt-1">
+                      NAD {(selectedArtist.metrics.merchandise.revenue / 1000).toFixed(0)}K
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {selectedArtist.metrics.merchandise.items.join(', ')}
+                    </div>
+                  </div>
+                  <div className="p-3 border rounded-lg">
+                    <div className="text-sm text-muted-foreground">
+                      Total Annual
+                    </div>
+                    <div className="text-xl font-bold mt-1">
+                      NAD {((selectedArtist.metrics.events.annualRevenue + selectedArtist.metrics.merchandise.revenue) / 1000000).toFixed(1)}M
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Estimated revenue
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
 
               <TabsContent value="social" className="space-y-4">
                 <div className="space-y-3">
-                  {Object.entries(selectedArtist.socials).map(([platform, count]) => (
-                    <div key={platform} className="flex items-center justify-between">
-                      <span className="capitalize text-sm">{platform}</span>
-                      <div className="flex items-center gap-3">
-                        <Progress value={(count / 2000000) * 100} className="w-24" />
-                        <span className="text-sm font-semibold w-20 text-right">
-                          {(count / 1000000).toFixed(1)}M
-                        </span>
+                  {Object.entries(selectedArtist.metrics.social.platforms).map(([platform, count]) => (
+                    count && count > 0 ? (
+                      <div key={platform} className="flex items-center justify-between">
+                        <span className="capitalize text-sm">{platform}</span>
+                        <div className="flex items-center gap-3">
+                          <Progress value={Math.min((count / 500000) * 100, 100)} className="w-24" />
+                          <span className="text-sm font-semibold w-20 text-right">
+                            {count >= 1000000 
+                              ? `${(count / 1000000).toFixed(1)}M`
+                              : `${Math.round(count / 1000)}K`}
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    ) : null
                   ))}
+                  <div className="pt-2 border-t">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Total Reach</span>
+                      <span className="text-lg font-bold">
+                        {selectedArtist.metrics.social.followers >= 1000000 
+                          ? `${(selectedArtist.metrics.social.followers / 1000000).toFixed(1)}M`
+                          : `${Math.round(selectedArtist.metrics.social.followers / 1000)}K`}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-sm text-muted-foreground">Engagement Rate</span>
+                      <Badge variant="outline">{selectedArtist.metrics.social.engagement}%</Badge>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
 
@@ -385,8 +378,19 @@ export const ArtistProfiles: React.FC = () => {
                       <CardTitle className="text-sm">Booking Information</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-lg font-semibold">
-                        {selectedArtist.bookingRate || selectedArtist.projectBudget || selectedArtist.partnershipDeals || selectedArtist.fundingRound}
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Availability</span>
+                          <Badge variant={selectedArtist.availableForBooking ? "default" : "secondary"}>
+                            {selectedArtist.availableForBooking ? "Available" : "Booked"}
+                          </Badge>
+                        </div>
+                        {selectedArtist.metrics.events.avgTicketPrice > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Avg Ticket Price</span>
+                            <span className="font-medium">NAD {selectedArtist.metrics.events.avgTicketPrice}</span>
+                          </div>
+                        )}
                       </div>
                       <Button className="w-full mt-3" size="sm">
                         <Briefcase className="mr-2 h-4 w-4" />
@@ -402,7 +406,16 @@ export const ArtistProfiles: React.FC = () => {
                     <CardContent>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm">Growth Potential</span>
-                        <PredictionBadge value={selectedArtist.growthRate} confidence={0.85} />
+                        <PredictionBadge 
+                          value={selectedArtist.metrics.streaming.growth} 
+                          confidence={selectedArtist.investmentPotential === 'high' ? 0.85 : 0.65} 
+                        />
+                      </div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-sm text-muted-foreground">Investment Level</span>
+                        <Badge variant="outline" className="capitalize">
+                          {selectedArtist.investmentPotential}
+                        </Badge>
                       </div>
                       <Button className="w-full" variant="outline" size="sm">
                         <DollarSign className="mr-2 h-4 w-4" />

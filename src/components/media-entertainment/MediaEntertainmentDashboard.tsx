@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Film, Tv, Music, Gamepad2, Radio, DollarSign, Users, Globe } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TrendingUp, Film, Tv, Music, Gamepad2, Radio, DollarSign, Users, Globe, UserCircle, Star, Briefcase, Store } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
 import PredictionBadge from '@/components/market-data/PredictionBadge';
+import { ArtistProfiles } from './ArtistProfiles';
+import { CreativeEconomyIndex } from './CreativeEconomyIndex';
+import { DealsOpportunities } from './DealsOpportunities';
+import { MarketplaceShowcase } from './MarketplaceShowcase';
 
 // Mock data for visualization
 const boxOfficeData = [
@@ -48,296 +53,333 @@ const audienceEngagement = [
 ];
 
 export const MediaEntertainmentDashboard: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+
   return (
     <div className="space-y-6">
-      {/* Header Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Box Office Revenue</CardTitle>
-            <Film className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$4.8M</div>
-            <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center text-xs text-muted-foreground">
-                <TrendingUp className="mr-1 h-3 w-3 text-green-500" />
-                +24.5% from last month
-              </div>
-              <PredictionBadge value={32.5} confidence={0.82} />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Enhanced Navigation Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview" className="flex items-center gap-1">
+            <Globe className="h-4 w-4" />
+            <span className="hidden sm:inline">Overview</span>
+          </TabsTrigger>
+          <TabsTrigger value="creators" className="flex items-center gap-1">
+            <UserCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">Creators</span>
+          </TabsTrigger>
+          <TabsTrigger value="economy" className="flex items-center gap-1">
+            <Star className="h-4 w-4" />
+            <span className="hidden sm:inline">Economy</span>
+          </TabsTrigger>
+          <TabsTrigger value="deals" className="flex items-center gap-1">
+            <Briefcase className="h-4 w-4" />
+            <span className="hidden sm:inline">Deals</span>
+          </TabsTrigger>
+          <TabsTrigger value="marketplace" className="flex items-center gap-1">
+            <Store className="h-4 w-4" />
+            <span className="hidden sm:inline">Marketplace</span>
+          </TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Streaming Growth</CardTitle>
-            <Tv className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+35.2%</div>
-            <div className="flex items-center justify-between mt-2">
-              <div className="text-xs text-muted-foreground">
-                Local platform adoption
-              </div>
-              <PredictionBadge value={42.8} confidence={0.78} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Content Production</CardTitle>
-            <Music className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">350</div>
-            <div className="flex items-center justify-between mt-2">
-              <div className="text-xs text-muted-foreground">
-                Active productions
-              </div>
-              <PredictionBadge value={15.3} confidence={0.85} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Gaming Revenue</CardTitle>
-            <Gamepad2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$12.3M</div>
-            <div className="flex items-center justify-between mt-2">
-              <div className="text-xs text-muted-foreground">
-                Esports & mobile gaming
-              </div>
-              <PredictionBadge value={45.2} confidence={0.88} />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Box Office & Streaming Revenue */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <DollarSign className="mr-2 h-5 w-5" />
-              Revenue Trends
-            </CardTitle>
-            <CardDescription>Box office, streaming, and global market performance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={boxOfficeData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="local" stroke="#0EA5E9" strokeWidth={2} name="Local Box Office" />
-                <Line type="monotone" dataKey="global" stroke="#10B981" strokeWidth={2} name="Global Revenue" />
-                <Line type="monotone" dataKey="streaming" stroke="#F59E0B" strokeWidth={2} name="Streaming" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Streaming Platform Market Share */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Tv className="mr-2 h-5 w-5" />
-              Streaming Platform Market Share
-            </CardTitle>
-            <CardDescription>Distribution and growth rates by platform</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={streamingPlatforms}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="marketShare"
-                  label={({ name, marketShare }) => `${name}: ${marketShare}%`}
-                >
-                  {streamingPlatforms.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Content Production Analysis */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Film className="mr-2 h-5 w-5" />
-            Content Production Analysis
-          </CardTitle>
-          <CardDescription>Local vs international production output and budgets</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={contentProduction}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="category" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
-              <Tooltip />
-              <Bar yAxisId="left" dataKey="local" fill="#0EA5E9" name="Local Productions" />
-              <Bar yAxisId="left" dataKey="international" fill="#10B981" name="International" />
-              <Bar yAxisId="right" dataKey="budget" fill="#F59E0B" name="Budget ($M)" />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      {/* Gaming & Esports Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Gamepad2 className="mr-2 h-5 w-5" />
-              Gaming Industry Metrics
-            </CardTitle>
-            <CardDescription>Market penetration and growth by segment</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {gamingMetrics.map((metric, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary" />
-                    <span className="text-sm font-medium">{metric.metric}</span>
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          {/* Header Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Box Office Revenue</CardTitle>
+                <Film className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">$4.8M</div>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <TrendingUp className="mr-1 h-3 w-3 text-green-500" />
+                    +24.5% from last month
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <div className="text-sm font-bold">{metric.value}%</div>
-                      <div className="text-xs text-muted-foreground">Penetration</div>
+                  <PredictionBadge value={32.5} confidence={0.82} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Streaming Growth</CardTitle>
+                <Tv className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">+35.2%</div>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="text-xs text-muted-foreground">
+                    Local platform adoption
+                  </div>
+                  <PredictionBadge value={42.8} confidence={0.78} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Content Production</CardTitle>
+                <Music className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">350</div>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="text-xs text-muted-foreground">
+                    Active productions
+                  </div>
+                  <PredictionBadge value={15.3} confidence={0.85} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Gaming Revenue</CardTitle>
+                <Gamepad2 className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">$12.3M</div>
+                <div className="flex items-center justify-between mt-2">
+                  <div className="text-xs text-muted-foreground">
+                    Esports & mobile gaming
+                  </div>
+                  <PredictionBadge value={45.2} confidence={0.88} />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Box Office & Streaming Revenue */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <DollarSign className="mr-2 h-5 w-5" />
+                  Revenue Trends
+                </CardTitle>
+                <CardDescription>Box office, streaming, and global market performance</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={boxOfficeData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="local" stroke="#0EA5E9" strokeWidth={2} name="Local Box Office" />
+                    <Line type="monotone" dataKey="global" stroke="#10B981" strokeWidth={2} name="Global Revenue" />
+                    <Line type="monotone" dataKey="streaming" stroke="#F59E0B" strokeWidth={2} name="Streaming" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            {/* Streaming Platform Market Share */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Tv className="mr-2 h-5 w-5" />
+                  Streaming Platform Market Share
+                </CardTitle>
+                <CardDescription>Distribution and growth rates by platform</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={streamingPlatforms}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="marketShare"
+                      label={({ name, marketShare }) => `${name}: ${marketShare}%`}
+                    >
+                      {streamingPlatforms.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Content Production Analysis */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Film className="mr-2 h-5 w-5" />
+                Content Production Analysis
+              </CardTitle>
+              <CardDescription>Local vs international production output and budgets</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={contentProduction}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="category" />
+                  <YAxis yAxisId="left" />
+                  <YAxis yAxisId="right" orientation="right" />
+                  <Tooltip />
+                  <Bar yAxisId="left" dataKey="local" fill="#0EA5E9" name="Local Productions" />
+                  <Bar yAxisId="left" dataKey="international" fill="#10B981" name="International" />
+                  <Bar yAxisId="right" dataKey="budget" fill="#F59E0B" name="Budget ($M)" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Gaming & Esports Metrics */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Gamepad2 className="mr-2 h-5 w-5" />
+                  Gaming Industry Metrics
+                </CardTitle>
+                <CardDescription>Market penetration and growth by segment</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {gamingMetrics.map((metric, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-primary" />
+                        <span className="text-sm font-medium">{metric.metric}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <div className="text-sm font-bold">{metric.value}%</div>
+                          <div className="text-xs text-muted-foreground">Penetration</div>
+                        </div>
+                        <Badge variant={metric.growth > 30 ? 'default' : 'secondary'}>
+                          +{metric.growth}%
+                        </Badge>
+                      </div>
                     </div>
-                    <Badge variant={metric.growth > 30 ? 'default' : 'secondary'}>
-                      +{metric.growth}%
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Audience Engagement */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Users className="mr-2 h-5 w-5" />
+                  Audience Engagement Analysis
+                </CardTitle>
+                <CardDescription>Engagement rates and reach by platform</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={250}>
+                  <RadarChart data={audienceEngagement}>
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="platform" />
+                    <PolarRadiusAxis angle={90} domain={[0, 10]} />
+                    <Radar name="Engagement" dataKey="engagement" stroke="#0EA5E9" fill="#0EA5E9" fillOpacity={0.6} />
+                    <Radar name="Reach (M)" dataKey="reach" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
+                    <Tooltip />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Cultural Export/Import */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Globe className="mr-2 h-5 w-5" />
+                Cultural Content Exchange
+              </CardTitle>
+              <CardDescription>Import and export value of entertainment content</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-lg font-semibold text-blue-600">Content Exports</div>
+                  <div className="text-3xl font-bold mt-2">$8.5M</div>
+                  <div className="text-sm text-muted-foreground mt-1">Film, music, digital content</div>
+                  <Badge className="mt-2">+18.7% YoY</Badge>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-lg font-semibold text-green-600">Content Imports</div>
+                  <div className="text-3xl font-bold mt-2">$12.3M</div>
+                  <div className="text-sm text-muted-foreground mt-1">International productions</div>
+                  <Badge className="mt-2">+22.4% YoY</Badge>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <div className="text-lg font-semibold text-purple-600">Trade Balance</div>
+                  <div className="text-3xl font-bold mt-2">-$3.8M</div>
+                  <div className="text-sm text-muted-foreground mt-1">Import deficit</div>
+                  <Badge variant="secondary" className="mt-2">Improving</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Advertising & Marketing Spend */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Radio className="mr-2 h-5 w-5" />
+                Advertising & Marketing Analytics
+              </CardTitle>
+              <CardDescription>Media spend distribution and ROI by channel</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  { channel: 'Digital Advertising', spend: 4.2, roi: 3.8, growth: 28.5 },
+                  { channel: 'TV & Radio', spend: 2.8, roi: 2.1, growth: -5.2 },
+                  { channel: 'Social Media', spend: 3.5, roi: 4.2, growth: 42.3 },
+                  { channel: 'Outdoor & Print', spend: 1.2, roi: 1.5, growth: -12.8 },
+                  { channel: 'Event Sponsorship', spend: 2.1, roi: 2.8, growth: 15.6 },
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="font-medium">{item.channel}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Spend: ${item.spend}M | ROI: {item.roi}x
+                      </div>
+                    </div>
+                    <Badge variant={item.growth > 0 ? 'default' : 'destructive'}>
+                      {item.growth > 0 ? '+' : ''}{item.growth}%
                     </Badge>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Audience Engagement */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Users className="mr-2 h-5 w-5" />
-              Audience Engagement Analysis
-            </CardTitle>
-            <CardDescription>Engagement rates and reach by platform</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <RadarChart data={audienceEngagement}>
-                <PolarGrid />
-                <PolarAngleAxis dataKey="platform" />
-                <PolarRadiusAxis angle={90} domain={[0, 10]} />
-                <Radar name="Engagement" dataKey="engagement" stroke="#0EA5E9" fill="#0EA5E9" fillOpacity={0.6} />
-                <Radar name="Reach (M)" dataKey="reach" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
-                <Tooltip />
-              </RadarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Cultural Export/Import */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Globe className="mr-2 h-5 w-5" />
-            Cultural Content Exchange
-          </CardTitle>
-          <CardDescription>Import and export value of entertainment content</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-lg font-semibold text-blue-600">Content Exports</div>
-              <div className="text-3xl font-bold mt-2">$8.5M</div>
-              <div className="text-sm text-muted-foreground mt-1">Film, music, digital content</div>
-              <Badge className="mt-2">+18.7% YoY</Badge>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-lg font-semibold text-green-600">Content Imports</div>
-              <div className="text-3xl font-bold mt-2">$12.3M</div>
-              <div className="text-sm text-muted-foreground mt-1">International productions</div>
-              <Badge className="mt-2">+22.4% YoY</Badge>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-lg font-semibold text-purple-600">Trade Balance</div>
-              <div className="text-3xl font-bold mt-2">-$3.8M</div>
-              <div className="text-sm text-muted-foreground mt-1">Import deficit</div>
-              <Badge variant="secondary" className="mt-2">Improving</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Advertising & Marketing Spend */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Radio className="mr-2 h-5 w-5" />
-            Advertising & Marketing Analytics
-          </CardTitle>
-          <CardDescription>Media spend distribution and ROI by channel</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[
-              { channel: 'Digital Advertising', spend: 4.2, roi: 3.8, growth: 28.5 },
-              { channel: 'TV & Radio', spend: 2.8, roi: 2.1, growth: -5.2 },
-              { channel: 'Social Media', spend: 3.5, roi: 4.2, growth: 42.3 },
-              { channel: 'Outdoor & Print', spend: 1.2, roi: 1.5, growth: -12.8 },
-              { channel: 'Event Sponsorship', spend: 2.1, roi: 2.8, growth: 15.6 },
-            ].map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex-1">
-                  <div className="font-medium">{item.channel}</div>
-                  <div className="text-sm text-muted-foreground">
-                    Spend: ${item.spend}M | ROI: {item.roi}x
-                  </div>
-                </div>
-                <Badge variant={item.growth > 0 ? 'default' : 'destructive'}>
-                  {item.growth > 0 ? '+' : ''}{item.growth}%
-                </Badge>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Investment Opportunities Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Media & Entertainment Investment Opportunities</CardTitle>
-          <CardDescription>High-growth opportunities in content production, streaming, and gaming</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <Film className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p>Investment opportunities data loading...</p>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Artist & Creators Tab */}
+        <TabsContent value="creators">
+          <ArtistProfiles />
+        </TabsContent>
+
+        {/* Creative Economy Tab */}
+        <TabsContent value="economy">
+          <CreativeEconomyIndex />
+        </TabsContent>
+
+        {/* Deals & Opportunities Tab */}
+        <TabsContent value="deals">
+          <DealsOpportunities />
+        </TabsContent>
+
+        {/* Marketplace Tab */}
+        <TabsContent value="marketplace">
+          <MarketplaceShowcase />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

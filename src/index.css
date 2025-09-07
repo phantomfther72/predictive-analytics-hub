@@ -263,7 +263,12 @@
   
   /* Link styles */
   a {
-    @apply text-primary hover:text-primary-variant transition-colors duration-200;
+    @apply text-primary transition-colors duration-200;
+    color: hsl(var(--primary));
+  }
+  
+  a:hover {
+    color: hsl(var(--primary-variant));
     text-decoration: none;
   }
   

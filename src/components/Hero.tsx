@@ -128,7 +128,7 @@ const Hero = () => {
 
             {/* Main headline */}
             <div className="animate-fade-up animation-delay-200">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-tight">
+              <h1 className="text-responsive-4xl font-bold text-white leading-tight">
                 Outsmart the Market.
                 <br />
                 <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
@@ -139,7 +139,7 @@ const Hero = () => {
 
             {/* Subheadline */}
             <div className="animate-fade-up animation-delay-400">
-              <p className="text-xl sm:text-2xl lg:text-3xl text-slate-300 max-w-4xl mx-auto leading-relaxed font-medium">
+              <p className="text-responsive-xl text-slate-300 max-w-4xl mx-auto leading-relaxed font-medium px-4">
                 AI-powered insights across <span className="text-green-400 font-bold">global equities</span>, oil & gas, agriculture, mining—
                 <br className="hidden sm:block" />
                 and <span className="text-green-400 font-bold">Namibia's untapped alpha</span>.
@@ -152,21 +152,21 @@ const Hero = () => {
             </div>
 
             {/* CTA Buttons */}
-            <div className="animate-fade-up animation-delay-600 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="animate-fade-up animation-delay-600 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
               <button 
                 onClick={() => navigate('/global-equity')}
-                className="group inline-flex items-center px-8 py-4 text-lg font-bold text-black bg-gradient-to-r from-green-400 to-emerald-300 rounded-xl shadow-xl hover:shadow-2xl hover:from-green-300 hover:to-emerald-200 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300/50"
+                className="group inline-flex items-center btn-responsive-lg font-bold text-black bg-gradient-to-r from-green-400 to-emerald-300 rounded-xl shadow-xl hover:shadow-2xl hover:from-green-300 hover:to-emerald-200 transition-all duration-300 transform hover:scale-105 focus-ring touch-target w-full sm:w-auto"
               >
-                <Globe className="mr-3 h-6 w-6" />
+                <Globe className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
                 Launch Your AI Fund
-                <ArrowRight className="ml-3 h-6 w-6 transition-transform group-hover:translate-x-1" />
+                <ArrowRight className="ml-2 sm:ml-3 h-5 w-5 sm:h-6 sm:w-6 transition-transform group-hover:translate-x-1" />
               </button>
               
               <button 
                 onClick={scrollToMarketData}
-                className="group inline-flex items-center px-8 py-4 text-lg font-bold text-white bg-transparent border-2 border-green-400 rounded-xl hover:bg-green-400/10 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300/50"
+                className="group inline-flex items-center btn-responsive-lg font-bold text-white bg-transparent border-2 border-green-400 rounded-xl hover:bg-green-400/10 transition-all duration-300 transform hover:scale-105 focus-ring touch-target w-full sm:w-auto"
               >
-                <Play className="mr-3 h-6 w-6" />
+                <Play className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
                 Explore Live Dashboards
               </button>
             </div>

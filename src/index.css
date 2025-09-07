@@ -39,6 +39,8 @@
     
     /* Design system */
     --radius: 0.75rem;
+    --radius-sm: 0.5rem;
+    --radius-lg: 1rem;
     
     /* Risk level colors */
     --risk-low: 142 76% 36%;
@@ -66,6 +68,56 @@
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Typography scale */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+    
+    /* Line heights */
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+    
+    /* Font weights */
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    
+    /* Spacing scale */
+    --space-0: 0;
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+    
+    /* Z-index scale */
+    --z-base: 0;
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
   }
 
   .dark {
@@ -144,146 +196,338 @@
     --terminal-accent-gradient: linear-gradient(90deg, hsl(18 95% 55%), hsl(200 100% 55%));
   }
 
-  /* Improved responsive typography */
+  /* Typography system */
   html {
     font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: var(--leading-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 640px) {
     html {
-      font-size: 93.75%; /* Slightly smaller base font size for mobile */
+      font-size: 15px;
+    }
+  }
+  
+  @media (min-width: 1536px) {
+    html {
+      font-size: 17px;
     }
   }
   
   * {
     @apply border-border;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
   
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-semibold;
+  /* Consistent heading styles */
+  h1 {
+    @apply font-heading font-bold text-3xl sm:text-4xl lg:text-5xl leading-tight mb-4;
+  }
+  
+  h2 {
+    @apply font-heading font-semibold text-2xl sm:text-3xl lg:text-4xl leading-tight mb-3;
+  }
+  
+  h3 {
+    @apply font-heading font-semibold text-xl sm:text-2xl lg:text-3xl leading-snug mb-3;
+  }
+  
+  h4 {
+    @apply font-heading font-medium text-lg sm:text-xl lg:text-2xl leading-snug mb-2;
+  }
+  
+  h5 {
+    @apply font-heading font-medium text-base sm:text-lg lg:text-xl leading-normal mb-2;
+  }
+  
+  h6 {
+    @apply font-heading font-medium text-sm sm:text-base lg:text-lg leading-normal mb-2;
+  }
+  
+  /* Paragraph styles */
+  p {
+    @apply text-base leading-relaxed mb-4;
+    max-width: 65ch;
+  }
+  
+  /* Link styles */
+  a {
+    @apply text-primary hover:text-primary-variant transition-colors duration-200;
+    text-decoration: none;
+  }
+  
+  /* List styles */
+  ul, ol {
+    @apply mb-4 pl-6;
+  }
+  
+  li {
+    @apply mb-2;
+  }
+  
+  /* Button base styles */
+  button {
+    @apply touch-target transition-all duration-200;
+    cursor: pointer;
+  }
+  
+  /* Input base styles */
+  input, textarea, select {
+    @apply w-full px-3 py-2 rounded-md border border-input bg-background;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  
+  /* Focus styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
+  
+  /* Selection styles */
+  ::selection {
+    @apply bg-primary text-primary-foreground;
   }
 }
 
-/* Enhanced mobile-optimized layout utilities */
+/* Comprehensive utility classes */
 @layer utilities {
-  /* Container utilities */
-  .mobile-container {
-    @apply px-3 sm:px-4 w-full mx-auto;
+  /* Consistent spacing system */
+  .container-responsive {
+    @apply w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
   }
   
-  /* Section spacing */
-  .mobile-section {
-    @apply py-3 sm:py-4 md:py-6;
+  .section-spacing {
+    @apply py-8 sm:py-12 lg:py-16;
   }
   
-  /* Card padding */
-  .mobile-card {
-    @apply p-3 sm:p-4;
+  .card-spacing {
+    @apply p-4 sm:p-6 lg:p-8;
   }
   
-  /* Navigation and menu items */
-  .mobile-menu-item {
-    @apply py-3 px-3 sm:px-4;
+  .stack-sm {
+    @apply space-y-2;
   }
   
-  /* Touch target size for mobile - ensuring accessibility standards */
-  .touch-target {
-    @apply min-h-[48px] min-w-[48px];
+  .stack-md {
+    @apply space-y-4;
   }
   
-  /* Mobile transitions - smoother animations */
-  .mobile-transition {
-    @apply transition-all duration-300 ease-in-out;
+  .stack-lg {
+    @apply space-y-6 sm:space-y-8;
   }
   
-  /* Mobile-friendly scroll areas */
-  .mobile-scroll {
-    @apply overflow-x-auto pb-2;
-    -webkit-overflow-scrolling: touch;
+  /* Consistent grid layouts */
+  .grid-responsive {
+    @apply grid gap-4 sm:gap-6 lg:gap-8;
   }
   
-  /* Responsive text utilities */
-  .responsive-text-sm {
+  .grid-cols-responsive {
+    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+  
+  .grid-cols-responsive-sm {
+    @apply grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  }
+  
+  .grid-cols-responsive-lg {
+    @apply grid-cols-1 md:grid-cols-2 xl:grid-cols-3;
+  }
+  
+  /* Consistent flex layouts */
+  .flex-responsive {
+    @apply flex flex-col sm:flex-row;
+  }
+  
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+  
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+  
+  .flex-wrap-responsive {
+    @apply flex flex-wrap gap-2 sm:gap-3 lg:gap-4;
+  }
+  
+  /* Text utilities */
+  .text-responsive-xs {
+    @apply text-[0.625rem] sm:text-xs;
+  }
+  
+  .text-responsive-sm {
     @apply text-xs sm:text-sm;
   }
   
-  .responsive-text-base {
+  .text-responsive-base {
     @apply text-sm sm:text-base;
   }
   
-  .responsive-text-lg {
-    @apply text-base sm:text-lg;
+  .text-responsive-lg {
+    @apply text-base sm:text-lg lg:text-xl;
   }
   
-  .responsive-text-xl {
-    @apply text-lg sm:text-xl md:text-2xl;
+  .text-responsive-xl {
+    @apply text-lg sm:text-xl lg:text-2xl;
   }
   
-  /* Active state and touch feedback */
-  .touch-feedback {
-    @apply active:bg-slate-100 dark:active:bg-slate-800 active:scale-95 transition-all duration-150;
+  .text-responsive-2xl {
+    @apply text-xl sm:text-2xl lg:text-3xl;
   }
   
-  /* Custom focus styles for better visibility */
-  .focus-visible-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-500;
-  }
-
-  /* Grid layout utilities */
-  .responsive-grid-cols-1 {
-    @apply grid grid-cols-1;
+  .text-responsive-3xl {
+    @apply text-2xl sm:text-3xl lg:text-4xl;
   }
   
-  .responsive-grid-cols-2 {
-    @apply grid grid-cols-1 sm:grid-cols-2;
+  .text-responsive-4xl {
+    @apply text-3xl sm:text-4xl lg:text-5xl;
   }
   
-  .responsive-grid-cols-3 {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3;
+  /* Touch targets for accessibility */
+  .touch-target {
+    @apply min-h-[44px] sm:min-h-[48px] min-w-[44px] sm:min-w-[48px];
   }
   
-  .responsive-grid-cols-4 {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
+  .touch-target-sm {
+    @apply min-h-[36px] min-w-[36px];
   }
   
-  /* PredictivePulse specific branding colors */
-  .bg-pulse-deep-blue {
-    @apply bg-slate-900;
+  /* Button sizes */
+  .btn-responsive {
+    @apply px-3 py-2 text-sm sm:px-4 sm:py-2.5 sm:text-base;
   }
   
-  .text-pulse-deep-blue {
-    @apply text-slate-900;
+  .btn-responsive-sm {
+    @apply px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm;
   }
   
-  .bg-pulse-teal {
-    @apply bg-teal-500;
+  .btn-responsive-lg {
+    @apply px-4 py-3 text-base sm:px-6 sm:py-3.5 sm:text-lg;
   }
   
-  .text-pulse-teal {
-    @apply text-teal-500;
+  /* Card styles */
+  .card-responsive {
+    @apply bg-card text-card-foreground rounded-lg shadow-md border border-border;
   }
   
-  .border-pulse-teal {
-    @apply border-teal-500;
+  .card-hover {
+    @apply hover:shadow-lg hover:scale-[1.02] transition-all duration-200;
   }
-
-  /* Text clamp utilities for better text overflow handling */
+  
+  /* Input styles */
+  .input-responsive {
+    @apply w-full px-3 py-2 text-sm sm:px-4 sm:py-2.5 sm:text-base;
+  }
+  
+  /* Scroll areas */
+  .scroll-area {
+    @apply overflow-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .scroll-x {
+    @apply overflow-x-auto overflow-y-hidden;
+  }
+  
+  .scroll-y {
+    @apply overflow-y-auto overflow-x-hidden;
+  }
+  
+  /* Focus states */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
+  }
+  
+  .focus-within-ring {
+    @apply focus-within:outline-none focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2;
+  }
+  
+  /* Hover states */
+  .hover-scale {
+    @apply hover:scale-105 transition-transform duration-200;
+  }
+  
+  .hover-opacity {
+    @apply hover:opacity-80 transition-opacity duration-200;
+  }
+  
+  /* Active states */
+  .active-scale {
+    @apply active:scale-95 transition-transform duration-150;
+  }
+  
+  /* Disabled states */
+  .disabled-state {
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none;
+  }
+  
+  /* Text truncation */
+  .truncate-responsive {
+    @apply truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[250px];
+  }
+  
+  .line-clamp-1 {
+    @apply line-clamp-1;
+  }
+  
   .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    @apply line-clamp-2;
   }
   
   .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    @apply line-clamp-3;
+  }
+  
+  /* Z-index utilities */
+  .z-dropdown {
+    z-index: var(--z-dropdown);
+  }
+  
+  .z-sticky {
+    z-index: var(--z-sticky);
+  }
+  
+  .z-modal {
+    z-index: var(--z-modal);
+  }
+  
+  .z-popover {
+    z-index: var(--z-popover);
+  }
+  
+  .z-tooltip {
+    z-index: var(--z-tooltip);
+  }
+  
+  /* Aspect ratios */
+  .aspect-responsive {
+    @apply aspect-square sm:aspect-video lg:aspect-[4/3];
+  }
+  
+  /* Backdrop utilities */
+  .backdrop-blur-responsive {
+    @apply backdrop-blur-sm sm:backdrop-blur-md;
+  }
+  
+  /* Border radius */
+  .rounded-responsive {
+    @apply rounded-md sm:rounded-lg;
+  }
+  
+  /* Shadow utilities */
+  .shadow-responsive {
+    @apply shadow-sm sm:shadow-md lg:shadow-lg;
   }
 }
 

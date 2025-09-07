@@ -482,18 +482,6 @@
     @apply truncate max-w-[150px] sm:max-w-[200px] lg:max-w-[250px];
   }
   
-  .line-clamp-1 {
-    @apply line-clamp-1;
-  }
-  
-  .line-clamp-2 {
-    @apply line-clamp-2;
-  }
-  
-  .line-clamp-3 {
-    @apply line-clamp-3;
-  }
-  
   /* Z-index utilities */
   .z-dropdown {
     z-index: var(--z-dropdown);

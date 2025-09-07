@@ -1,21 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, TrendingUp, AlertTriangle, BarChart3, Activity, Zap } from 'lucide-react';
-import { useDataPoints, useForecasts, useHeatmaps } from '@/hooks/usePredictiveData';
-
-interface NamibianHeatmapProps {
-  selectedIndustry?: string;
-  selectedMetric?: string;
-}
-
-export const NamibianHeatmap: React.FC<NamibianHeatmapProps> = ({ 
-  selectedIndustry, 
-  selectedMetric 
-}) => {
+// Re-export the accurate Namibia heatmap component
+export { NamibiaHeatmap as NamibianHeatmap } from '@/components/namibia/NamibiaHeatmap';
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'risk' | 'growth' | 'investment'>('risk');
   const [timeRange, setTimeRange] = useState('1M');

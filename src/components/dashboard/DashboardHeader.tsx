@@ -66,8 +66,8 @@ export const DashboardHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
-      <div className="container flex h-14 md:h-16 items-center justify-between">
+    <header className="sticky top-0 z-[var(--z-sticky)] w-full border-b border-border/40 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/60 shadow-sm">
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 flex h-14 md:h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           {isMobile && (
             <Button 
@@ -81,10 +81,10 @@ export const DashboardHeader = () => {
             </Button>
           )}
           <span className={cn(
-            "font-display font-semibold text-slate-900 dark:text-white truncate transition-all",
+            "font-heading font-semibold text-foreground truncate transition-all",
             isMobile ? "text-base max-w-[160px]" : "text-lg sm:text-xl"
           )}>
-            <span className="bg-gradient-to-r from-blue-700 to-teal-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-primary-variant bg-clip-text text-transparent">
               Predictive Pulse
             </span>
           </span>

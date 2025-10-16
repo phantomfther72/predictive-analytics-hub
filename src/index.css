@@ -231,34 +231,41 @@
   }
   
   /* Consistent heading styles */
+  /* Unified heading system with consistent spacing */
   h1 {
-    @apply font-heading font-bold text-3xl sm:text-4xl lg:text-5xl leading-tight mb-4;
+    @apply font-heading font-bold text-3xl sm:text-4xl lg:text-5xl leading-tight text-foreground mb-4;
   }
   
   h2 {
-    @apply font-heading font-semibold text-2xl sm:text-3xl lg:text-4xl leading-tight mb-3;
+    @apply font-heading font-semibold text-2xl sm:text-3xl lg:text-4xl leading-tight text-foreground mb-3;
   }
   
   h3 {
-    @apply font-heading font-semibold text-xl sm:text-2xl lg:text-3xl leading-snug mb-3;
+    @apply font-heading font-semibold text-xl sm:text-2xl lg:text-3xl leading-snug text-foreground mb-3;
   }
   
   h4 {
-    @apply font-heading font-medium text-lg sm:text-xl lg:text-2xl leading-snug mb-2;
+    @apply font-heading font-medium text-lg sm:text-xl lg:text-2xl leading-snug text-foreground mb-2;
   }
   
   h5 {
-    @apply font-heading font-medium text-base sm:text-lg lg:text-xl leading-normal mb-2;
+    @apply font-heading font-medium text-base sm:text-lg lg:text-xl leading-normal text-foreground mb-2;
   }
   
   h6 {
-    @apply font-heading font-medium text-sm sm:text-base lg:text-lg leading-normal mb-2;
+    @apply font-heading font-medium text-sm sm:text-base lg:text-lg leading-normal text-foreground mb-2;
   }
   
-  /* Paragraph styles */
+  /* Paragraph styles with consistent color */
   p {
-    @apply text-base leading-relaxed mb-4;
+    @apply text-base leading-relaxed text-foreground mb-4;
     max-width: 65ch;
+  }
+  
+  /* Prevent text overflow globally */
+  * {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
   /* Link styles */
@@ -521,6 +528,84 @@
   /* Shadow utilities */
   .shadow-responsive {
     @apply shadow-sm sm:shadow-md lg:shadow-lg;
+  }
+  
+  /* Prevent layout overlap issues */
+  .layout-safe {
+    position: relative;
+    z-index: var(--z-base);
+    overflow: hidden;
+  }
+  
+  .text-no-overlap {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+  }
+  
+  /* Chart and table container safety */
+  .chart-container {
+    @apply w-full overflow-hidden rounded-lg;
+    min-height: 200px;
+  }
+  
+  .table-container {
+    @apply w-full overflow-x-auto rounded-lg border border-border;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ensure proper stacking context */
+  .card-layer {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .overlay-layer {
+    position: relative;
+    z-index: 2;
+  }
+  
+  /* Fix flex/grid alignment issues */
+  .flex-safe {
+    @apply flex flex-wrap gap-4;
+    min-width: 0; /* Prevent flex overflow */
+  }
+  
+  .grid-safe {
+    @apply grid gap-4;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  
+  /* Responsive text sizing with no clipping */
+  .text-responsive-safe {
+    @apply text-sm sm:text-base lg:text-lg;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+  }
+  
+  /* Ensure proper header spacing */
+  .header-spacing {
+    @apply mb-4 sm:mb-6 lg:mb-8;
+  }
+  
+  /* Consistent card padding */
+  .card-padding-safe {
+    @apply p-4 sm:p-6 lg:p-8;
+  }
+  
+  /* Prevent badge/chip overflow */
+  .badge-safe {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs whitespace-nowrap;
+    max-width: 100%;
+  }
+  
+  /* Table cell safety */
+  .table-cell-safe {
+    @apply p-3 sm:p-4 align-middle;
+    min-width: 80px;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

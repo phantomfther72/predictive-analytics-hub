@@ -46,36 +46,36 @@ export const AppNavbar: React.FC = () => {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-      <div className="h-full px-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <header className="h-16 border-b border-border bg-card/95 backdrop-blur-md sticky top-0 z-[var(--z-sticky)] shadow-sm">
+      <div className="h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between max-w-[1600px] mx-auto">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <h1 
-            className="text-xl font-semibold bg-gradient-to-r from-primary to-primary-variant bg-clip-text text-transparent cursor-pointer"
+            className="text-lg sm:text-xl font-semibold bg-gradient-to-r from-primary to-primary-variant bg-clip-text text-transparent cursor-pointer truncate"
             onClick={() => navigate('/')}
           >
             PredictivePulse
           </h1>
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs hidden sm:inline-flex whitespace-nowrap">
             Intelligence Platform
           </Badge>
           {isDevMode && (
-            <Badge variant="outline" className="text-xs bg-terminal-orange/10 text-terminal-orange border-terminal-orange/30">
+            <Badge variant="outline" className="text-xs bg-terminal-orange/10 text-terminal-orange border-terminal-orange/30 whitespace-nowrap">
               <Code className="h-3 w-3 mr-1" />
-              Dev Mode
+              <span className="hidden sm:inline">Dev Mode</span>
             </Badge>
           )}
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {hasRole('admin') && (
             <Button
               variant="outline"
               size="sm"
               onClick={handleRefreshData}
-              className="gap-2"
+              className="gap-2 hidden lg:flex"
             >
               <RefreshCw className="h-4 w-4" />
-              Refresh Data
+              <span className="hidden xl:inline">Refresh Data</span>
             </Button>
           )}
 
@@ -86,7 +86,7 @@ export const AppNavbar: React.FC = () => {
             className="gap-2"
           >
             <Terminal className="h-4 w-4" />
-            Terminal
+            <span className="hidden md:inline">Terminal</span>
           </Button>
           
           <Button variant="ghost" size="sm" className="relative">
@@ -104,16 +104,16 @@ export const AppNavbar: React.FC = () => {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64" align="end">
+            <DropdownMenuContent className="w-64 sm:w-72" align="end">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-2">
-                  <p className="text-sm font-medium leading-none truncate">
+                  <p className="text-sm font-medium leading-none truncate max-w-[240px]">
                     {user?.email}
                   </p>
                   {userRole && (
                     <Badge 
                       variant={getRoleColor(userRole.role)}
-                      className="w-fit text-xs"
+                      className="w-fit text-xs whitespace-nowrap"
                     >
                       {userRole.role.charAt(0).toUpperCase() + userRole.role.slice(1)}
                     </Badge>

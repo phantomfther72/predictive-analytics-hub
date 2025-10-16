@@ -61,7 +61,7 @@ export const AppLayout: React.FC = () => {
           <AppNavbar />
           
           <main className="flex-1 overflow-auto bg-gradient-to-br from-background via-background to-muted/30">
-            <div className="container mx-auto p-6 space-y-6">
+            <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
               {/* Show upgrade banner for guest users */}
               {profile?.role === 'guest' && showUpgradeBanner && (
                 <UpgradeBanner onDismiss={() => setShowUpgradeBanner(false)} />

@@ -21,8 +21,15 @@ const MediaEntertainment: React.FC = () => {
   }, [error, toast]);
 
   return (
-    <div className="container mx-auto p-4 space-y-8">
-      <h1 className="text-3xl font-bold mb-6">Media & Entertainment Sector Dashboard</h1>
+    <div className="w-full space-y-6">
+      <div className="mb-6">
+        <h1 className="font-heading font-bold text-3xl sm:text-4xl text-foreground mb-2">
+          Media & Entertainment Sector
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base">
+          Real-time insights and predictions for the media and entertainment industry
+        </p>
+      </div>
       
       {error && (
         <Alert variant="destructive">

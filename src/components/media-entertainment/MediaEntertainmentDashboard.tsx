@@ -56,62 +56,62 @@ export const MediaEntertainmentDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* Enhanced Navigation Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview" className="flex items-center gap-1">
-            <Globe className="h-4 w-4" />
-            <span className="hidden sm:inline">Overview</span>
+        <TabsList className="grid w-full grid-cols-5 h-auto">
+          <TabsTrigger value="overview" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+            <Globe className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline truncate">Overview</span>
           </TabsTrigger>
-          <TabsTrigger value="creators" className="flex items-center gap-1">
-            <UserCircle className="h-4 w-4" />
-            <span className="hidden sm:inline">Creators</span>
+          <TabsTrigger value="creators" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+            <UserCircle className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline truncate">Creators</span>
           </TabsTrigger>
-          <TabsTrigger value="economy" className="flex items-center gap-1">
-            <Star className="h-4 w-4" />
-            <span className="hidden sm:inline">Economy</span>
+          <TabsTrigger value="economy" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+            <Star className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline truncate">Economy</span>
           </TabsTrigger>
-          <TabsTrigger value="deals" className="flex items-center gap-1">
-            <Briefcase className="h-4 w-4" />
-            <span className="hidden sm:inline">Deals</span>
+          <TabsTrigger value="deals" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+            <Briefcase className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline truncate">Deals</span>
           </TabsTrigger>
-          <TabsTrigger value="marketplace" className="flex items-center gap-1">
-            <Store className="h-4 w-4" />
-            <span className="hidden sm:inline">Marketplace</span>
+          <TabsTrigger value="marketplace" className="flex items-center gap-2 py-3 text-xs sm:text-sm">
+            <Store className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline truncate">Marketplace</span>
           </TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
+        <TabsContent value="overview" className="space-y-6 mt-6">
           {/* Header Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Box Office Revenue</CardTitle>
-                <Film className="h-4 w-4 text-muted-foreground" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="relative overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-card-foreground">Box Office Revenue</CardTitle>
+                <Film className="h-5 w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">$4.8M</div>
-                <div className="flex items-center justify-between mt-2">
+              <CardContent className="space-y-2">
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">$4.8M</div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div className="flex items-center text-xs text-muted-foreground">
-                    <TrendingUp className="mr-1 h-3 w-3 text-green-500" />
-                    +24.5% from last month
+                    <TrendingUp className="mr-1 h-3 w-3 text-green-500 flex-shrink-0" />
+                    <span className="truncate">+24.5% from last month</span>
                   </div>
                   <PredictionBadge value={32.5} confidence={0.82} />
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Streaming Growth</CardTitle>
-                <Tv className="h-4 w-4 text-muted-foreground" />
+            <Card className="relative overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-card-foreground">Streaming Growth</CardTitle>
+                <Tv className="h-5 w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+35.2%</div>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="text-xs text-muted-foreground">
+              <CardContent className="space-y-2">
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">+35.2%</div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="text-xs text-muted-foreground truncate">
                     Local platform adoption
                   </div>
                   <PredictionBadge value={42.8} confidence={0.78} />
@@ -119,15 +119,15 @@ export const MediaEntertainmentDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Content Production</CardTitle>
-                <Music className="h-4 w-4 text-muted-foreground" />
+            <Card className="relative overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-card-foreground">Content Production</CardTitle>
+                <Music className="h-5 w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">350</div>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="text-xs text-muted-foreground">
+              <CardContent className="space-y-2">
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">350</div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="text-xs text-muted-foreground truncate">
                     Active productions
                   </div>
                   <PredictionBadge value={15.3} confidence={0.85} />
@@ -135,15 +135,15 @@ export const MediaEntertainmentDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Gaming Revenue</CardTitle>
-                <Gamepad2 className="h-4 w-4 text-muted-foreground" />
+            <Card className="relative overflow-hidden">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-medium text-card-foreground">Gaming Revenue</CardTitle>
+                <Gamepad2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">$12.3M</div>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="text-xs text-muted-foreground">
+              <CardContent className="space-y-2">
+                <div className="text-2xl sm:text-3xl font-bold text-foreground">$12.3M</div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="text-xs text-muted-foreground truncate">
                     Esports & mobile gaming
                   </div>
                   <PredictionBadge value={45.2} confidence={0.88} />
@@ -155,15 +155,17 @@ export const MediaEntertainmentDashboard: React.FC = () => {
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Box Office & Streaming Revenue */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <DollarSign className="mr-2 h-5 w-5" />
-                  Revenue Trends
+            <Card className="overflow-hidden">
+              <CardHeader className="space-y-2">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <DollarSign className="h-5 w-5 flex-shrink-0 text-primary" />
+                  <span className="truncate">Revenue Trends</span>
                 </CardTitle>
-                <CardDescription>Box office, streaming, and global market performance</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
+                  Box office, streaming, and global market performance
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-2">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={boxOfficeData}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -179,15 +181,17 @@ export const MediaEntertainmentDashboard: React.FC = () => {
             </Card>
 
             {/* Streaming Platform Market Share */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Tv className="mr-2 h-5 w-5" />
-                  Streaming Platform Market Share
+            <Card className="overflow-hidden">
+              <CardHeader className="space-y-2">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Tv className="h-5 w-5 flex-shrink-0 text-primary" />
+                  <span className="truncate">Streaming Platform Market Share</span>
                 </CardTitle>
-                <CardDescription>Distribution and growth rates by platform</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
+                  Distribution and growth rates by platform
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-2">
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
@@ -211,15 +215,17 @@ export const MediaEntertainmentDashboard: React.FC = () => {
           </div>
 
           {/* Content Production Analysis */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Film className="mr-2 h-5 w-5" />
-                Content Production Analysis
+          <Card className="overflow-hidden">
+            <CardHeader className="space-y-2">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <Film className="h-5 w-5 flex-shrink-0 text-primary" />
+                <span className="truncate">Content Production Analysis</span>
               </CardTitle>
-              <CardDescription>Local vs international production output and budgets</CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
+                Local vs international production output and budgets
+              </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-2">
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={contentProduction}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -237,28 +243,30 @@ export const MediaEntertainmentDashboard: React.FC = () => {
 
           {/* Gaming & Esports Metrics */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Gamepad2 className="mr-2 h-5 w-5" />
-                  Gaming Industry Metrics
+            <Card className="overflow-hidden">
+              <CardHeader className="space-y-2">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Gamepad2 className="h-5 w-5 flex-shrink-0 text-primary" />
+                  <span className="truncate">Gaming Industry Metrics</span>
                 </CardTitle>
-                <CardDescription>Market penetration and growth by segment</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
+                  Market penetration and growth by segment
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="pt-2">
+                <div className="space-y-3">
                   {gamingMetrics.map((metric, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-primary" />
-                        <span className="text-sm font-medium">{metric.metric}</span>
+                    <div key={index} className="flex items-center justify-between gap-3 p-3 rounded-lg border border-border bg-muted/30">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                        <span className="text-sm font-medium truncate">{metric.metric}</span>
                       </div>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3 flex-shrink-0">
                         <div className="text-right">
-                          <div className="text-sm font-bold">{metric.value}%</div>
-                          <div className="text-xs text-muted-foreground">Penetration</div>
+                          <div className="text-sm font-bold text-foreground">{metric.value}%</div>
+                          <div className="text-xs text-muted-foreground whitespace-nowrap">Penetration</div>
                         </div>
-                        <Badge variant={metric.growth > 30 ? 'default' : 'secondary'}>
+                        <Badge variant={metric.growth > 30 ? 'default' : 'secondary'} className="whitespace-nowrap">
                           +{metric.growth}%
                         </Badge>
                       </div>
@@ -269,15 +277,17 @@ export const MediaEntertainmentDashboard: React.FC = () => {
             </Card>
 
             {/* Audience Engagement */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Users className="mr-2 h-5 w-5" />
-                  Audience Engagement Analysis
+            <Card className="overflow-hidden">
+              <CardHeader className="space-y-2">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Users className="h-5 w-5 flex-shrink-0 text-primary" />
+                  <span className="truncate">Audience Engagement Analysis</span>
                 </CardTitle>
-                <CardDescription>Engagement rates and reach by platform</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
+                  Engagement rates and reach by platform
+                </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-2">
                 <ResponsiveContainer width="100%" height={250}>
                   <RadarChart data={audienceEngagement}>
                     <PolarGrid />

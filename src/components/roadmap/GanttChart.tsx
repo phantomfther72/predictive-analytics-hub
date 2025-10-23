@@ -1,10 +1,6 @@
 import { useEffect, useRef } from "react";
 import Gantt from "frappe-gantt";
 import { Milestone } from "@/hooks/useMilestones";
-import "frappe-gantt/dist/frappe-gantt.css";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 
 interface GanttChartProps {
   milestones: Milestone[];
@@ -106,14 +102,78 @@ export const GanttChart = ({ milestones }: GanttChartProps) => {
   return (
     <div className="gantt-container w-full overflow-x-auto">
       <style>{`
+        /* Base Frappe Gantt Styles */
+        .gantt {
+          width: 100%;
+          overflow-x: auto;
+          font-family: var(--font-sans);
+        }
+        
+        .gantt svg {
+          width: 100%;
+          overflow: visible;
+        }
+        
+        .gantt .grid-background {
+          fill: none;
+        }
+        
+        .gantt .grid-header {
+          fill: hsl(var(--muted));
+          stroke: hsl(var(--border));
+          stroke-width: 1.4;
+        }
+        
+        .gantt .grid-row {
+          fill: hsl(var(--background));
+        }
+        
+        .gantt .grid-row:nth-child(even) {
+          fill: hsl(var(--muted) / 0.3);
+        }
+        
+        .gantt .row-line {
+          stroke: hsl(var(--border));
+        }
+        
+        .gantt .tick {
+          stroke: hsl(var(--border));
+          stroke-width: 0.2;
+        }
+        
+        .gantt .tick.thick {
+          stroke: hsl(var(--border));
+          stroke-width: 0.4;
+        }
+        
+        .gantt .today-highlight {
+          fill: hsl(var(--primary) / 0.1);
+          opacity: 0.5;
+        }
+        
+        /* Custom color variables */
         .gantt-container {
           --gantt-bar-planned: hsl(var(--primary));
           --gantt-bar-in-progress: hsl(45 93% 47%);
           --gantt-bar-completed: hsl(142 76% 36%);
         }
         
+        /* Bar styling */
+        .gantt .bar-wrapper {
+          cursor: pointer;
+        }
+        
         .gantt .bar {
           fill: var(--gantt-bar-planned);
+          stroke: transparent;
+          stroke-width: 0;
+          transition: fill 0.3s ease;
+          rx: 3;
+          ry: 3;
+        }
+        
+        .gantt .bar-wrapper:hover .bar {
+          opacity: 0.9;
         }
         
         .gantt .status-planned .bar {
@@ -132,49 +192,80 @@ export const GanttChart = ({ milestones }: GanttChartProps) => {
           fill: rgba(255, 255, 255, 0.3);
         }
         
+        .gantt .bar-label {
+          fill: hsl(var(--foreground));
+          font-size: 12px;
+          font-weight: 500;
+        }
+        
+        .gantt .bar-wrapper:hover .bar-label {
+          fill: hsl(var(--foreground));
+        }
+        
+        /* Handle styling */
+        .gantt .handle {
+          fill: rgba(255, 255, 255, 0.6);
+          cursor: ew-resize;
+          opacity: 0;
+        }
+        
+        .gantt .bar-wrapper:hover .handle {
+          opacity: 1;
+        }
+        
+        /* Arrow styling */
+        .gantt .arrow {
+          fill: none;
+          stroke: hsl(var(--muted-foreground));
+          stroke-width: 1.4;
+        }
+        
+        /* Text styling */
+        .gantt text {
+          fill: hsl(var(--foreground));
+          font-family: var(--font-sans);
+          font-size: 12px;
+          user-select: none;
+        }
+        
+        .gantt .upper-text,
+        .gantt .lower-text {
+          font-size: 12px;
+          text-anchor: middle;
+        }
+        
+        /* Popup styling */
+        .gantt-popup-wrapper {
+          position: absolute;
+          z-index: 1000;
+        }
+        
         .gantt-popup {
           background: hsl(var(--popover));
           border: 1px solid hsl(var(--border));
           border-radius: 8px;
           box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+          padding: 12px;
+          min-width: 280px;
         }
         
-        .gantt .grid-header {
-          fill: hsl(var(--muted));
+        .gantt .pointer {
+          fill: hsl(var(--popover));
           stroke: hsl(var(--border));
         }
         
-        .gantt .grid-row {
-          fill: hsl(var(--background));
-        }
-        
-        .gantt .grid-row:nth-child(even) {
-          fill: hsl(var(--muted) / 0.3);
-        }
-        
-        .gantt .tick {
-          stroke: hsl(var(--border));
-        }
-        
-        .gantt .tick.thick {
-          stroke: hsl(var(--border));
-        }
-        
-        .gantt .today-highlight {
-          fill: hsl(var(--primary) / 0.1);
-        }
-        
-        .gantt text {
-          fill: hsl(var(--foreground));
-          font-family: var(--font-sans);
-        }
-        
+        /* Responsive adjustments */
         @media (max-width: 768px) {
           .gantt text {
             font-size: 11px;
           }
+          
           .gantt .bar {
             height: 24px !important;
+          }
+          
+          .gantt .bar-label {
+            font-size: 11px;
           }
         }
       `}</style>

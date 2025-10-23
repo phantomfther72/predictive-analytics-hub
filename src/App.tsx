@@ -38,6 +38,7 @@ const Tourism = lazy(() => import("./pages/Tourism"));
 const Education = lazy(() => import("./pages/Education"));
 const Infrastructure = lazy(() => import("./pages/Infrastructure"));
 const MediaEntertainment = lazy(() => import("./pages/MediaEntertainment"));
+const Roadmap = lazy(() => import("./pages/Roadmap"));
 
 const queryClient = new QueryClient();
 
@@ -145,6 +146,9 @@ const App = () => {
               </Route>
               <Route path="/media-entertainment" element={<AppLayout />}>
                 <Route index element={<Suspense fallback={<LoadingFallback />}><MediaEntertainment /></Suspense>} />
+              </Route>
+              <Route path="/roadmap" element={<AppLayout />}>
+                <Route index element={<Suspense fallback={<LoadingFallback />}><Roadmap /></Suspense>} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

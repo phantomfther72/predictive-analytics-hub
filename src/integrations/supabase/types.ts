@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -697,6 +697,42 @@ export type Database = {
         }
         Relationships: []
       }
+      milestones: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          progress: number
+          start_date: string
+          status: Database["public"]["Enums"]["milestone_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          progress?: number
+          start_date: string
+          status?: Database["public"]["Enums"]["milestone_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          progress?: number
+          start_date?: string
+          status?: Database["public"]["Enums"]["milestone_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       Mining: {
         Row: {
           created_at: string
@@ -1281,10 +1317,10 @@ export type Database = {
       calculate_predicted_change: {
         Args: { current_value: number; historical_change: number }
         Returns: {
-          predicted_change: number
           confidence: number
           explanation: string
           factors: Json
+          predicted_change: number
         }[]
       }
       calculate_weighted_prediction: {
@@ -1295,8 +1331,8 @@ export type Database = {
           _user_id: string
         }
         Returns: {
-          weighted_prediction: number
           model_details: Json
+          weighted_prediction: number
         }[]
       }
       get_user_role: {
@@ -1305,19 +1341,16 @@ export type Database = {
       }
       has_role: {
         Args: {
-          _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
         }
         Returns: boolean
       }
       insert_sample_investment_opportunities: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: undefined
       }
-      update_predictions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      update_predictions: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "analyst" | "guest"
@@ -1329,6 +1362,7 @@ export type Database = {
         | "mining"
         | "cryptocurrency"
         | "green_hydrogen"
+      milestone_status: "Planned" | "In Progress" | "Completed"
       payment_status: "pending" | "success" | "failed"
       risk_level: "low" | "medium" | "high" | "critical"
       subscription_tier: "free" | "premium" | "investor"
@@ -1470,6 +1504,7 @@ export const Constants = {
         "cryptocurrency",
         "green_hydrogen",
       ],
+      milestone_status: ["Planned", "In Progress", "Completed"],
       payment_status: ["pending", "success", "failed"],
       risk_level: ["low", "medium", "high", "critical"],
       subscription_tier: ["free", "premium", "investor"],

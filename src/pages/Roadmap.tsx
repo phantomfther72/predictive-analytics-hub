@@ -1,13 +1,24 @@
+import { useState } from "react";
+import { useMilestones, Milestone } from "@/hooks/useMilestones";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { GanttChart } from "@/components/roadmap/GanttChart";
 import { RoadmapSummary } from "@/components/roadmap/RoadmapSummary";
-import { useMilestones } from "@/hooks/useMilestones";
+import { MilestoneEditDialog } from "@/components/roadmap/MilestoneEditDialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Target } from "lucide-react";
+import { AlertCircle, Target, Calendar, CalendarDays, CalendarRange } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 const Roadmap = () => {
   const { milestones, isLoading, error } = useMilestones();
+  const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"Day" | "Week" | "Month">("Month");
+
+  const handleMilestoneClick = (milestone: Milestone) => {
+    setSelectedMilestone(milestone);
+    setIsEditDialogOpen(true);
+  };
 
   return (
     <div className="w-full space-y-6 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -32,12 +43,42 @@ const Roadmap = () => {
       {/* Gantt Chart */}
       <Card className="overflow-hidden">
         <CardHeader className="space-y-2">
-          <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
-            <span>Interactive Timeline</span>
-          </CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Hover over milestones for details. Color coded by status: Blue (Planned), Yellow (In Progress), Green (Completed).
-          </CardDescription>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                <span>Interactive Timeline</span>
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                Drag bars to reschedule • Click to edit • Zoom timeline view
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={viewMode === "Day" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode("Day")}
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Day
+              </Button>
+              <Button
+                variant={viewMode === "Week" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode("Week")}
+              >
+                <CalendarDays className="h-4 w-4 mr-2" />
+                Week
+              </Button>
+              <Button
+                variant={viewMode === "Month" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode("Month")}
+              >
+                <CalendarRange className="h-4 w-4 mr-2" />
+                Month
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="pt-2">
           {isLoading ? (
@@ -65,10 +106,20 @@ const Roadmap = () => {
               </AlertDescription>
             </Alert>
           ) : (
-            <GanttChart milestones={milestones} />
+            <GanttChart 
+              milestones={milestones} 
+              onMilestoneClick={handleMilestoneClick}
+              viewMode={viewMode}
+            />
           )}
         </CardContent>
       </Card>
+
+      <MilestoneEditDialog
+        milestone={selectedMilestone}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+      />
     </div>
   );
 };

@@ -1,17 +1,22 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Gantt from "frappe-gantt";
 import { Milestone } from "@/hooks/useMilestones";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface GanttChartProps {
   milestones: Milestone[];
+  onMilestoneClick: (milestone: Milestone) => void;
+  viewMode: "Day" | "Week" | "Month";
 }
 
-export const GanttChart = ({ milestones }: GanttChartProps) => {
+export const GanttChart = ({ milestones, onMilestoneClick, viewMode }: GanttChartProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const ganttInstance = useRef<any>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    if (!containerRef.current || milestones.length === 0) return;
+    if (!containerRef.current || milestones.length === 0 || isUpdating) return;
 
     // Transform milestones to Frappe Gantt format
     const tasks = milestones.map((milestone) => ({
@@ -34,22 +39,59 @@ export const GanttChart = ({ milestones }: GanttChartProps) => {
     // Create new Gantt instance
     try {
       ganttInstance.current = new Gantt(containerRef.current, tasks, {
-        view_mode: "Month",
+        view_mode: viewMode,
         bar_height: 30,
         bar_corner_radius: 3,
         arrow_curve: 5,
         padding: 18,
         date_format: "YYYY-MM-DD",
         language: "en",
+        on_date_change: async (task: any, start: Date, end: Date) => {
+          setIsUpdating(true);
+          try {
+            const { error } = await supabase
+              .from("milestones")
+              .update({
+                start_date: start.toISOString().split("T")[0],
+                end_date: end.toISOString().split("T")[0],
+              })
+              .eq("id", task.id);
+
+            if (error) throw error;
+            toast.success("Milestone dates updated");
+          } catch (error) {
+            console.error("Error updating milestone:", error);
+            toast.error("Failed to update milestone dates");
+          } finally {
+            setIsUpdating(false);
+          }
+        },
+        on_progress_change: async (task: any, progress: number) => {
+          setIsUpdating(true);
+          try {
+            const { error } = await supabase
+              .from("milestones")
+              .update({ progress })
+              .eq("id", task.id);
+
+            if (error) throw error;
+            toast.success("Progress updated");
+          } catch (error) {
+            console.error("Error updating progress:", error);
+            toast.error("Failed to update progress");
+          } finally {
+            setIsUpdating(false);
+          }
+        },
+        on_click: (task: any) => {
+          const milestone = milestones.find((m) => m.id === task.id);
+          if (milestone) {
+            onMilestoneClick(milestone);
+          }
+        },
         custom_popup_html: (task: any) => {
           const milestone = milestones.find((m) => m.id === task.id);
           if (!milestone) return "";
-
-          const statusColors = {
-            Planned: "bg-blue-500",
-            "In Progress": "bg-yellow-500",
-            Completed: "bg-green-500",
-          };
 
           return `
             <div class="gantt-popup" style="padding: 12px; min-width: 280px;">
@@ -64,9 +106,13 @@ export const GanttChart = ({ milestones }: GanttChartProps) => {
                   : ""
               }
               <div style="display: flex; gap: 8px; margin-bottom: 8px;">
-                <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                  statusColors[milestone.status]
-                } text-white">
+                <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium" style="background-color: ${
+                  milestone.status === "Completed"
+                    ? "#4ade80"
+                    : milestone.status === "In Progress"
+                    ? "#facc15"
+                    : "#93c5fd"
+                }; color: ${milestone.status === "In Progress" ? "#000" : "#fff"}">
                   ${milestone.status}
                 </span>
               </div>
@@ -84,6 +130,9 @@ export const GanttChart = ({ milestones }: GanttChartProps) => {
                   <div style="width: ${milestone.progress}%; height: 100%; background-color: hsl(var(--primary)); transition: width 0.3s ease;"></div>
                 </div>
               </div>
+              <div style="font-size: 11px; color: hsl(var(--muted-foreground)); margin-top: 8px;">
+                Click to edit • Drag to reschedule
+              </div>
             </div>
           `;
         },
@@ -97,7 +146,7 @@ export const GanttChart = ({ milestones }: GanttChartProps) => {
         ganttInstance.current = null;
       }
     };
-  }, [milestones]);
+  }, [milestones, viewMode, onMilestoneClick, isUpdating]);
 
   return (
     <div className="gantt-container w-full overflow-x-auto">
@@ -151,11 +200,11 @@ export const GanttChart = ({ milestones }: GanttChartProps) => {
           opacity: 0.5;
         }
         
-        /* Custom color variables */
+        /* Custom color variables - Exact colors from requirements */
         .gantt-container {
-          --gantt-bar-planned: hsl(var(--primary));
-          --gantt-bar-in-progress: hsl(45 93% 47%);
-          --gantt-bar-completed: hsl(142 76% 36%);
+          --gantt-bar-planned: #93c5fd;
+          --gantt-bar-in-progress: #facc15;
+          --gantt-bar-completed: #4ade80;
         }
         
         /* Bar styling */

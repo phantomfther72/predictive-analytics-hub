@@ -121,6 +121,12 @@ Each industry has specialized dashboards with:
 - **Alert System**: Automated notifications for significant changes
 - **Historical Archiving**: Complete audit trail maintenance
 
+#### AI Machinery (Multi-Industry Foundation)
+- **Registry-Driven Ensemble**: `ai_model_registry` defines active models, weights, and confidence thresholds per industry.
+- **Cross-Industry Orchestration**: `update-predictions` runs a unified pipeline for financial, mining, housing, agriculture, and green hydrogen data tables.
+- **Feature-Based Inference**: Runtime feature extraction computes normalized momentum, volatility, and baseline strength before model scoring.
+- **Operational Auditability**: `ai_prediction_runs` stores run metadata (status, duration, details) while `pulse_logs` captures cron-level operational logs.
+
 ## Getting Started
 
 ### Prerequisites

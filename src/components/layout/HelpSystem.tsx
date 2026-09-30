@@ -19,7 +19,7 @@ export const HelpSystem: React.FC = () => {
       icon: Book,
       action: () => {
         // Could open a tutorial or documentation
-        window.open('/docs', '_blank');
+        window.open('https://docs.predictivepulse.com', '_blank');
       }
     },
     {
